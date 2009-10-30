@@ -62,7 +62,7 @@ check_and_add(string &read, const int max_diffs,
 	      size_t &read_count) {
   if (read_width == 0) read_width = read.length();
   else if (read.length() < read_width)
-    throw RMAPException("Incorrect read width");
+    throw RMAPException("Incorrect read width:\n" + read + "\n");
   else read.erase(read_width);
 
   if (read_count == 0)

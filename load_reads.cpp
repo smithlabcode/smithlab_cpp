@@ -60,7 +60,7 @@ check_and_add(string &read, const int max_diffs,
 	      size_t &read_count) {
   if (read_width == 0) read_width = read.length();
   else if (read.length() < read_width)
-    throw RMAPException("Incorrect read width");
+    throw RMAPException("Incorrect read width:\n" + read + "\n");
   else read.erase(read_width);
   
   if (read_count == 0)
@@ -229,7 +229,7 @@ check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
   
   if (read_width == 0) read_width = read.length();
   else if (read.length() < read_width)
-    throw RMAPException("Incorrect read width");
+    throw RMAPException("Incorrect read width: " + read + "\t" + toa(read_width));
   else {
     read.erase(read_width);
     score_line.erase(read_width);
