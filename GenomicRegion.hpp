@@ -35,7 +35,7 @@
 using std::tr1::unordered_map;
 
 
-typedef char chrom_id_type;
+typedef unsigned chrom_id_type;
 
 class GenomicRegion;
 
