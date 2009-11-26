@@ -422,7 +422,7 @@ adjust_region_size(const size_t orig_start, const string &chrom_name,
   return (orig_size + (preceding_newlines_end - preceding_newlines_start));
 }
 
-static void
+void
 extract_regions_chrom_fasta(const string &chrom_name, const string &filename,
 			    const vector<SimpleGenomicRegion> &regions, 
 			    vector<string> &sequences) {
@@ -457,7 +457,7 @@ extract_regions_chrom_fasta(const string &chrom_name, const string &filename,
 }
 
 
-static void
+void
 extract_regions_chrom_fasta(const string &chrom_name, const string &filename,
 			    const vector<GenomicRegion> &regions, 
 			    vector<string> &sequences) {
