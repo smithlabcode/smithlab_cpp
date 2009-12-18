@@ -119,6 +119,7 @@ read_dir(const string& dirname, string filename_suffix,
     throw RMAPException("error reading directory: " + dirname);
   if (filenames.empty())
     throw RMAPException("no valid files found in: " + dirname);
+  closedir(dir);
 }
 
 
@@ -511,6 +512,7 @@ read_dir(const string& dirname, vector<string> &filenames) {
     throw "error reading directory: " + dirname;
   if (filenames.empty())
     throw "no valid files found in: " + dirname;
+  closedir(dir);
 }
 
 
