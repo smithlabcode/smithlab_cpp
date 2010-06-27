@@ -20,10 +20,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-ifndef RMAP
-$(error Must define RMAP variable)
-endif
-
 HEADERS = $(shell ls *.hpp)
 SOURCES = $(shell ls *.cpp)
 
