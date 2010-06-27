@@ -47,10 +47,15 @@ public:
     assert(first <= buffer.end());
     assert(last <= buffer.end());
   }
+  void increment() {
+    increment_last();
+    increment_first();
+  }
   typename std::vector<T>::const_iterator get_first() const {return first;}
   typename std::vector<T>::const_iterator get_last() const {return last;}
   bool first_is_good() const {return (!in.eof() || first < buffer.end());}
   bool last_is_good() const {return (!in.eof() || last < buffer.end());}
+  bool is_good() const {return first_is_good() && last_is_good();}
   
 private:
   std::ifstream in;
