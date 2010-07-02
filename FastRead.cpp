@@ -36,10 +36,10 @@ FastRead::WordPair::WordPair(const string &s) :
   string::const_iterator i = s.begin();
   const string::const_iterator limit = s.end();
   while (i != limit) {
-    const char c = base2int(*i) & static_cast<size_t>(3);
+    const char c = base2int(*i);// & static_cast<size_t>(3);
     upper = ((upper << 1) + get_upper(c));
     lower = ((lower << 1) + get_lower(c));
-    bads  = ((bads << 1) + get_bads(*i));
+    bads  = ((bads << 1) + get_bads(c));
     ++i;
   }
   if (s.length() < rmap_bits::word_size) {
