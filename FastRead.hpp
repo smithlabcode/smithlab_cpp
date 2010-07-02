@@ -51,6 +51,11 @@ public:
   size_t score(const FastRead &other) const;
   size_t score_tc(const FastRead &other) const;
   size_t score_ag(const FastRead &other) const;
+
+  size_t score_wild_n(const FastRead &other) const;
+  size_t score_tc_wild_n(const FastRead &other) const;
+  size_t score_ag_wild_n(const FastRead &other) const;
+
   void shift(const size_t i);
   static void set_read_width(const size_t m);
 private:
@@ -192,6 +197,55 @@ FastRead::WordPair::score_ag(const FastRead::WordPair &other,
   bits = ((bits & 0xFFFF0000FFFF0000ul) >> 16) + (bits & 0x0000FFFF0000FFFFul);
   return ((bits & 0xFFFFFFFF00000000ul) >> 32) + (bits & 0x00000000FFFFFFFFul);
 }
+
+
+
+inline size_t
+FastRead::WordPair::score_wild_n(const FastRead::WordPair &other, const size_t score_mask) const {
+  // N is wildcard
+  register size_t bits = (((other.upper ^ upper) |
+			   (other.lower ^ lower) | other.bads) & ~bads) & score_mask;
+  bits = ((bits & 0xAAAAAAAAAAAAAAAAul) >> 1)  + (bits & 0x5555555555555555ul);
+  bits = ((bits & 0xCCCCCCCCCCCCCCCCul) >> 2)  + (bits & 0x3333333333333333ul);
+  bits = ((bits & 0xF0F0F0F0F0F0F0F0ul) >> 4)  + (bits & 0x0F0F0F0F0F0F0F0Ful);
+  bits = ((bits & 0xFF00FF00FF00FF00ul) >> 8)  + (bits & 0x00FF00FF00FF00FFul);
+  bits = ((bits & 0xFFFF0000FFFF0000ul) >> 16) + (bits & 0x0000FFFF0000FFFFul);
+  return ((bits & 0xFFFFFFFF00000000ul) >> 32) + (bits & 0x00000000FFFFFFFFul);
+}
+
+
+inline size_t
+FastRead::WordPair::score_tc_wild_n(const FastRead::WordPair &other,
+				    const size_t score_mask) const {
+  // N is wildcard
+  register size_t bits = (((((upper ^ other.upper) |
+			     (lower ^ other.lower)) & ~(upper & lower & other.lower))
+			   | other.bads) & ~bads) & score_mask;
+  bits = ((bits & 0xAAAAAAAAAAAAAAAAul) >> 1)  + (bits & 0x5555555555555555ul);
+  bits = ((bits & 0xCCCCCCCCCCCCCCCCul) >> 2)  + (bits & 0x3333333333333333ul);
+  bits = ((bits & 0xF0F0F0F0F0F0F0F0ul) >> 4)  + (bits & 0x0F0F0F0F0F0F0F0Ful);
+  bits = ((bits & 0xFF00FF00FF00FF00ul) >> 8)  + (bits & 0x00FF00FF00FF00FFul);
+  bits = ((bits & 0xFFFF0000FFFF0000ul) >> 16) + (bits & 0x0000FFFF0000FFFFul);
+  return ((bits & 0xFFFFFFFF00000000ul) >> 32) + (bits & 0x00000000FFFFFFFFul);
+}
+
+
+inline size_t
+FastRead::WordPair::score_ag_wild_n(const FastRead::WordPair &other,
+				    const size_t score_mask) const {
+  // N is wildcard:
+  register size_t bits = (((((upper ^ other.upper) |
+			     (lower ^ other.lower)) & (upper | lower | other.lower))
+			   | other.bads) & ~bads) & score_mask;
+  bits = ((bits & 0xAAAAAAAAAAAAAAAAul) >> 1)  + (bits & 0x5555555555555555ul);
+  bits = ((bits & 0xCCCCCCCCCCCCCCCCul) >> 2)  + (bits & 0x3333333333333333ul);
+  bits = ((bits & 0xF0F0F0F0F0F0F0F0ul) >> 4)  + (bits & 0x0F0F0F0F0F0F0F0Ful);
+  bits = ((bits & 0xFF00FF00FF00FF00ul) >> 8)  + (bits & 0x00FF00FF00FF00FFul);
+  bits = ((bits & 0xFFFF0000FFFF0000ul) >> 16) + (bits & 0x0000FFFF0000FFFFul);
+  return ((bits & 0xFFFFFFFF00000000ul) >> 32) + (bits & 0x00000000FFFFFFFFul);
+}
+
+
 
 
 inline void
