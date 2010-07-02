@@ -78,6 +78,9 @@ private:
     size_t score(const WordPair &other, size_t mask) const;
     size_t score_ag(const WordPair &other, size_t mask) const;
     size_t score_tc(const WordPair &other, size_t mask) const;
+    size_t score_wild_n(const WordPair &other, size_t mask) const;
+    size_t score_ag_wild_n(const WordPair &other, size_t mask) const;
+    size_t score_tc_wild_n(const WordPair &other, size_t mask) const;
     std::string tostring_bases(size_t mask) const;
     std::string tostring_bits(size_t mask) const;
   private:
@@ -153,6 +156,32 @@ FastRead::score_ag(const FastRead &other) const {
   for (size_t i = 0; i < segments; ++i)
     ss += wp[i].score_ag(other.wp[i], rmap_bits::all_ones);
   return ss + wp[segments].score_ag(other.wp[segments], score_mask);
+}
+
+inline size_t
+FastRead::score_wild_n(const FastRead &other) const {
+  size_t ss = 0;
+  for (size_t i = 0; i < segments; ++i)
+    ss += wp[i].score_wild_n(other.wp[i], rmap_bits::all_ones);
+  return ss + wp[segments].score_wild_n(other.wp[segments], score_mask);
+}
+
+
+inline size_t
+FastRead::score_tc_wild_n(const FastRead &other) const {
+  size_t ss = 0;
+  for (size_t i = 0; i < segments; ++i)
+    ss += wp[i].score_tc_wild_n(other.wp[i], rmap_bits::all_ones);
+  return ss + wp[segments].score_tc_wild_n(other.wp[segments], score_mask);
+}
+
+
+inline size_t
+FastRead::score_ag_wild_n(const FastRead &other) const {
+  size_t ss = 0;
+  for (size_t i = 0; i < segments; ++i)
+    ss += wp[i].score_ag_wild_n(other.wp[i], rmap_bits::all_ones);
+  return ss + wp[segments].score_ag_wild_n(other.wp[segments], score_mask);
 }
 
 
