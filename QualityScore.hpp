@@ -68,11 +68,11 @@ solexa_to_error_probability(const double r) {
 }
 
 //// CONVERT _FROM_ QUALITY CHARACTERS (I.E. THE CHARACTERS IN FASTQ FILES)
-inline double
+inline char
 quality_character_to_phred(const char c) {
   return char(c - 33);
 }
-inline double
+inline char
 quality_character_to_solexa(const char c) {
   return char(c - 64);
 }
