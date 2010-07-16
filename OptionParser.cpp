@@ -60,7 +60,7 @@ Option::format_option(const string &argument) {
   else if (arg_type == RMAP_ARG_STRING)
     *string_value = argument;
   else if (arg_type == RMAP_ARG_BOOL)
-    *bool_value = true;
+    *bool_value = !(*bool_value);
 }
 
 ////////////////////////////////////////////////////////////////////////
