@@ -27,6 +27,7 @@
 #include "FastRead.hpp"
 #include "FastReadQuality.hpp"
 #include "FastReadWC.hpp"
+#include "FastReadWildN.hpp"
 
 #include <vector>
 #include <string>
@@ -39,6 +40,11 @@ load_reads_from_fasta_file(const std::string &filename, const size_t max_diffs,
 void
 load_reads_from_fastq_file(const std::string &filename, const size_t max_diffs,
 			   size_t &read_width, std::vector<FastRead> &fast_reads,
+			   std::vector<size_t> &read_words, std::vector<unsigned int> &read_index);
+
+void
+load_reads_from_fastq_file(const std::string &filename, const size_t max_diffs,
+			   size_t &read_width, std::vector<FastReadWildN> &fast_reads,
 			   std::vector<size_t> &read_words, std::vector<unsigned int> &read_index);
 
 void

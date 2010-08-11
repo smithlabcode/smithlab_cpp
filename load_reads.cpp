@@ -35,6 +35,7 @@ using std::not1;
 using std::min;
 
 static const int INPUT_BUFFER_SIZE = 10000;
+static const int MIN_NON_N_IN_READS = 28;
 
 static char
 to_base_symbol(char c) {return (isvalid(c)) ? toupper(c) : 'N';}
@@ -65,8 +66,9 @@ check_and_add(string &read, const int max_diffs,
   
   // clean the read
   transform(read.begin(), read.end(), read.begin(), ptr_fun(&to_base_symbol));
+
   // check for quality
-  const bool good_read = (count(read.begin(), read.end(), 'N') <= max_diffs);
+  const bool good_read = (read_width - (count(read.begin(), read.end(), 'N')) >= MIN_NON_N_IN_READS);
   if (good_read) {
     fast_reads.push_back(FastRead(read));
     read_words.push_back(get_read_word(read));
@@ -212,7 +214,7 @@ check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
     bad_count += (error_prob > FastReadWC::get_cutoff());
   }
   
-  const bool good_read = (bad_count <= max_diffs);
+  const bool good_read = (read_width - (bad_count + max_diffs) >= MIN_NON_N_IN_READS);
   if (good_read) {
     fast_reads.push_back(FastReadWC(scores));
     read_words.push_back(get_read_word(read));
@@ -299,7 +301,7 @@ check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
     bad_count += (error_prob > FastReadQuality::get_cutoff());
   }
   
-  const bool good_read = (bad_count <= max_diffs);
+  const bool good_read = (read_width - (bad_count + max_diffs) >= MIN_NON_N_IN_READS);
   
   if (good_read) {
     fast_reads.push_back(FastReadQuality(scores));
@@ -394,7 +396,7 @@ check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
 		  FastReadWC::get_cutoff());
   }
   
-  const bool good_read = (bad_count <= max_diffs);
+  const bool good_read = (read_width - (bad_count + max_diffs) >= MIN_NON_N_IN_READS);
   if (good_read) {
     fast_reads.push_back(FastReadWC(error_probs));
     string read;
@@ -477,7 +479,7 @@ check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
 		  FastReadQuality::get_cutoff());
   }
   
-  const bool good_read = (bad_count <= max_diffs);
+  const bool good_read = (read_width - (bad_count + max_diffs) >= MIN_NON_N_IN_READS);
   if (good_read) {
     fast_reads.push_back(FastReadQuality(error_probs));
 
