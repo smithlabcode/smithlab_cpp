@@ -34,9 +34,6 @@ using std::ptr_fun;
 using std::not1;
 using std::min;
 
-using std::cerr;
-using std::endl;
-
 static const int INPUT_BUFFER_SIZE = 10000;
 
 static char
