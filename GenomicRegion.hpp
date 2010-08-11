@@ -32,9 +32,6 @@
 #include <tr1/unordered_map>
 #include <limits>
 
-using std::tr1::unordered_map;
-
-
 typedef unsigned chrom_id_type;
 
 class GenomicRegion;
@@ -83,7 +80,7 @@ public:
   bool operator<=(const SimpleGenomicRegion& rhs) const;
   bool operator==(const SimpleGenomicRegion& rhs) const;
   bool operator!=(const SimpleGenomicRegion& rhs) const;
-
+  
   bool same_chrom(const SimpleGenomicRegion &other) const {
     return chrom == other.chrom;
   }
@@ -97,8 +94,8 @@ private:
   static chrom_id_type assign_chrom(const std::string &c);
   static std::string retrieve_chrom(chrom_id_type i);
   
-  static unordered_map<std::string, chrom_id_type> fw_table_in;
-  static unordered_map<chrom_id_type, std::string> fw_table_out;
+  static std::tr1::unordered_map<std::string, chrom_id_type> fw_table_in;
+  static std::tr1::unordered_map<chrom_id_type, std::string> fw_table_out;
   
   // std::string chrom;
   chrom_id_type chrom;
@@ -186,8 +183,8 @@ private:
   static chrom_id_type assign_chrom(const std::string &c);
   static std::string retrieve_chrom(chrom_id_type i);
   
-  static unordered_map<std::string, chrom_id_type> fw_table_in;
-  static unordered_map<chrom_id_type, std::string> fw_table_out;
+  static std::tr1::unordered_map<std::string, chrom_id_type> fw_table_in;
+  static std::tr1::unordered_map<chrom_id_type, std::string> fw_table_out;
   
   // std::string chrom;
   chrom_id_type chrom;
@@ -224,14 +221,14 @@ template <class T, class U>
 void
 sync_chroms(const std::vector<std::vector<T> > &stable, 
 	    std::vector<std::vector<U> > &to_sync) {
-  unordered_map<std::string, size_t> chrom_index;
+  std::tr1::unordered_map<std::string, size_t> chrom_index;
   for (size_t i = 0; i < stable.size(); ++i)
     if (!stable[i].empty())
       chrom_index[stable[i].front().get_chrom()] = i;
   std::vector<std::vector<U> > syncd(stable.size());
   for (size_t i = 0; i < to_sync.size(); ++i) {
     if (!to_sync[i].empty()) {
-      unordered_map<std::string, size_t>::const_iterator j = 
+      std::tr1::unordered_map<std::string, size_t>::const_iterator j = 
 	chrom_index.find(to_sync[i].front().get_chrom());
       if (j != chrom_index.end())
 	to_sync[i].swap(syncd[j->second]);
