@@ -265,7 +265,6 @@ separate_regions(const std::vector<T> &big_regions,
 }
 
 
-using std::cerr; using std::endl;
 template <class T> bool 
 check_sorted(const std::vector<T> &regions, bool require_unique = false) {
   if (require_unique) {
