@@ -35,7 +35,7 @@ using std::not1;
 using std::min;
 
 static const int INPUT_BUFFER_SIZE = 10000;
-static const int MIN_NON_N_IN_READS = 28;
+static const size_t MIN_NON_N_IN_READS = 28;
 
 static char
 to_base_symbol(char c) {return (isvalid(c)) ? toupper(c) : 'N';}
@@ -47,7 +47,11 @@ get_read_word(const string &read) {
   // conversion from DNA to integers. Could replace with random
   // bases, but everyone hates non-deterministic programs.
   string s(read.begin(), read.begin() + trunc_to);
-  replace(s.begin(), s.end(), 'N', 'A');
+  for (size_t i = 0; i < s.length(); ++i) {
+    if (s[i] == 'N')
+      s[i] = int2base(rand() % 4);
+  }
+  // replace(s.begin(), s.end(), 'N', random_base());
   return SeedMaker::make_read_word(s);
 }
 
@@ -68,7 +72,9 @@ check_and_add(string &read, const int max_diffs,
   transform(read.begin(), read.end(), read.begin(), ptr_fun(&to_base_symbol));
 
   // check for quality
-  const bool good_read = (read_width - (count(read.begin(), read.end(), 'N')) >= MIN_NON_N_IN_READS);
+  const bool good_read = 
+    (read_width - (count(read.begin(), read.end(), 'N')) >= 
+     MIN_NON_N_IN_READS);
   if (good_read) {
     fast_reads.push_back(FastRead(read));
     read_words.push_back(get_read_word(read));
