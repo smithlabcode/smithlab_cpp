@@ -26,6 +26,7 @@
 #include "GenomicRegion.hpp"
 
 struct MappedRead {
+  MappedRead() {}
   MappedRead(const char *line);
   GenomicRegion r;
   std::string seq;
@@ -36,7 +37,7 @@ void
 LoadMappedReadsFile(std::string filename, 
 		    std::vector<MappedRead> &the_mapped_reads);
 
-std::ostream& 
-operator>>(std::ostream& the_stream, MappedRead &mr);
+std::istream& 
+operator>>(std::istream& the_stream, MappedRead &mr);
 
 #endif
