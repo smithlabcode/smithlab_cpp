@@ -20,6 +20,7 @@
 
 #include "FileIterator.hpp"
 #include "GenomicRegion.hpp"
+#include "MappedRead.hpp"
 
 #include <iostream>
 
@@ -75,7 +76,7 @@ fill_buffer(std::ifstream &in, const size_t buffer_start,
 
 
 /*  THIS FUNCTION FILLS A BUFFER FOR THE ACTUAL READS, REPRESENTED AS
- *  STRINGS, AND MUST BE IN A FASTA FORMAT FILE
+ *  RECORDS IN A FASTQ FILE, INCLUDING THE QUALITY SCORES
  */
 void 
 fill_buffer(std::ifstream &in, const size_t buffer_start, 
@@ -91,6 +92,22 @@ fill_buffer(std::ifstream &in, const size_t buffer_start,
     in >> tmp;
     in >> scores_seq;
     buffer[i] = std::make_pair(read_seq, scores_seq);
+    in.peek();
+  }
+  if (i < buffer.size())
+    buffer.erase(buffer.begin() + i, buffer.end());
+}
+
+
+/*  THIS FUNCTION FILLS A BUFFER FOR THE ACTUAL READS, REPRESENTED AS
+ *  RECORDS IN A FASTQ FILE, INCLUDING THE QUALITY SCORES
+ */
+void 
+fill_buffer(std::ifstream &in, const size_t buffer_start, 
+	    vector<MappedRead> &buffer) {
+  size_t i = buffer_start;
+  for (; i != buffer.size() && !in.eof(); ++i) {
+    in >> buffer[i];
     in.peek();
   }
   if (i < buffer.size())

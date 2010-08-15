@@ -79,6 +79,10 @@ void
 fill_buffer(std::ifstream &in, const size_t buffer_start, 
 	    std::vector<FASTQRecord> &buffer);
 
+class MappedRead;
+void 
+fill_buffer(std::ifstream &in, const size_t buffer_start, 
+	    std::vector<MappedRead> &buffer);
 
 /* THIS REFILL BUFFER IS USED WHEN INCREMENTS TO EITHER THE FIRST OR
    THE LAST CURRENTLY USED ELEMENTS IN THE BUFFER HIT THE END OF THE
