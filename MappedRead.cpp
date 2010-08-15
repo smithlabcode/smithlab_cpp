@@ -67,6 +67,8 @@ operator>>(std::istream& the_stream, MappedRead &mr) {
   if (!(the_stream >> chr >> start >> end >> name >> 
 	score >> strand >> mr.seq >> mr.scr))
     throw RMAPException("ERROR reading MappedRead");
+  while (isspace(the_stream.peek()))
+    the_stream.get();
   mr.r = GenomicRegion(chr, start, end, name, score, strand);
   return the_stream;
 }
