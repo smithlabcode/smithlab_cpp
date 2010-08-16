@@ -39,5 +39,7 @@ LoadMappedReadsFile(std::string filename,
 
 std::istream& 
 operator>>(std::istream& the_stream, MappedRead &mr);
+std::ostream& 
+operator<<(std::ostream& the_stream, MappedRead &mr);
 
 #endif
