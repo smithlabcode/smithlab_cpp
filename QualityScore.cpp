@@ -55,3 +55,37 @@ fastq_score_type(const string filename) {
   }
   return (phred) ? FASTQ_Phred : FASTQ_Solexa;
 }
+
+FASTQScoreType
+mapped_reads_score_type(const string filename) {
+  static const size_t MAX_LINE_SIZE = 10000;
+  std::ifstream f(filename.c_str());
+  if (!f)
+    throw RMAPException("cannot open input file " + string(filename));
+  
+  char line[MAX_LINE_SIZE];
+  bool solexa = true, phred = true;
+  while (f.getline(line, MAX_LINE_SIZE)) {
+    size_t space_count = 0, position = 0;
+    while (space_count < 7) {
+      while (position < MAX_LINE_SIZE && isspace(line[position]))
+	++position;
+      if (position == MAX_LINE_SIZE)
+	throw RMAPException("line too long in file: " + filename);
+      while (position < MAX_LINE_SIZE && !isspace(line[position]))
+	++position;
+      if (position == MAX_LINE_SIZE)
+	throw RMAPException("line too long in file: " + filename);
+      ++space_count;
+    }
+    if (space_count < 7)
+      throw RMAPException("malformed line in file: " + filename);
+    while (position < MAX_LINE_SIZE && isspace(line[position]))
+      ++position;
+    char *c = line + position;
+    while (!isspace(*c) && check_formats(*c, solexa, phred)) ++c;
+    if (!check_formats(*c, solexa, phred))
+      return ((phred) ? FASTQ_Phred : FASTQ_Solexa);
+  }
+  return (phred) ? FASTQ_Phred : FASTQ_Solexa;
+}

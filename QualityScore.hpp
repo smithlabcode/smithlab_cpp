@@ -113,7 +113,9 @@ quality_score_to_error_probability(const FASTQScoreType t,
     solexa_to_error_probability(s) : phred_to_error_probability(s);
 }
 
-size_t
+FASTQScoreType
 fastq_score_type(const std::string filename);
+FASTQScoreType
+mapped_reads_score_type(const std::string filename);
 
 #endif
