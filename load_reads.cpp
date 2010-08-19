@@ -24,6 +24,7 @@
 #include "SeedMaker.hpp"
 #include "rmap_os.hpp"
 #include "QualityScore.hpp"
+#include "clip_adaptor_from_reads.hpp"
 
 #include <cstring>
 #include <fstream>
@@ -56,7 +57,7 @@ get_read_word(const string &read) {
 }
 
 static void
-check_and_add(string &read, const int max_diffs,
+check_and_add(string &read, const string &adaptor, const int max_diffs,
 	      size_t &read_width, vector<FastRead> &fast_reads, 
 	      vector<size_t> &read_words, vector<unsigned int> &read_index, 
 	      size_t &read_count) {
@@ -70,7 +71,10 @@ check_and_add(string &read, const int max_diffs,
   
   // clean the read
   transform(read.begin(), read.end(), read.begin(), ptr_fun(&to_base_symbol));
-
+  
+  if (!adaptor.empty())
+    clip_adaptor_from_read(adaptor, MIN_ADAPTOR_MATCH_SCORE, read);
+  
   // check for quality
   const bool good_read = 
     (read_width - (count(read.begin(), read.end(), 'N')) >= 
@@ -84,7 +88,8 @@ check_and_add(string &read, const int max_diffs,
 }
 
 void
-load_reads_from_fasta_file(const string &filename, const size_t max_diffs,
+load_reads_from_fasta_file(const string &filename, 
+			   const string &adaptor, const size_t max_diffs,
 			   size_t &read_width, vector<FastRead> &fast_reads,
 			   vector<size_t> &read_words, vector<unsigned int> &read_index) {
   std::ifstream in(filename.c_str(), std::ios::binary);
@@ -113,7 +118,7 @@ load_reads_from_fasta_file(const string &filename, const size_t max_diffs,
 	  if ((line_count & 1ul) == 0)
 	    throw RMAPException("empty/multi-line reads or bad FASTA header");
 	  string read(start, end);//&buffer[0]);
-	  check_and_add(read, max_diffs, read_width, fast_reads, 
+	  check_and_add(read, adaptor, max_diffs, read_width, fast_reads, 
 			read_words, read_index, read_count);
 	}
 	++line_count;
@@ -151,7 +156,8 @@ is_fastq_score_line(size_t line_count) {
 }
 
 void
-load_reads_from_fastq_file(const string &filename, const size_t max_diffs,
+load_reads_from_fastq_file(const string &filename, 
+			   const string &adaptor, const size_t max_diffs,
 			   size_t &read_width, vector<FastRead> &fast_reads,
 			   vector<size_t> &read_words, vector<unsigned int> &read_index) {
   std::ifstream in(filename.c_str(), std::ios::binary);
@@ -169,19 +175,12 @@ load_reads_from_fastq_file(const string &filename, const size_t max_diffs,
       const size_t last_pos = in.gcount() - 2;//strlen(buffer) - 1;
       if (buffer[last_pos] == '\r') buffer[last_pos] = '\0';
       
-      // if (is_fastq_name_line(line_count))
-      //   if (buffer[0] != '@')
-      //     throw RMAPException("invalid FASTQ name line: " + string(buffer));
       if (is_fastq_sequence_line(line_count)) {
 	string read(buffer);
-	check_and_add(read, max_diffs, read_width, fast_reads, read_words, 
+	check_and_add(read, adaptor, max_diffs, 
+		      read_width, fast_reads, read_words,
 		      read_index, read_count);
       }
-      //  if (is_fastq_score_name_line(line_count))
-      //    if (buffer[0] != '+')
-      //      throw RMAPException("invalid FASTQ score name line: " + string(buffer));
-      //  if (is_fastq_score_line(line_count))
-      //    ; //!!!!!!!!!!!!!
       ++line_count;
     }
     in.peek();
@@ -192,7 +191,8 @@ load_reads_from_fastq_file(const string &filename, const size_t max_diffs,
 
 
 static void
-check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
+check_and_add(const FASTQScoreType score_format, const string &adaptor, 
+	      const size_t max_diffs,
 	      string &score_line, string &read, size_t &read_width, 
 	      vector<FastReadWC> &fast_reads, vector<size_t> &read_words, 
 	      vector<unsigned int> &read_index, size_t &read_count) {
@@ -209,6 +209,10 @@ check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
     FastReadWC::set_read_width(read_width);
   
   transform(read.begin(), read.end(), read.begin(), ptr_fun(&to_base_symbol));
+
+  if (!adaptor.empty())
+    clip_adaptor_from_read(adaptor, MIN_ADAPTOR_MATCH_SCORE, read);
+  
   size_t bad_count = 0;
   vector<vector<double> > scores;
   for (size_t i = 0; i < read_width; ++i) {
@@ -230,7 +234,8 @@ check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
 }
 
 void
-load_reads_from_fastq_file(const string &filename, const size_t max_diffs,
+load_reads_from_fastq_file(const string &filename, 
+			   const string &adaptor, const size_t max_diffs,
 			   size_t &read_width, vector<FastReadWC> &fast_reads,
 			   vector<size_t> &read_words, vector<unsigned int> &read_index) {
 
@@ -263,7 +268,7 @@ load_reads_from_fastq_file(const string &filename, const size_t max_diffs,
       // 	  throw RMAPException("invalid FASTQ score name line: " + string(buffer));
       if (is_fastq_score_line(line_count)) {
 	string score_line(buffer);
-	check_and_add(score_format, max_diffs, score_line, sequence, read_width, 
+	check_and_add(score_format, adaptor, max_diffs, score_line, sequence, read_width, 
 		      fast_reads, read_words, read_index, read_count);
       }
       ++line_count;
@@ -276,7 +281,8 @@ load_reads_from_fastq_file(const string &filename, const size_t max_diffs,
 
 
 static void
-check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
+check_and_add(const FASTQScoreType score_format, const string &adaptor, 
+	      const size_t max_diffs,
 	      string &score_line, string &read, size_t &read_width, 
 	      vector<FastReadQuality> &fast_reads, vector<size_t> &read_words, 
 	      vector<unsigned int> &read_index, size_t &read_count) {
@@ -294,6 +300,9 @@ check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
   
   // clean the read
   transform(read.begin(), read.end(), read.begin(), ptr_fun(&to_base_symbol));
+  
+  if (!adaptor.empty())
+    clip_adaptor_from_read(adaptor, MIN_ADAPTOR_MATCH_SCORE, read);
   
   size_t bad_count = 0;
   vector<vector<double> > scores;
@@ -319,7 +328,8 @@ check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
 
 
 void
-load_reads_from_fastq_file(const string &filename, const size_t max_diffs,
+load_reads_from_fastq_file(const string &filename, 
+			   const string &adaptor, const size_t max_diffs,
 			   size_t &read_width, vector<FastReadQuality> &fast_reads,
 			   vector<size_t> &read_words, vector<unsigned int> &read_index) {
   FASTQScoreType score_format = fastq_score_type(filename);
@@ -350,7 +360,7 @@ load_reads_from_fastq_file(const string &filename, const size_t max_diffs,
       // 	;
       if (is_fastq_score_line(line_count)) {
 	string score_line(buffer);
-	check_and_add(score_format, max_diffs, score_line, sequence, 
+	check_and_add(score_format, adaptor, max_diffs, score_line, sequence, 
 		      read_width, fast_reads, read_words, read_index, read_count);
       }
       ++line_count;
@@ -366,7 +376,8 @@ load_reads_from_fastq_file(const string &filename, const size_t max_diffs,
 ////////////////////////////////////////////////////////////////////////
 
 static void
-check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
+check_and_add(const FASTQScoreType score_format, const string &adaptor, 
+	      const size_t max_diffs,
 	      const string &score_line, size_t &read_width, 
 	      vector<FastReadWC> &fast_reads, vector<size_t> &read_words, 
 	      vector<unsigned int> &read_index, size_t &read_count) {
@@ -417,7 +428,8 @@ check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
 
 
 void
-load_reads_from_prb_file(const string &filename, const size_t max_diffs,
+load_reads_from_prb_file(const string &filename, 
+			 const string &adaptor, const size_t max_diffs,
 			 size_t &read_width, vector<FastReadWC> &fast_reads,
 			 vector<size_t> &read_words, vector<unsigned int> &read_index) {
 
@@ -438,7 +450,7 @@ load_reads_from_prb_file(const string &filename, const size_t max_diffs,
       const size_t last_pos = in.gcount() - 2;//strlen(buffer) - 1;
       if (buffer[last_pos] == '\r') buffer[last_pos] = '\0';
       const string score_line(buffer);
-      check_and_add(score_format, max_diffs, score_line, read_width, 
+      check_and_add(score_format, adaptor, max_diffs, score_line, read_width, 
 		    fast_reads, read_words, read_index, read_count);
     }
     in.peek();
@@ -449,7 +461,8 @@ load_reads_from_prb_file(const string &filename, const size_t max_diffs,
  
  
 static void
-check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
+check_and_add(const FASTQScoreType score_format, const string &adaptor, 
+	      const size_t max_diffs,
 	      const string &score_line, size_t &read_width, 
 	      vector<FastReadQuality> &fast_reads, vector<size_t> &read_words, 
 	      vector<unsigned int> &read_index, size_t &read_count) {
@@ -501,7 +514,8 @@ check_and_add(const FASTQScoreType score_format, const size_t max_diffs,
 
 
 void
-load_reads_from_prb_file(const string &filename, const size_t max_diffs,
+load_reads_from_prb_file(const string &filename, 
+			 const string &adaptor, const size_t max_diffs,
 			 size_t &read_width, vector<FastReadQuality> &fast_reads,
 			 vector<size_t> &read_words, vector<unsigned int> &read_index) {
   FASTQScoreType score_format = FASTQ_Solexa;
@@ -520,7 +534,7 @@ load_reads_from_prb_file(const string &filename, const size_t max_diffs,
       const size_t last_pos = in.gcount() - 2;//strlen(buffer) - 1;
       if (buffer[last_pos] == '\r') buffer[last_pos] = '\0';
       const string score_line(buffer);
-      check_and_add(score_format, max_diffs, score_line, read_width, 
+      check_and_add(score_format, adaptor, max_diffs, score_line, read_width, 
 		    fast_reads, read_words, read_index, read_count);
     }
     in.peek();
