@@ -28,7 +28,7 @@ using std::min;
 size_t
 similarity(const string &s, const size_t pos, const string &adaptor) {
   const size_t lim = min(min(s.length() - pos, adaptor.length()), 
-			 MIN_ADAPTOR_MATCH_SCORE + 3ul);
+			 MIN_ADAPTOR_MATCH_SCORE + static_cast<size_t>(3));
   size_t count = 0;
   for (size_t i = 0; i < lim; ++i)
     count += (s[pos + i] == adaptor[i]);
