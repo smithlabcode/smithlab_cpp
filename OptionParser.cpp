@@ -62,9 +62,9 @@ Option::format_option(const string &argument) {
   else if (arg_type == RMAP_ARG_BOOL)
   {
     *bool_value = !(*bool_value);
-    if (argument == "true" && argument == "on")
+    if (argument == "true" || argument == "on")
         *bool_value = true;
-    if (argument == "false" && argument == "off")
+    if (argument == "false" || argument == "off")
         *bool_value = false;
   }
 }
