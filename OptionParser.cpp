@@ -60,7 +60,13 @@ Option::format_option(const string &argument) {
   else if (arg_type == RMAP_ARG_STRING)
     *string_value = argument;
   else if (arg_type == RMAP_ARG_BOOL)
+  {
     *bool_value = !(*bool_value);
+    if (argument == "true" && argument == "on")
+        *bool_value = true;
+    if (argument == "false" && argument == "off")
+        *bool_value = false;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -175,14 +181,21 @@ Option::parse(vector<string> &command_line) {
 
 void
 Option::parse_config_file(vector<string> &options) {
-  for (size_t i = 0; i < options.size(); ++i) {
-    vector<string> opt_val = rmap::split(options[i], "=");
-    if (option_match(opt_val.front())) {
-      format_option(opt_val.back());
-      options.erase(options.begin() + i);
-      specified = true;
+    size_t i = 0;
+    size_t op_num = options.size();
+    while (i < op_num) {
+        vector<string> opt_val = rmap::split(options[i], "=");
+        opt_val.front() = rmap::strip(opt_val.front());
+        opt_val.back() = rmap::strip(opt_val.back());
+        if (option_match(opt_val.front())) {
+            format_option(opt_val.back());
+            options.erase(options.begin() + i);
+            specified = true;
+            --op_num;
+        }
+        else
+            ++i;
     }
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -285,6 +298,47 @@ read_config_file(const string &config_filename, vector<string> &config_file_opti
     }
     in.peek();
   }
+}
+
+void
+OptionParser::parse(const int argc, const char **argv, vector<string> &arguments)
+{
+    // The "2" below corresponds to the "about" and "help" options
+    assert(options.size() >=  2);
+
+    // The '1' and '+ 1' below is to skip over the program name
+    arguments.clear();
+    assert(argc >= 1);
+    copy(argv + 1, argv + argc, back_inserter(arguments));
+
+    // search for configuration file given in commnadline
+    int i = 0;
+    int arg_num = argc - 1;
+    while (i < arg_num)
+        if (arguments[i] == "-config-file")
+        {
+            vector<string> config_file_options;
+            string config_filename;
+            if (i + 1 < argc - 1)
+                config_filename =  arguments[i+1];
+            else
+                throw RMAPOptionException(
+                    "-config-line requires config filename");
+            read_config_file(config_filename, config_file_options);
+            for (size_t j = 0; j < options.size(); ++j)
+                options[j].parse_config_file(config_file_options);
+
+            arguments.erase(arguments.begin() + i);
+            arguments.erase(arguments.begin() + i);
+            arg_num -= 2;
+        }
+        else
+            ++i;
+
+    // parse options given in commmand line
+    for (size_t i = 0; i < options.size(); ++i)
+        if (!options[i].parse(arguments) && first_missing_option_name.empty())
+            first_missing_option_name = options[i].format_option_name();
 }
 
 void
