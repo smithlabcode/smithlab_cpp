@@ -94,6 +94,6 @@ LoadMappedReadsFile(string filename,
 }
 
 std::ostream& 
-operator<<(std::ostream& the_stream, MappedRead &mr) {
+operator<<(std::ostream& the_stream, const MappedRead &mr) {
   return the_stream << mr.r << "\t" << mr.seq << "\t" << mr.scr;
 }
