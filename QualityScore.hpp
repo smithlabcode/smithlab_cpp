@@ -107,6 +107,58 @@ quality_char_to_error_probability(const FASTQScoreType t,
 }
 
 inline double
+char2prob_solexa(const char c)
+{
+    return 1 - solexa_to_error_probability(quality_character_to_solexa(c));
+}
+
+inline double
+char2prob_phred(const char c)
+{
+    return 1 - phred_to_error_probability(quality_character_to_phred(c));
+}
+
+inline double
+char2err_solexa(const char c)
+{
+    return solexa_to_error_probability(quality_character_to_solexa(c));
+}
+
+inline double
+char2err_phred(const char c)
+{
+    return phred_to_error_probability(quality_character_to_phred(c));
+}
+
+inline char
+prob2char_solexa(const double prob)
+{
+    return solexa_to_quality_character(
+        error_probability_to_solexa(1 - prob));
+}
+
+inline char
+prob2char_phred(const double prob)
+{
+    return phred_to_quality_character(
+        error_probability_to_phred(1 - prob));
+}
+
+inline char
+err2char_solexa(const double err)
+{
+    return solexa_to_quality_character(
+        error_probability_to_solexa(err));
+}
+
+inline char
+err2char_phred(const double err)
+{
+    return phred_to_quality_character(
+        error_probability_to_phred(err));
+}
+
+inline double
 quality_score_to_error_probability(const FASTQScoreType t,
 				   const double s) {
   return (FASTQScoreIsSolexa(t)) ?
