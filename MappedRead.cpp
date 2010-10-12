@@ -21,10 +21,12 @@
  */
 
 #include "MappedRead.hpp"
+#include "rmap_utils.hpp"
 
 #include <cassert>
 #include <fstream>
 #include <tr1/unordered_map>
+#include <algorithm>
 
 using std::string;
 using std::vector;
@@ -97,3 +99,16 @@ std::ostream&
 operator<<(std::ostream& the_stream, const MappedRead &mr) {
   return the_stream << mr.r << "\t" << mr.seq << "\t" << mr.scr;
 }
+
+void
+revcomp(MappedRead &mr)
+{
+    if (mr.r.get_strand() == '+')
+        mr.r.set_strand('-');
+    else
+        mr.r.set_strand('+');
+    
+    revcomp_inplace(mr.seq);
+    std::reverse(mr.scr.begin(), mr.scr.end());
+}
+
