@@ -21,32 +21,52 @@
 
 HEADERS = $(shell ls *.hpp)
 SOURCES = $(shell ls *.cpp)
+OBJECTS = $(subst .cpp,.o,$(SOURCES))
 
-OBJS = $(subst .cpp,.o,$(SOURCES))
+# BINDIR = $(ROOT)/bin
+# LIBDIR = $(ROOT)/lib
+# INCLUDEDIR = $(ROOT)/include
+
+STATIC_LIB = lib$(shell basename $$PWD).a
+DYNAMIC_LIB = lib$(shell basename $$PWD).so
 
 CXX = g++
-CFLAGS = -Wall -fPIC -fmessage-length=50
+CXXFLAGS = -Wall -fPIC -fmessage-length=50 
 OPTFLAGS = -O3
 DEBUGFLAGS = -g
 
 ifeq "$(shell uname)" "Darwin"
-CFLAGS += -arch x86_64
+CXXFLAGS += -arch x86_64
 endif
 
 ifdef DEBUG
-CFLAGS += $(DEBUGFLAGS)
+CXXFLAGS += $(DEBUGFLAGS)
 endif
 
 ifdef OPT
-CFLAGS += $(OPTFLAGS)
+CXXFLAGS += $(OPTFLAGS)
 endif
 
-all: $(OBJS)
+all: $(DYNAMIC_LIB) $(STATIC_LIB)
+
+install: $(DYNAMIC_LIB) $(STATIC_LIB)
+#	@mkdir -p $(LIBDIR)
+#	@mkdir -p $(INCLUDEDIR)
+#	@install -m 755 $(DYNAMIC_LIB) $(LIBDIR)
+#	@install -m 644 $(STATIC_LIB) $(LIBDIR)
+#	@install -m 644 $(HEADERS) $(INCLUDEDIR)
+
+
+$(DYNAMIC_LIB): $(OBJECTS)
+	$(CXX) -shared $(CXXFLAGS) -o $@ $^
+
+$(STATIC_LIB): $(OBJECTS)
+	ar cru $@ $^
 
 %.o: %.cpp %.hpp
-	$(CXX) $(CFLAGS) -c -o $@ $<
-
-clean:
-	@-rm -f $(PROGS) *.o *.so *.a *~
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 .PHONY: clean
+clean: 
+	@-rm -f *.o *.so *.a *~
+
