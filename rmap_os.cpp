@@ -35,7 +35,7 @@
 using std::string;
 using std::vector;
 using std::ios_base;
-
+using std::cout;
 
 string
 strip_path(string full_path) {
@@ -317,7 +317,7 @@ read_fastq_file(const char *filename, vector<string> &names,
 void
 read_fasta_file(const char *filename, vector<string> &names, 
 		vector<string> &sequences) {
-  
+ 
   std::ifstream in(filename, std::ios::binary);
   if (!in) {
     throw RMAPException("cannot open input file " + string(filename));
@@ -326,6 +326,7 @@ read_fasta_file(const char *filename, vector<string> &names,
   static const size_t INPUT_BUFFER_SIZE = 1000000;
   
   string s, name;
+
   bool first_line = true;
   while (!in.eof()) {
     char buffer[INPUT_BUFFER_SIZE + 1];
@@ -343,14 +344,17 @@ read_fasta_file(const char *filename, vector<string> &names,
       }
       else first_line = false;
       name = buffer;
-      name = name.substr(name.find_first_not_of("> "));
+   name = name.substr(name.find_first_not_of("> "));
+	int ind = name.find(' ');
+	if(ind != std::string::npos)
+		name = name.substr(0, ind);
       s = "";
     }
     else s += buffer;
     in.peek();
-  }
-
+  }//while
   if (!first_line && s.length() > 0) {
+
     names.push_back(name);
     sequences.push_back(s);
   }
