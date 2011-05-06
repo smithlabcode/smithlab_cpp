@@ -344,10 +344,10 @@ read_fasta_file(const char *filename, vector<string> &names,
       }
       else first_line = false;
       name = buffer;
-   name = name.substr(name.find_first_not_of("> "));
-	int ind = name.find(' ');
-	if(ind != std::string::npos)
-		name = name.substr(0, ind);
+      name = name.substr(name.find_first_not_of("> "));
+      const size_t first_whitespace = name.find(' ');
+      if (first_whitespace != std::string::npos)
+	name = name.substr(0, first_whitespace);
       s = "";
     }
     else s += buffer;
