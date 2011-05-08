@@ -42,7 +42,4 @@ operator>>(std::istream& the_stream, MappedRead &mr);
 std::ostream& 
 operator<<(std::ostream& the_stream, const MappedRead &mr);
 
-void
-revcomp(MappedRead &mr);
-
 #endif

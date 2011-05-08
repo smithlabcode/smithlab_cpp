@@ -55,7 +55,7 @@ find_sixth_and_seventh_whitespace(const char *buffer,
 MappedRead::MappedRead(const char *line) : r(line) {
   size_t sixth_ws = 0, seventh_ws = 0;
   find_sixth_and_seventh_whitespace(line, sixth_ws, seventh_ws);
-  seq = string(line + sixth_ws + 1, seventh_ws - sixth_ws);
+  seq = string(line + sixth_ws + 1, seventh_ws - sixth_ws - 1);
   scr = string(line + seventh_ws + 1);
 }
 
@@ -99,16 +99,3 @@ std::ostream&
 operator<<(std::ostream& the_stream, const MappedRead &mr) {
   return the_stream << mr.r << "\t" << mr.seq << "\t" << mr.scr;
 }
-
-void
-revcomp(MappedRead &mr)
-{
-    if (mr.r.get_strand() == '+')
-        mr.r.set_strand('-');
-    else
-        mr.r.set_strand('+');
-    
-    revcomp_inplace(mr.seq);
-    std::reverse(mr.scr.begin(), mr.scr.end());
-}
-
