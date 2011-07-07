@@ -127,7 +127,10 @@ public:
     return !first_missing_option_name.empty();
   }
   std::string option_missing_message() const;
-  
+
+  static const bool OPTIONAL = false;
+  static const bool REQUIRED = true;
+    
 private:
   std::string prog_name;
   std::string prog_descr;
