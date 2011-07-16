@@ -61,17 +61,14 @@ MappedRead::MappedRead(const char *line) : r(line) {
 
 std::istream& 
 operator>>(std::istream& the_stream, MappedRead &mr) {
-  string chr;
-  size_t start, end;
-  string name;
+  string chr, name;
+  size_t start = 0ul, end = 0ul;
   char strand;
   double score;
-  if (!(the_stream >> chr >> start >> end >> name >> 
-	score >> strand >> mr.seq >> mr.scr))
-    throw RMAPException("ERROR reading MappedRead");
-  while (isspace(the_stream.peek()))
-    the_stream.get();
-  mr.r = GenomicRegion(chr, start, end, name, score, strand);
+  if (the_stream >> chr >> start >> end >> name >> 
+      score >> strand >> mr.seq >> mr.scr)
+    mr.r = GenomicRegion(chr, start, end, name, score, strand);
+  else mr = MappedRead();
   return the_stream;
 }
 
@@ -97,5 +94,5 @@ LoadMappedReadsFile(string filename,
 
 std::ostream& 
 operator<<(std::ostream& the_stream, const MappedRead &mr) {
-  return the_stream << mr.r << "\t" << mr.seq << "\t" << mr.scr;
+  return the_stream << mr.r << '\t' << mr.seq << '\t' << mr.scr;
 }
