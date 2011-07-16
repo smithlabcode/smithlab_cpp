@@ -118,6 +118,16 @@ operator<<(std::ostream& s, const SimpleGenomicRegion& region) {
   return s << region.tostring();
 }
 
+std::istream& 
+operator>>(std::istream& s, SimpleGenomicRegion& region) {
+  string chrom;
+  size_t start = 0ul, end = 0ul;
+  if (s >> chrom >> start >> end)
+    region = SimpleGenomicRegion(chrom, start, end);
+  else region = SimpleGenomicRegion();
+  return s;
+}
+
 
 bool
 SimpleGenomicRegion::contains(const SimpleGenomicRegion& other) const {
@@ -283,6 +293,18 @@ GenomicRegion::tostring() const {
 std::ostream& 
 operator<<(std::ostream& s, const GenomicRegion& region) {
   return s << region.tostring();
+}
+
+std::istream&
+operator>>(std::istream& s, GenomicRegion& region) {
+  string chrom, name;
+  size_t start = 0ul, end = 0ul;
+  double score = 0.0;
+  char strand = '\0';
+  if (s >> chrom >> start >> end >> name >> score >> strand)
+    region = GenomicRegion(chrom, start, end, name, score, strand);
+  else region = GenomicRegion();
+  return s;
 }
 
 bool

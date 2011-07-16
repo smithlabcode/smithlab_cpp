@@ -106,6 +106,9 @@ private:
 std::ostream& 
 operator<<(std::ostream& the_stream, const SimpleGenomicRegion& region);
 
+std::istream& 
+operator>>(std::istream& the_stream, SimpleGenomicRegion& region);
+
 class GenomicRegion {
 public:
   GenomicRegion() : chrom(assign_chrom("(NULL)")), 
@@ -215,6 +218,9 @@ public:
 
 std::ostream&
 operator<<(std::ostream& the_stream, const GenomicRegion& region);
+
+std::istream&
+operator>>(std::istream& the_stream, GenomicRegion& region);
 
 
 template <class T, class U> 
