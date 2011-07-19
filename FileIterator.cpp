@@ -28,15 +28,6 @@ using std::istream;
 using std::vector;
 using std::string;
 
-istream& 
-operator>>(istream &in, GenomicRegion &region){
-  static const size_t buffer_size = 10000; // Magic
-  char buffer[buffer_size];
-  in.getline(buffer, buffer_size);
-  region = GenomicRegion(buffer);
-  return in;
-}
-
 /*  THIS FUNCTION FILLS A BUFFER FOR GenomicRegion OBJECTS
  */
 void 
