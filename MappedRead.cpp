@@ -63,10 +63,10 @@ std::istream&
 operator>>(std::istream& the_stream, MappedRead &mr) {
   string chr, name;
   size_t start = 0ul, end = 0ul;
-  char strand;
+  char strand = '\0';
   double score;
   if (the_stream >> chr >> start >> end >> name >> 
-      score >> strand >> mr.seq >> mr.scr)
+      score >> strand >> mr.seq >> mr.scr) 
     mr.r = GenomicRegion(chr, start, end, name, score, strand);
   else mr = MappedRead();
   return the_stream;
