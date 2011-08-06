@@ -158,8 +158,17 @@ SimpleGenomicRegion::distance(const SimpleGenomicRegion& other) const {
 bool
 SimpleGenomicRegion::operator<(const SimpleGenomicRegion& rhs) const {
   return (get_chrom() < rhs.get_chrom() ||
-	  (chrom == rhs.chrom && end < rhs.end) ||
-	  (chrom == rhs.chrom && end == rhs.end && start < rhs.start));
+	  (chrom == rhs.chrom &&
+	   (end < rhs.end ||
+	    (end == rhs.end && start < rhs.start))));
+}
+
+bool
+SimpleGenomicRegion::less1(const SimpleGenomicRegion& rhs) const {
+  return (get_chrom() < rhs.get_chrom() ||
+	  (chrom == rhs.chrom && 
+	   (start < rhs.start ||
+	    (start == rhs.start && (end < rhs.end)))));
 }
 
 bool
@@ -335,9 +344,29 @@ GenomicRegion::distance(const GenomicRegion& other) const {
 
 bool
 GenomicRegion::operator<(const GenomicRegion& rhs) const {
-  return (get_chrom() < rhs.get_chrom() ||
-	  (chrom == rhs.chrom && end < rhs.end) ||
-	  (chrom == rhs.chrom && end == rhs.end && start < rhs.start));
+  return ((chrom == rhs.chrom && 
+	   (end < rhs.end ||
+	    (end == rhs.end && 
+	     (start < rhs.start || 
+	      (start == rhs.start && 
+	       (strand < rhs.strand
+		// || (strand == rhs.strand && name < rhs.name)
+		)))))) ||
+	  get_chrom() < rhs.get_chrom());
+}
+
+
+bool
+GenomicRegion::less1(const GenomicRegion& rhs) const {
+  return ((chrom == rhs.chrom && 
+	   (start < rhs.start ||
+	    (start == rhs.start && 
+	     (end < rhs.end || 
+	      (end == rhs.end && 
+	       (strand < rhs.strand 
+		// || (strand == rhs.strand && name < rhs.name)
+		)))))) ||
+	  get_chrom() < rhs.get_chrom());
 }
 
 

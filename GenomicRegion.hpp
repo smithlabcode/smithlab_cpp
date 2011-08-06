@@ -77,6 +77,7 @@ public:
   bool overlaps(const SimpleGenomicRegion& other) const;
   size_t distance(const SimpleGenomicRegion& other) const;
   bool operator<(const SimpleGenomicRegion& rhs) const;
+  bool less1(const SimpleGenomicRegion& rhs) const;
   bool operator<=(const SimpleGenomicRegion& rhs) const;
   bool operator==(const SimpleGenomicRegion& rhs) const;
   bool operator!=(const SimpleGenomicRegion& rhs) const;
@@ -168,6 +169,7 @@ public:
   bool overlaps(const GenomicRegion& other) const;
   size_t distance(const GenomicRegion& other) const;
   bool operator<(const GenomicRegion& rhs) const;
+  bool less1(const GenomicRegion& rhs) const;
   bool operator<=(const GenomicRegion& rhs) const;
   bool operator!=(const GenomicRegion& rhs) const;
   bool operator==(const GenomicRegion& rhs) const;
