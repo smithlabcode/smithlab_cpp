@@ -19,8 +19,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(patsubst %.cpp,%.o,$(SOURCES))
+
 CXX = g++
-CXXFLAGS = -Wall -fmessage-length=50 
+CXXFLAGS = -Wall
 OPTFLAGS = -O2
 DEBUGFLAGS = -g
 
@@ -35,6 +38,8 @@ endif
 ifdef OPT
 CXXFLAGS += $(OPTFLAGS)
 endif
+
+all: $(OBJECTS)
 
 %.o: %.cpp %.hpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
