@@ -1,5 +1,5 @@
 /*
- *    Part of RMAP software
+ *    Part of SMITHLAB software
  *
  *    Copyright (C) 2008 Cold Spring Harbor Laboratory, 
  *                       University of Southern California and
@@ -22,7 +22,7 @@
  */
 
 #include "sim_utils.hpp"
-#include "rmap_utils.hpp"
+#include "smithlab_utils.hpp"
 
 #include <numeric>
 #include <algorithm>
@@ -46,7 +46,7 @@ sequence_to_consensus_matrix(const string &sequence,
   static const double prior = 1e-4; 
   const size_t seq_len = sequence.length();
   matrix.clear();
-  matrix.resize(seq_len, vector<double>(rmap::alphabet_size, prior));
+  matrix.resize(seq_len, vector<double>(smithlab::alphabet_size, prior));
   for (size_t i = 0; i < seq_len; ++i) {
     if (isvalid(sequence[i]))
       matrix[i][base2int(sequence[i])] = 1.0 - 3*prior;
@@ -92,9 +92,9 @@ add_error(const Runif &rng, double err, vector<double> &matrix) {
   // add that prob to other bases
   while (err > 0) {
     const double curr_err = ((err < tolerance) ? err : rng.runif(0.0, err));
-    size_t pos = rng.runif(0ul, rmap::alphabet_size);
+    size_t pos = rng.runif(0ul, smithlab::alphabet_size);
     while (pos == consensus)
-      pos = rng.runif(0ul, rmap::alphabet_size);
+      pos = rng.runif(0ul, smithlab::alphabet_size);
     matrix[pos] += curr_err;
     err -= curr_err;
   }
@@ -137,7 +137,6 @@ call_bases_solexa(const vector<vector<double> > &matrix,
 }
 
 
-
 void
 add_sequencing_errors(const Runif &rng, const double max_errors,
 		      string &seq, string &error_log) {
@@ -150,9 +149,9 @@ add_sequencing_errors(const Runif &rng, const double max_errors,
     errors.insert(error_pos);
     error_log[error_pos] = '1';
 
-    size_t c = rng.runif(0ul, rmap::alphabet_size);
+    size_t c = rng.runif(0ul, smithlab::alphabet_size);
     while (c == base2int(seq[error_pos]))
-      c = rng.runif(0ul, rmap::alphabet_size);
+      c = rng.runif(0ul, smithlab::alphabet_size);
     
     seq[error_pos] = int2base(c);
   }
@@ -165,11 +164,11 @@ generate_sequencing_errors(const Runif &rng,
 			   const size_t read_width,const double total_error, 
 			   vector<vector<double> > &errors) {
   
-  errors.resize(read_width, vector<double>(rmap::alphabet_size, 0));
+  errors.resize(read_width, vector<double>(smithlab::alphabet_size, 0));
   double remaining_error = total_error;
   while (remaining_error > 0) {
     const size_t error_pos = rng.runif(0ul, read_width);
-    size_t error_base = rng.runif(0ul, rmap::alphabet_size);
+    size_t error_base = rng.runif(0ul, smithlab::alphabet_size);
     
     const double error_amount = min(min(1.0 - errors[error_pos][error_base], remaining_error),
 				    rng.runif(0.0, 1.0));
@@ -180,7 +179,8 @@ generate_sequencing_errors(const Runif &rng,
 }
 
 void
-add_sequencing_errors(const vector<vector<double> > &errors, vector<vector<double> > &prb) {
+add_sequencing_errors(const vector<vector<double> > &errors, 
+		      vector<vector<double> > &prb) {
   for (size_t i = 0; i < prb.size(); ++i) {
     size_t base = max_element(prb[i].begin(), prb[i].end()) - prb[i].begin();
     const double sum = accumulate(errors[i].begin(), errors[i].end(), 0.0);
@@ -202,7 +202,8 @@ adjust_seq_using_matrix(const vector<vector<double> > &prb, string &seq) {
 }
 
 void
-prob_to_quality_scores_solexa(const vector<vector<double> > &prb, vector<vector<double> > &quality) {
+prob_to_quality_scores_solexa(const vector<vector<double> > &prb, 
+			      vector<vector<double> > &quality) {
   quality = prb;
   for (size_t i = 0; i < prb.size(); ++i) {
     std::transform(prb[i].begin(), prb[i].end(),
@@ -212,7 +213,7 @@ prob_to_quality_scores_solexa(const vector<vector<double> > &prb, vector<vector<
 		   quality[i].begin(), std::bind2nd(std::divides<double>(), column_sum));
   }
   for (size_t i = 0; i < quality.size(); ++i)
-    for (size_t j = 0; j < rmap::alphabet_size; ++j) {
+    for (size_t j = 0; j < smithlab::alphabet_size; ++j) {
       assert(quality[i][j] > 0);
       quality[i][j] = 10*(log(quality[i][j]) - log(1 - quality[i][j]))/log(10);
     }
@@ -223,7 +224,7 @@ add_sequencing_errors(const Runif &rng, const double max_errors,
 		      string &seq, vector<vector<double> > &quality_scores) {
   
   // first make the pwm:
-  quality_scores.resize(seq.length(), vector<double>(rmap::alphabet_size, 0.0));
+  quality_scores.resize(seq.length(), vector<double>(smithlab::alphabet_size, 0.0));
   for (size_t i = 0; i < seq.length(); ++i)
     quality_scores[i][base2int(seq[i])] = 1.0;
   
@@ -232,12 +233,13 @@ add_sequencing_errors(const Runif &rng, const double max_errors,
     // sample an error position:
     const size_t error_pos = rng.runif(0ul, seq.length());
     // sample an error amount:
-    double remaining_freq = min(quality_scores[error_pos][base2int(seq[error_pos])], total_error);
+    double remaining_freq = min(quality_scores[error_pos][base2int(seq[error_pos])], 
+				total_error);
     const double error_amount = min(min(rng.runif(0.0, 1.0), max_errors), 
 				    remaining_freq);
     size_t error_base = base2int(seq[error_pos]);
     while (error_base == base2int(seq[error_pos]))
-      error_base = rng.runif(0ul, rmap::alphabet_size);
+      error_base = rng.runif(0ul, smithlab::alphabet_size);
     
     quality_scores[error_pos][base2int(seq[error_pos])] -= error_amount;
     quality_scores[error_pos][error_base] += error_amount;
@@ -255,8 +257,9 @@ add_sequencing_errors(const Runif &rng, const double max_errors,
   }
   
   for (size_t i = 0; i < quality_scores.size(); ++i)
-    for (size_t j = 0; j < rmap::alphabet_size; ++j)
-      quality_scores[i][j] = 10*(log(quality_scores[i][j]) - log(1 - quality_scores[i][j]))/log(10);
+    for (size_t j = 0; j < smithlab::alphabet_size; ++j)
+      quality_scores[i][j] = 10*(log(quality_scores[i][j]) - 
+				 log(1 - quality_scores[i][j]))/log(10);
 }
 
 void

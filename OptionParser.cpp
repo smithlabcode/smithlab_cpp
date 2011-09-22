@@ -1,5 +1,5 @@
 /*
- *    Part of RMAP software
+ *    Part of SMITHLAB software
  *
  *    Copyright (C) 2008 Cold Spring Harbor Laboratory, 
  *                       University of Southern California and
@@ -29,7 +29,7 @@
 #include <cassert>
 #include <iomanip>
 
-#include "rmap_utils.hpp"
+#include "smithlab_utils.hpp"
 
 using std::vector;
 using std::string;
@@ -38,9 +38,9 @@ using std::endl;
 static const size_t MAX_LINE_LENGTH = 72;
 
 enum {
-  RMAP_ARG_INT,    RMAP_ARG_UINT,    RMAP_ARG_LONG,
-  RMAP_ARG_ULONG,  RMAP_ARG_FLOAT,   RMAP_ARG_DOUBLE,
-  RMAP_ARG_STRING, RMAP_ARG_BOOL, RMAP_ARG_CHAR
+  SMITHLAB_ARG_INT,    SMITHLAB_ARG_UINT,    SMITHLAB_ARG_LONG,
+  SMITHLAB_ARG_ULONG,  SMITHLAB_ARG_FLOAT,   SMITHLAB_ARG_DOUBLE,
+  SMITHLAB_ARG_STRING, SMITHLAB_ARG_BOOL, SMITHLAB_ARG_CHAR
 };
 
 using std::cerr;
@@ -48,18 +48,18 @@ using std::cerr;
 void
 Option::format_option(const string &argument) {
   std::istringstream ss(argument);
-  if ((arg_type == RMAP_ARG_INT && !(ss >> *int_value)) ||
-      (arg_type == RMAP_ARG_UINT && !(ss >> *uint_value)) ||
-      (arg_type == RMAP_ARG_LONG && !(ss >> *long_value)) ||
-      (arg_type == RMAP_ARG_ULONG && !(ss >> *ulong_value)) ||
-      (arg_type == RMAP_ARG_FLOAT && !(ss >> *float_value)) ||
-      (arg_type == RMAP_ARG_DOUBLE && !(ss >> *double_value)) ||
-      (arg_type == RMAP_ARG_CHAR && !(ss >> *char_value)))
-    throw RMAPOptionException("Invalid argument [" + argument + 
+  if ((arg_type == SMITHLAB_ARG_INT && !(ss >> *int_value)) ||
+      (arg_type == SMITHLAB_ARG_UINT && !(ss >> *uint_value)) ||
+      (arg_type == SMITHLAB_ARG_LONG && !(ss >> *long_value)) ||
+      (arg_type == SMITHLAB_ARG_ULONG && !(ss >> *ulong_value)) ||
+      (arg_type == SMITHLAB_ARG_FLOAT && !(ss >> *float_value)) ||
+      (arg_type == SMITHLAB_ARG_DOUBLE && !(ss >> *double_value)) ||
+      (arg_type == SMITHLAB_ARG_CHAR && !(ss >> *char_value)))
+    throw SMITHLABOptionException("Invalid argument [" + argument + 
 			      "] to option [" + format_option_name() + "]");
-  else if (arg_type == RMAP_ARG_STRING)
+  else if (arg_type == SMITHLAB_ARG_STRING)
     *string_value = argument;
-  else if (arg_type == RMAP_ARG_BOOL)
+  else if (arg_type == SMITHLAB_ARG_BOOL)
   {
     *bool_value = !(*bool_value);
     if (argument == "true" || argument == "on")
@@ -75,47 +75,47 @@ Option::format_option(const string &argument) {
 
 Option::Option(const string l_name, const char s_name, const string descr, 
 	       const bool reqd, int &val) :
-  arg_type(RMAP_ARG_INT), long_name(l_name), short_name(s_name), 
+  arg_type(SMITHLAB_ARG_INT), long_name(l_name), short_name(s_name), 
   description(descr), required(reqd), specified(false), int_value(&val)  {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
 	       const bool reqd, unsigned int &val) :
-  arg_type(RMAP_ARG_UINT), long_name(l_name), short_name(s_name), 
+  arg_type(SMITHLAB_ARG_UINT), long_name(l_name), short_name(s_name), 
   description(descr), required(reqd), specified(false), uint_value(&val)  {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
 	       const bool reqd, long &val) :
-  arg_type(RMAP_ARG_LONG), long_name(l_name), short_name(s_name), 
+  arg_type(SMITHLAB_ARG_LONG), long_name(l_name), short_name(s_name), 
   description(descr), required(reqd), specified(false), long_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
 	       const bool reqd, unsigned long &val) :
-  arg_type(RMAP_ARG_ULONG), long_name(l_name), short_name(s_name), 
+  arg_type(SMITHLAB_ARG_ULONG), long_name(l_name), short_name(s_name), 
   description(descr), required(reqd), specified(false), ulong_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
 	       const bool reqd, float &val) :
-  arg_type(RMAP_ARG_FLOAT), long_name(l_name), short_name(s_name), 
+  arg_type(SMITHLAB_ARG_FLOAT), long_name(l_name), short_name(s_name), 
   description(descr), required(reqd), specified(false), float_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
 	       const bool reqd, double &val) :
-  arg_type(RMAP_ARG_DOUBLE), long_name(l_name), short_name(s_name), 
+  arg_type(SMITHLAB_ARG_DOUBLE), long_name(l_name), short_name(s_name), 
   description(descr), required(reqd), specified(false), double_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
 	       const bool reqd, string &val) :
-  arg_type(RMAP_ARG_STRING), long_name(l_name), short_name(s_name), 
+  arg_type(SMITHLAB_ARG_STRING), long_name(l_name), short_name(s_name), 
   description(descr), required(reqd), specified(false), string_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr, 
 	       const bool reqd, bool &val) :
-  arg_type(RMAP_ARG_BOOL), long_name(l_name), short_name(s_name), 
+  arg_type(SMITHLAB_ARG_BOOL), long_name(l_name), short_name(s_name), 
   description(descr), required(reqd), specified(false), bool_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr, 
 	       const bool reqd, char &val) :
-  arg_type(RMAP_ARG_CHAR), long_name(l_name), short_name(s_name), 
+  arg_type(SMITHLAB_ARG_CHAR), long_name(l_name), short_name(s_name), 
   description(descr), required(reqd), specified(false), char_value(&val) {}
 
 ////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ Option::format_option_description(const size_t offset) const {
   std::ostringstream ss;
   if (!description.empty()) {
     vector<string> parts;
-    rmap::split_whitespace(description, parts);
+    smithlab::split_whitespace(description, parts);
     
     size_t line_len = 0;
     for (size_t i = 0; i < parts.size(); ++i) {
@@ -172,7 +172,7 @@ Option::parse(vector<string> &command_line) {
 	else format_option(dummy);
 	specified = true;
 	command_line.erase(command_line.begin() + i);
-	if (arg_type != RMAP_ARG_BOOL)
+	if (arg_type != SMITHLAB_ARG_BOOL)
 	  command_line.erase(command_line.begin() + i);
       }
       else ++i;
@@ -184,9 +184,9 @@ Option::parse_config_file(vector<string> &options) {
     size_t i = 0;
     size_t op_num = options.size();
     while (i < op_num) {
-        vector<string> opt_val = rmap::split(options[i], "=");
-        opt_val.front() = rmap::strip(opt_val.front());
-        opt_val.back() = rmap::strip(opt_val.back());
+        vector<string> opt_val = smithlab::split(options[i], "=");
+        opt_val.front() = smithlab::strip(opt_val.front());
+        opt_val.back() = smithlab::strip(opt_val.back());
         if (option_match(opt_val.front())) {
             format_option(opt_val.back());
             options.erase(options.begin() + i);
@@ -272,7 +272,7 @@ read_config_file(const string &config_filename, vector<string> &config_file_opti
   
   std::ifstream in(config_filename.c_str());
   if (!in)
-    throw RMAPOptionException("cannot open config file " + config_filename);
+    throw SMITHLABOptionException("cannot open config file " + config_filename);
   
   size_t line_number = 0;
   while (!in.eof()) {
@@ -280,19 +280,19 @@ read_config_file(const string &config_filename, vector<string> &config_file_opti
     char buffer[INPUT_BUFFER_SIZE + 1];
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw RMAPOptionException("Line in " + config_filename + 
+      throw SMITHLABOptionException("Line in " + config_filename + 
 				  "\nexceeds max length: " +
 				  toa(INPUT_BUFFER_SIZE));
     if (in.gcount() == 0)
-      throw RMAPOptionException("Problem reading file \"" + config_filename +
+      throw SMITHLABOptionException("Problem reading file \"" + config_filename +
 				  "\" (empty?)");
     const size_t final_char = in.gcount() - 1;
     if (buffer[final_char] == '\r') buffer[final_char] = '\0';
     if (buffer[0] != '\0' && buffer[0] != COMMENT_CHARACTER) {
       string line(buffer);
-      line = rmap::strip(line);
+      line = smithlab::strip(line);
       if (line.length() == 0 || line.find('=') == string::npos)
-	throw RMAPOptionException("Line " + toa(line_number) +
+	throw SMITHLABOptionException("Line " + toa(line_number) +
 				    " malformed in config file " + config_filename);
       config_file_options.push_back(line);
     }
@@ -322,7 +322,7 @@ OptionParser::parse(const int argc, const char **argv, vector<string> &arguments
             if (i + 1 < argc - 1)
                 config_filename =  arguments[i+1];
             else
-                throw RMAPOptionException(
+                throw SMITHLABOptionException(
                     "-config-line requires config filename");
             read_config_file(config_filename, config_file_options);
             for (size_t j = 0; j < options.size(); ++j)
@@ -422,7 +422,7 @@ OptionParser::about_message() const {
   static const char *PROGRAM_NAME_TAG =  "PROGRAM: ";
   
   vector<string> parts;
-  rmap::split_whitespace(prog_descr, parts);
+  smithlab::split_whitespace(prog_descr, parts);
 
   size_t line_len = 0;
   std::ostringstream ss;

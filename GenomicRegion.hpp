@@ -1,5 +1,5 @@
 /*
- *    Part of RMAP software
+ *    Part of SMITHLAB software
  *
  *    Copyright (C) 2008 Cold Spring Harbor Laboratory, 
  *                       University of Southern California and
@@ -24,7 +24,7 @@
 #ifndef GENOMIC_REGION_HPP
 #define GENOMIC_REGION_HPP
 
-#include "rmap_utils.hpp"
+#include "smithlab_utils.hpp"
 
 #include <string>
 #include <vector>
@@ -213,9 +213,9 @@ score_greater(const T &a, const T &b) {
 }
 
 
-class GenomicRegionException : public RMAPException {
+class GenomicRegionException : public SMITHLABException {
 public:
-  GenomicRegionException(std::string s = std::string()) : RMAPException(s) {}
+  GenomicRegionException(std::string s = std::string()) : SMITHLABException(s) {}
 };
 
 std::ostream&
@@ -402,9 +402,9 @@ WriteBEDFile(const std::string filename,
   out.close();
 }
 
-class BEDFileException : public RMAPException {
+class BEDFileException : public SMITHLABException {
 public:
-  BEDFileException(std::string s = std::string()) throw() : RMAPException(s) {}
+  BEDFileException(std::string s = std::string()) throw() : SMITHLABException(s) {}
 };
 
 void
@@ -414,15 +414,15 @@ parse_region_name(std::string region_name,
 template <class T>
 std::string
 assemble_region_name(const T &region) {
-  return (region.get_chrom() + ":" + rmap::toa(region.get_start()) + "-" +
-          rmap::toa(region.get_end()));
+  return (region.get_chrom() + ":" + smithlab::toa(region.get_start()) + "-" +
+          smithlab::toa(region.get_end()));
 }
 
 template <class T>
 std::string
 assemble_region_name(const T &region, const std::string sep) {
-  return (region.get_chrom() + sep + rmap::toa(region.get_start()) + sep +
-	  rmap::toa(region.get_end()));
+  return (region.get_chrom() + sep + smithlab::toa(region.get_start()) + sep +
+	  smithlab::toa(region.get_end()));
 }
 
 #endif

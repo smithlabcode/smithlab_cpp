@@ -1,5 +1,5 @@
 /*
- *    Part of RMAP software
+ *    Part of SMITHLAB software
  *
  *    Copyright (C) 2008 Cold Spring Harbor Laboratory, 
  *                       University of Southern California and
@@ -26,7 +26,7 @@
 
 #include <string>
 #include <vector>
-#include "rmap_utils.hpp"
+#include "smithlab_utils.hpp"
 
 class Option {
 public:
@@ -81,8 +81,8 @@ private:
   bool option_match(const std::string &other);
 };
 
-struct RMAPOptionException : public RMAPException {
-  RMAPOptionException(std::string m) : RMAPException(m) {}
+struct SMITHLABOptionException : public SMITHLABException {
+  SMITHLABOptionException(std::string m) : SMITHLABException(m) {}
 };
 
 class OptionParser {

@@ -1,8 +1,7 @@
 /*
- *    Part of RMAP software
+ *    Part of SMITHLAB software
  *
- *    Copyright (C) 2008 Cold Spring Harbor Laboratory, 
- *                       University of Southern California and
+ *    Copyright (C) 2011 University of Southern California and
  *                       Andrew D. Smith
  *
  *    Authors: Andrew D. Smith
@@ -61,7 +60,7 @@ SimpleGenomicRegion::SimpleGenomicRegion(const GenomicRegion &r) :
   chrom(assign_chrom(r.get_chrom())), start(r.get_start()), end(r.get_end()) {}
 
 SimpleGenomicRegion::SimpleGenomicRegion(string string_representation) {
-  vector<string> parts = rmap::split_whitespace_quoted(string_representation);
+  vector<string> parts = smithlab::split_whitespace_quoted(string_representation);
   
   // make sure there is the minimal required info
   if (parts.size() < 3)
@@ -216,7 +215,7 @@ GenomicRegion::retrieve_chrom(chrom_id_type i) {
 
 
 GenomicRegion::GenomicRegion(string string_representation) {
-  vector<string> parts(rmap::split_whitespace_quoted(string_representation));
+  vector<string> parts(smithlab::split_whitespace_quoted(string_representation));
   
   // make sure there is the minimal required info
   if (parts.size() < 3)

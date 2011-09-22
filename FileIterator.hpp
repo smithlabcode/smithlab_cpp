@@ -25,7 +25,7 @@
 #include <vector>
 #include <fstream>
 
-#include "rmap_utils.hpp"
+#include "smithlab_utils.hpp"
 
 template <class T>
 class FileIterator {
@@ -112,7 +112,7 @@ template <class T>
 FileIterator<T>::FileIterator(const std::string f, const size_t bs) :
   buffer(std::vector<T>(bs)) {
   in.open(f.c_str());
-  if (!in) throw RMAPException("cannot open input file " + f);
+  if (!in) throw SMITHLABException("cannot open input file " + f);
   fill_buffer(in, 0, buffer);
   first = buffer.begin();
   last = buffer.begin();

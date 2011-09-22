@@ -1,5 +1,5 @@
 /*
- *    Part of RMAP software
+ *    Part of SMITHLAB software
  *
  *    Copyright (C) 2008 Cold Spring Harbor Laboratory, 
  *                       University of Southern California and

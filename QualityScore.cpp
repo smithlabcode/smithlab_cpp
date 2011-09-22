@@ -1,5 +1,5 @@
 /*
- *    Part of RMAP software
+ *    Part of SMITHLAB software
  *
  *    Copyright (C) 2009 University of Southern California and
  *                       Andrew D. Smith
@@ -23,7 +23,7 @@
 #include "QualityScore.hpp"
 
 #include <fstream>
-#include "rmap_utils.hpp"
+#include "smithlab_utils.hpp"
 
 using std::string;
 
@@ -39,7 +39,7 @@ fastq_score_type(const string filename) {
   static const size_t MAX_LINE_SIZE = 1000;
   std::ifstream f(filename.c_str());
   if (!f)
-    throw RMAPException("cannot open input file " + string(filename));
+    throw SMITHLABException("cannot open input file " + string(filename));
   
   char line[MAX_LINE_SIZE];
   bool solexa = true, phred = true;
@@ -61,7 +61,7 @@ mapped_reads_score_type(const string filename) {
   static const size_t MAX_LINE_SIZE = 10000;
   std::ifstream f(filename.c_str());
   if (!f)
-    throw RMAPException("cannot open input file " + string(filename));
+    throw SMITHLABException("cannot open input file " + string(filename));
   
   char line[MAX_LINE_SIZE];
   bool solexa = true, phred = true;
@@ -71,15 +71,15 @@ mapped_reads_score_type(const string filename) {
       while (position < MAX_LINE_SIZE && isspace(line[position]))
 	++position;
       if (position == MAX_LINE_SIZE)
-	throw RMAPException("line too long in file: " + filename);
+	throw SMITHLABException("line too long in file: " + filename);
       while (position < MAX_LINE_SIZE && !isspace(line[position]))
 	++position;
       if (position == MAX_LINE_SIZE)
-	throw RMAPException("line too long in file: " + filename);
+	throw SMITHLABException("line too long in file: " + filename);
       ++space_count;
     }
     if (space_count < 7)
-      throw RMAPException("malformed line in file: " + filename);
+      throw SMITHLABException("malformed line in file: " + filename);
     while (position < MAX_LINE_SIZE && isspace(line[position]))
       ++position;
     char *c = line + position;

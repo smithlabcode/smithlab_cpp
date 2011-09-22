@@ -1,5 +1,5 @@
 /*
- *    Part of RMAP software
+ *    Part of SMITHLAB software
  *
  *    Copyright (C) 2010 University of Southern California and
  *                       Andrew D. Smith
@@ -23,7 +23,7 @@
 #ifndef CLIP_ADAPTOR_FROM_READS_HPP
 #define CLIP_ADAPTOR_FROM_READS_HPP
 
-#include "rmap_utils.hpp"
+#include "smithlab_utils.hpp"
 
 #include <string>
 #include <limits>

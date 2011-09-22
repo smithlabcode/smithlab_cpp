@@ -21,7 +21,7 @@
  */
 
 #include "MappedRead.hpp"
-#include "rmap_utils.hpp"
+#include "smithlab_utils.hpp"
 
 #include <cassert>
 #include <fstream>
@@ -42,13 +42,13 @@ find_sixth_and_seventh_whitespace(const char *buffer,
       ++position;
   }
   if (ws_count != 6)
-    throw RMAPException("malformed line (a):\n" + string(buffer));
+    throw SMITHLABException("malformed line (a):\n" + string(buffer));
   sixth_ws = std::distance(buffer, position);
   ++position;
   while (*position != '\0' && *position != '\t' && *position != ' ')
     ++position;
   if (*position != '\t' && *position != ' ')
-    throw RMAPException("malformed line (b):\n" + string(buffer) + "\t\"" + *position + "\"");
+    throw SMITHLABException("malformed line (b):\n" + string(buffer) + "\t\"" + *position + "\"");
   seventh_ws = std::distance(buffer, position);
 }
 
@@ -79,7 +79,7 @@ LoadMappedReadsFile(string filename,
   // open and check the file
   std::ifstream in(filename.c_str());
   if (!in) 
-    throw RMAPException("cannot open input file " + filename);
+    throw SMITHLABException("cannot open input file " + filename);
   
   char buffer[buffer_size];
   while (!in.eof()) {
