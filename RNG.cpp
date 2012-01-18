@@ -34,12 +34,15 @@ DUMMY_SEED = std::numeric_limits<size_t>::max();
 static const size_t
 MODULUS_MASK = static_cast<size_t>(-1);
 static const double
-DOUBLE_DENOMINATOR = static_cast<double>(std::numeric_limits<size_t>::max());
+DOUBLE_DENOMINATOR = static_cast<double>(std::numeric_limits<int>::max());
+
+#include <iostream>
 
 static inline size_t
 rng_integer(size_t &state) {
   // TOO MUCH MAGIC:
-  state = (1103515245*state + 12345) & MODULUS_MASK;
+  // state = (1103515245*state + 12345) & MODULUS_MASK;
+  state = rand();
   return state;
 }
 
@@ -53,6 +56,7 @@ Runif::Runif(size_t seed) {
     state = seed;
   else if (!seed_set)
     state = time(0) + getpid();
+  srand(state);
 }
 
 int
