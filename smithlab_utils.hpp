@@ -59,6 +59,9 @@ namespace smithlab {
   void split_whitespace(const std::string& s, std::vector<std::string> &v);
   
   std::string strip(const std::string& s);
+
+  std::vector<std::string> 
+  squash(const std::vector<std::string> &v);
   
   template <class T> std::string toa(T t) {
     std::ostringstream s;

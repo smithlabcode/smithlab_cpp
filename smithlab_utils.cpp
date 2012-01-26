@@ -158,3 +158,17 @@ smithlab::log_sum_log_vec(const std::vector<double> &vals, size_t limit) {
       sum += std::exp(vals[i] - max_val);
   return max_val + std::log(sum);
 }
+
+/****
+ * @summary: remove empty (or only whitespace) strings from a vector of string
+ */
+std::vector<std::string> 
+smithlab::squash(const std::vector<std::string>& v) {
+  std::vector<std::string> res;
+  for (size_t i=0; i<v.size(); i++) {
+    std::string t = v[i];
+    strip(t);
+    if (t != "") res.push_back(t);
+  }
+  return res;
+}
