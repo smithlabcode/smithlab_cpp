@@ -51,7 +51,7 @@ read_dir(const std::string& dirname,
 	 std::vector<std::string> &filenames);
 
 void
-read_fasta_file(const char *filename, 
+read_fasta_file(const std::string filename,
 		std::vector<std::string> &names, 
 		std::vector<std::string> &sequences);
 

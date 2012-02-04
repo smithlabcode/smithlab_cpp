@@ -315,10 +315,10 @@ read_fastq_file(const char *filename, vector<string> &names,
 
 
 void
-read_fasta_file(const char *filename, vector<string> &names, 
+read_fasta_file(const string filename, vector<string> &names, 
 		vector<string> &sequences) {
- 
-  std::ifstream in(filename, std::ios::binary);
+  
+  std::ifstream in(filename.c_str(), std::ios::binary);
   if (!in) {
     throw SMITHLABException("cannot open input file " + string(filename));
   }
