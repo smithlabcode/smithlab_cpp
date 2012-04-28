@@ -121,9 +121,20 @@ std::istream&
 operator>>(std::istream& s, SimpleGenomicRegion& region) {
   string chrom;
   size_t start = 0ul, end = 0ul;
-  if (s >> chrom >> start >> end)
+  if (s >> chrom >> start >> end) {
     region = SimpleGenomicRegion(chrom, start, end);
-  else region = SimpleGenomicRegion();
+    // else region = SimpleGenomicRegion();
+  }
+  else s.setstate(std::ios::badbit);
+  
+  char c;
+  while ((c = s.get()) != '\n' && s);
+  if (c != '\n')
+    s.setstate(std::ios::badbit);
+  s.peek();
+  if (s.eof())
+    s.setstate(std::ios::badbit);
+  
   return s;
 }
 
@@ -312,6 +323,16 @@ operator>>(std::istream& s, GenomicRegion& region) {
   if (s >> chrom >> start >> end >> name >> score >> strand)
     region = GenomicRegion(chrom, start, end, name, score, strand);
   else region = GenomicRegion();
+  
+  char c;
+  while ((c = s.get()) != '\n' && s);
+  
+  if (c != '\n')
+    s.setstate(std::ios::badbit);
+  s.peek();
+  if (s.eof())
+    s.setstate(std::ios::badbit);
+  
   return s;
 }
 
