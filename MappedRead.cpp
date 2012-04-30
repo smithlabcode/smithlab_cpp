@@ -65,10 +65,22 @@ operator>>(std::istream& the_stream, MappedRead &mr) {
   size_t start = 0ul, end = 0ul;
   char strand = '\0';
   double score;
-  if (the_stream >> chr >> start >> end >> name >> 
-      score >> strand >> mr.seq >> mr.scr) 
-    mr.r = GenomicRegion(chr, start, end, name, score, strand);
-  else mr = MappedRead();
+  if (!(the_stream >> chr >> start >> end >> name >> 
+	score >> strand >> mr.seq >> mr.scr))
+    the_stream.setstate(std::ios::badbit);
+  
+  mr.r = GenomicRegion(chr, start, end, name, score, strand);
+  
+  char c;
+  while ((c = the_stream.get()) != '\n' && the_stream);
+  
+  if (c != '\n')
+    the_stream.setstate(std::ios::badbit);
+  
+  the_stream.peek();
+  if (the_stream.eof())
+    the_stream.setstate(std::ios::badbit);
+  
   return the_stream;
 }
 
