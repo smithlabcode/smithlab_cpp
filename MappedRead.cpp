@@ -77,7 +77,7 @@ operator>>(std::istream& the_stream, MappedRead &mr) {
   if (c != '\n')
     the_stream.setstate(std::ios::badbit);
   
-  the_stream.peek();
+  // the_stream.peek();
   if (the_stream.eof())
     the_stream.setstate(std::ios::badbit);
   

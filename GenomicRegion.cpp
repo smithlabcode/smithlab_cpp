@@ -131,7 +131,7 @@ operator>>(std::istream& s, SimpleGenomicRegion& region) {
   while ((c = s.get()) != '\n' && s);
   if (c != '\n')
     s.setstate(std::ios::badbit);
-  s.peek();
+  
   if (s.eof())
     s.setstate(std::ios::badbit);
   
@@ -320,6 +320,7 @@ operator>>(std::istream& s, GenomicRegion& region) {
   size_t start = 0ul, end = 0ul;
   double score = 0.0;
   char strand = '\0';
+  
   if (s >> chrom >> start >> end >> name >> score >> strand)
     region = GenomicRegion(chrom, start, end, name, score, strand);
   else region = GenomicRegion();
@@ -329,7 +330,7 @@ operator>>(std::istream& s, GenomicRegion& region) {
   
   if (c != '\n')
     s.setstate(std::ios::badbit);
-  s.peek();
+  
   if (s.eof())
     s.setstate(std::ios::badbit);
   
