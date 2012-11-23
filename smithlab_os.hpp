@@ -56,6 +56,11 @@ read_fasta_file(const std::string filename,
 		std::vector<std::string> &sequences);
 
 void
+read_fasta_file(const std::string filename,
+        const std::string &name,
+        std::string &sequence);
+
+void
 read_fastq_file(const char *filename, 
 		std::vector<std::string> &names, 
 		std::vector<std::string> &sequences,

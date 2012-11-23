@@ -345,9 +345,9 @@ read_fasta_file(const string filename, vector<string> &names,
       else first_line = false;
       name = buffer;
       name = name.substr(name.find_first_not_of("> "));
-      const size_t first_whitespace = name.find(' ');
+      const size_t first_whitespace = name.find_first_of(" \t");
       if (first_whitespace != std::string::npos)
-	name = name.substr(0, first_whitespace);
+      name = name.substr(0, first_whitespace);
       s = "";
     }
     else s += buffer;
@@ -360,7 +360,57 @@ read_fasta_file(const string filename, vector<string> &names,
   }
 }
 
+void
+read_fasta_file(const string filename, const string &target,
+                string &sequence) {
 
+  // read the sequence with the given name from a fasta file
+  
+  sequence = "";
+  
+  std::ifstream in(filename.c_str(), std::ios::binary);
+  if (!in) {
+    throw SMITHLABException("cannot open input file " + string(filename));
+  }
+
+  static const size_t INPUT_BUFFER_SIZE = 1000000;
+  
+  string s, name;
+
+  bool first_line = true;
+  while (!in.eof()) {
+    char buffer[INPUT_BUFFER_SIZE + 1];
+    in.getline(buffer, INPUT_BUFFER_SIZE);
+    if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
+      throw SMITHLABException("Line in " + name + "\nexceeds max length: " +
+                              toa(INPUT_BUFFER_SIZE));
+    // correct for dos carriage returns before newlines
+    if (buffer[strlen(buffer) - 1] == '\r')
+      buffer[strlen(buffer) - 1] = '\0';
+    if (buffer[0] == '>') {
+      if (first_line == false && s.length() > 0 && name == target) {
+        std::swap(sequence, s);
+        in.close();
+        return;
+      }
+      else
+        first_line = false;
+      name = buffer;
+      name = name.substr(name.find_first_not_of("> "));
+      const size_t first_whitespace = name.find_first_of(" \t");
+      if (first_whitespace != std::string::npos)
+        name = name.substr(0, first_whitespace);
+      s = "";
+    }
+    else if (name == target)
+      s += buffer;
+    in.peek();
+  }//while
+  if (!first_line && s.length() > 0 && name == target) {
+    std::swap(sequence, s);
+  }
+  in.close();
+}
 
 void
 read_filename_file(const char *filename, vector<string> &filenames) {
