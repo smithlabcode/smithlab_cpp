@@ -87,6 +87,12 @@ private:
   int seg_len;
 
   //functions to get MappedRead
+  void get_mr_bsmap(MappedRead &mr, GenomicRegion &r) const;
+  void get_mr_bismark(MappedRead &mr, GenomicRegion &r) const;
+  void get_mr_bsseeker(MappedRead &mr, GenomicRegion &r) const;
+  void get_mr_general(MappedRead &mr, GenomicRegion &r) const;
+
+  //other functions associated with information extraction
   void apply_CIGAR(std::string &new_seq, std::string &new_qual) const;
   void get_mismatch_bsmap();
   void get_mismatch_bismark();
