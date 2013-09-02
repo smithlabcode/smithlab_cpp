@@ -58,6 +58,8 @@ public:
   MappedRead GetMappedRead() const;
   bool load_read_from_line(std::istream& the_stream);
 
+  std::string GetName() {return name;}
+
 private:
   //standard SAM format fields
   std::string mapper;

@@ -46,7 +46,7 @@ SAM::SAM(string mapper, string line) : mapper(mapper) {
         >> mate_name >> mate_start >> seg_len >> seq >> qual
         >> edit_distance_str >> mismatch_str >> meth_call_str
         >> read_conv_str >> genome_conv_str))
-      throw SMITHLABException("malformed line in bsmap SAM format:\n" + line);
+      throw SMITHLABException("malformed line in bismark SAM format:\n" + line);
 
     get_mismatch_bismark();
   }
@@ -62,7 +62,7 @@ SAM::SAM(string mapper, string line) : mapper(mapper) {
     string new_qual(seq.size(), 'h');
     qual = new_qual;
   }
-  else if (mapper.compare("unkown") == 0) {
+  else if (mapper.compare("unknown") == 0) {
     if (!(iss >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
         >> mate_name >> mate_start >> seg_len >> seq >> qual
         ))
@@ -241,7 +241,7 @@ SAM::load_read_from_line(std::istream& the_stream) {
     qual = new_qual;
     return true;
   }
-  else if (mapper.compare("unkown") == 0) {
+  else if (mapper.compare("unknown") == 0) {
     if (!(the_stream >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
         >> mate_name >> mate_start >> seg_len >> seq >> qual))
       return false;
