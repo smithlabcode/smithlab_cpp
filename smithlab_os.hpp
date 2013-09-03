@@ -86,6 +86,11 @@ get_filesize(std::string filename);
 std::string
 basename(std::string filename);
 
+void
+parse_dir_baseanme_suffix(std::string full_path,
+          std::string &dirname,
+          std::string &base_name,
+          std::string &suffix);
 
 std::string
 strip_path(std::string full_path);
