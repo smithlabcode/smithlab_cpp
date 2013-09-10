@@ -108,6 +108,7 @@ SAM::get_mr_bsmap(MappedRead &mr, GenomicRegion &r) const {
 
   r.set_score(mismatch);
   mr.r = r;
+  mr.r.set_end(r.get_start() + new_seq.size()); //update region length
   mr.seq = new_seq;
   mr.scr = new_qual;
 
@@ -155,6 +156,7 @@ SAM::get_mr_bismark(MappedRead &mr, GenomicRegion &r) const {
 
   r.set_score(mismatch);
   mr.r = r;
+  mr.r.set_end(r.get_start() + new_seq.size()); //update region length
   mr.seq = new_seq;
   mr.scr = new_qual;
   mr.r.set_name(name);
@@ -182,6 +184,7 @@ SAM::get_mr_bsseeker(MappedRead &mr, GenomicRegion &r) const {
 
   r.set_score(mismatch);
   mr.r = r;
+  mr.r.set_end(r.get_start() + new_seq.size()); //update region length
   mr.seq = new_seq;
   mr.scr = new_qual;
 
@@ -200,6 +203,7 @@ SAM::get_mr_general(MappedRead &mr, GenomicRegion &r) const {
 
   r.set_score(mismatch);
   mr.r = r;
+  mr.r.set_end(r.get_start() + new_seq.size()); //update region length
   mr.seq = new_seq;
   mr.scr = new_qual;
 
