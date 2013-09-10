@@ -88,9 +88,9 @@ basename(std::string filename);
 
 void
 parse_dir_baseanme_suffix(std::string full_path,
-          std::string &dirname,
-          std::string &base_name,
-          std::string &suffix);
+			  std::string &dirname,
+			  std::string &base_name,
+			  std::string &suffix);
 
 std::string
 strip_path(std::string full_path);
@@ -100,13 +100,15 @@ strip_path_and_suffix(std::string full_path);
 
 
 void
-extract_regions_chrom_fasta(const std::string &chrom_name, const std::string &filename,
+extract_regions_chrom_fasta(const std::string &chrom_name, 
+			    const std::string &filename,
 			    const std::vector<GenomicRegion> &regions, 
 			    std::vector<std::string> &sequences);
 
 
 void
-extract_regions_chrom_fasta(const std::string &chrom_name, const std::string &filename,
+extract_regions_chrom_fasta(const std::string &chrom_name, 
+			    const std::string &filename,
 			    const std::vector<SimpleGenomicRegion> &regions, 
 			    std::vector<std::string> &sequences);
 
