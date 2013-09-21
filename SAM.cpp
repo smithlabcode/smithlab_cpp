@@ -20,6 +20,8 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iterator>
+
 #include "SAM.hpp"
 #include "smithlab_utils.hpp"
 #include "MappedRead.hpp"
@@ -39,6 +41,7 @@ SAM::SAM(string mapper, string line) : mapper(mapper) {
         >> mismatch_str >> strand_str))
       throw SMITHLABException("malformed line in bsmap SAM format:\n" + line);
 
+    IS_TRICH = flag & 0x40;
     get_mismatch_bsmap();
   }
   else if (mapper.compare("bismark") == 0) {
@@ -48,6 +51,8 @@ SAM::SAM(string mapper, string line) : mapper(mapper) {
         >> read_conv_str >> genome_conv_str))
       throw SMITHLABException("malformed line in bismark SAM format:\n" + line);
 
+    IS_TRICH = read_conv_str.substr(read_conv_str.size() - 2)
+      == genome_conv_str.substr(genome_conv_str.size() - 2);
     get_mismatch_bismark();
   }
   else if (mapper.compare("bs_seeker") == 0) {
@@ -77,7 +82,7 @@ SAM::SAM(string mapper, string line) : mapper(mapper) {
 }
 
 MappedRead
-SAM::GetMappedRead() const {
+SAM::GetMappedRead()  {
   MappedRead mr;
   //SAM is 1-based
   GenomicRegion r(chrom,start - 1,start - 1 + seq.size());
@@ -135,60 +140,123 @@ SAM::get_mr_bsmap(MappedRead &mr, GenomicRegion &r) const {
 }
 
 void
-SAM::get_mr_bismark(MappedRead &mr, GenomicRegion &r) const {
-  string new_seq, new_qual;
-  apply_CIGAR(new_seq, new_qual);
+SAM::get_mr_bismark(MappedRead &mr, GenomicRegion &r) {
+  
+  // string new_seq, new_qual;
+  // apply_CIGAR(new_seq, new_qual);
 
-  if (is_revcomp())
-    r.set_strand('-');
-  else
-    r.set_strand('+');
+  // if (is_revcomp())
+  //   r.set_strand('-');
+  // else
+  //   r.set_strand('+');
 
-  // if a read is mapped to - strand, bismark stores the + strand seq of
-  // reference genome rather than the seq of that read. I'm not sure
-  // about the orientation of CIGAR string in bismark. But we do need the
-  // original sequence in .mr
-  if (is_revcomp())
+  // // if a read is mapped to - strand, bismark stores the + strand seq of
+  // // reference genome rather than the seq of that read. I'm not sure
+  // // about the orientation of CIGAR string in bismark. But we do need the
+  // // original sequence in .mr
+  // if (is_revcomp())
+  // {
+  //   revcomp_inplace(new_seq);
+  //   std::reverse(new_qual.begin(), new_qual.end());
+  // }
+
+  // if (CIGAR.find_first_of("IDSHPX") != string::npos)
+  // {
+  //   throw SMITHLABException("Only support bowtie 1 reaults without gaps");
+  // }
+  
+  const string read_conv_mode = read_conv_str.substr(read_conv_str.size() - 2);
+  const string genome_conv_mode =
+      genome_conv_str.substr(genome_conv_str.size() - 2);
+  if (genome_conv_mode == "CT")
   {
-    revcomp_inplace(new_seq);
-    std::reverse(new_qual.begin(), new_qual.end());
-  }
+    r.set_strand('+');
+    
+    string new_seq, new_qual;
+    if (read_conv_mode == "CT")
+      apply_CIGAR(new_seq, new_qual);
+    else
+    {
+      revcomp_inplace(seq);
+      std::reverse(qual.begin(), qual.end());
+      apply_CIGAR(new_seq, new_qual);
+      revcomp_inplace(new_seq);
+      std::reverse(new_qual.begin(), new_qual.end());
+      revcomp_inplace(seq);
+      std::reverse(qual.begin(), qual.end());
+    }
+    
+    r.set_score(mismatch);
+    mr.r = r;
+    mr.r.set_end(r.get_start() + new_seq.size()); //update region length
+    mr.seq = new_seq;
+    mr.scr = new_qual;
+    mr.r.set_name(name);
 
-  r.set_score(mismatch);
-  mr.r = r;
-  mr.r.set_end(r.get_start() + new_seq.size()); //update region length
-  mr.seq = new_seq;
-  mr.scr = new_qual;
-  mr.r.set_name(name);
+    std::cout << mr << std::endl;
+    
+  }
+  else if (genome_conv_mode == "GA") 
+  {
+    r.set_strand('-');
+
+    string new_seq, new_qual;
+    if (read_conv_mode == "GA")
+      apply_CIGAR(new_seq, new_qual);
+    else
+    {
+      revcomp_inplace(seq);
+      std::reverse(qual.begin(), qual.end());
+      apply_CIGAR(new_seq, new_qual);
+      revcomp_inplace(new_seq);
+      std::reverse(new_qual.begin(), new_qual.end());
+      revcomp_inplace(seq);
+      std::reverse(qual.begin(), qual.end());
+    }
+
+    std::transform(new_seq.begin(), new_seq.end(), new_seq.begin(), complement);
+    r.set_score(mismatch);
+    mr.r = r;
+    mr.r.set_end(r.get_start() + new_seq.size()); //update region length
+    mr.seq = new_seq;
+    mr.scr = new_qual;
+    mr.r.set_name(name);
+
+    std::cout << mr << std::endl;
+
+  }
 }
 
 void
 SAM::get_mr_bsseeker(MappedRead &mr, GenomicRegion &r) const {
-  string new_seq, new_qual;
-  apply_CIGAR(new_seq, new_qual);
+  throw SMITHLABException("NOT FULLY SUPPORTED");
 
-  if (is_revcomp())
-    r.set_strand('-');
-  else
-    r.set_strand('+');
+  // string new_seq, new_qual;
 
-  // if a read is mapped to - strand, bs_seeker stores the + strand seq of
-  // reference genome rather than the seq of that read. I'm not sure
-  // about the orientation of CIGAR string in bs_seeker. But we do need the
-  // original sequence in .mr
-  if (is_revcomp())
-  {
-    revcomp_inplace(new_seq);
-    std::reverse(new_qual.begin(), new_qual.end());
-  }
+  // apply_CIGAR(new_seq, new_qual);
 
-  r.set_score(mismatch);
-  mr.r = r;
-  mr.r.set_end(r.get_start() + new_seq.size()); //update region length
-  mr.seq = new_seq;
-  mr.scr = new_qual;
+  // if (is_revcomp())
+  //   r.set_strand('-');
+  // else
+  //   r.set_strand('+');
 
-  mr.r.set_name(name);
+  // // if a read is mapped to - strand, bs_seeker stores the + strand seq of
+  // // reference genome rather than the seq of that read. I'm not sure
+  // // about the orientation of CIGAR string in bs_seeker. But we do need the
+  // // original sequence in .mr
+  // if (is_revcomp())
+  // {
+  //   revcomp_inplace(new_seq);
+  //   std::reverse(new_qual.begin(), new_qual.end());
+  // }
+
+  // r.set_score(mismatch);
+  // mr.r = r;
+  // mr.r.set_end(r.get_start() + new_seq.size()); //update region length
+  // mr.seq = new_seq;
+  // mr.scr = new_qual;
+
+  // mr.r.set_name(name);
 }
 
 void

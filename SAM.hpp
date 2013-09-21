@@ -50,12 +50,13 @@ public:
   bool is_unmapped() const {return flag & 0x4;}
   bool is_mapped() const {return !(is_unmapped());}
   bool is_revcomp() const {return flag & 0x10;}
-  bool is_Trich() const {return flag & 0x40;}
+//  bool is_Trich() const {return flag & 0x40;} // valid only bsmap
+  bool is_Trich() const {return IS_TRICH;}
   bool is_Arich() const {return flag & 0x80;}
   bool is_secondary() const {return flag & 0x100;}
   bool is_primary() const {return !(is_secondary());}
 
-  MappedRead GetMappedRead() const;
+  MappedRead GetMappedRead();
   bool load_read_from_line(std::istream& the_stream);
 
   std::string GetName() {return name;}
@@ -88,9 +89,12 @@ private:
   size_t mismatch;
   int seg_len;
 
+  // helper 
+  bool IS_TRICH;
+
   //functions to get MappedRead
   void get_mr_bsmap(MappedRead &mr, GenomicRegion &r) const;
-  void get_mr_bismark(MappedRead &mr, GenomicRegion &r) const;
+  void get_mr_bismark(MappedRead &mr, GenomicRegion &r);
   void get_mr_bsseeker(MappedRead &mr, GenomicRegion &r) const;
   void get_mr_general(MappedRead &mr, GenomicRegion &r) const;
 
