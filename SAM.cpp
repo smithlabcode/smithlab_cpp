@@ -193,7 +193,7 @@ SAM::get_mr_bismark(MappedRead &mr, GenomicRegion &r) {
     mr.scr = new_qual;
     mr.r.set_name(name);
 
-    std::cout << mr << std::endl;
+//    std::cout << mr << std::endl;
     
   }
   else if (genome_conv_mode == "GA") 
@@ -222,7 +222,7 @@ SAM::get_mr_bismark(MappedRead &mr, GenomicRegion &r) {
     mr.scr = new_qual;
     mr.r.set_name(name);
 
-    std::cout << mr << std::endl;
+//    std::cout << mr << std::endl;
 
   }
 }
