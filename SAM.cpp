@@ -20,313 +20,103 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iterator>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <iostream>
 
 #include "SAM.hpp"
 #include "smithlab_utils.hpp"
 #include "MappedRead.hpp"
-
-#include <fstream>
+#include "sam.h"
 
 using std::string;
 using std::vector;
+using std::cerr;
+using std::endl;
 
-SAM::SAM(string mapper) : mapper(mapper) {}
+SAMReader::SAMReader(const string fn, const string mapper_used) :
+  filename(fn), mapper(mapper_used), file_handler(NULL),
+  algn_p(NULL), GOOD(false) 
+{
+  if (mapper != "bsmap" && mapper != "bismark" && mapper != "bsseeker")
+    throw SMITHLABException("Mapper unsupported:" + mapper);
 
-SAM::SAM(string mapper, string line) : mapper(mapper) {
-  std::istringstream iss(line);
-  if (mapper.compare("bsmap") == 0) {
-    if (!(iss >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
-        >> mate_name >> mate_start >> seg_len >> seq >> qual
-        >> mismatch_str >> strand_str))
-      throw SMITHLABException("malformed line in bsmap SAM format:\n" + line);
+  const string ext_name = filename.substr(filename.find_last_of('.'));
+  mode = ext_name == ".bam" ? "rb" : "r";
 
-    IS_TRICH = flag & 0x40;
-    get_mismatch_bsmap();
-  }
-  else if (mapper.compare("bismark") == 0) {
-    if (!(iss >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
-        >> mate_name >> mate_start >> seg_len >> seq >> qual
-        >> edit_distance_str >> mismatch_str >> meth_call_str
-        >> read_conv_str >> genome_conv_str))
-      throw SMITHLABException("malformed line in bismark SAM format:\n" + line);
-
-    IS_TRICH = read_conv_str.substr(read_conv_str.size() - 2)
-      == genome_conv_str.substr(genome_conv_str.size() - 2);
-    get_mismatch_bismark();
-  }
-  else if (mapper.compare("bs_seeker") == 0) {
-    if (!(iss >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
-        >> mate_name >> mate_start >> seg_len >> seq >> qual))
-      throw SMITHLABException("malformed line in bs_seeker SAM format:\n" + line);
-
-    // seems bs_seeker doesn't keep mismatch information.
-    mismatch = 0;
-
-    // bs_seeker also doesn't keep sequencing quality information?
-    string new_qual(seq.size(), 'h');
-    qual = new_qual;
-  }
-  else if (mapper.compare("unknown") == 0) {
-    if (!(iss >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
-        >> mate_name >> mate_start >> seg_len >> seq >> qual
-        ))
-      throw SMITHLABException("malformed line in SAM format:\n" + line);
-
-    mismatch = 0;
-  }
-  else {
-    throw SMITHLABException("Unsupported mapper for SAM format: " + mapper
-        + ". Please try using 'unknown'.");
-  }
-}
-
-MappedRead
-SAM::GetMappedRead()  {
-  MappedRead mr;
-  //SAM is 1-based
-  GenomicRegion r(chrom,start - 1,start - 1 + seq.size());
-  
-  if (mapper.compare("bismark") == 0)
-    get_mr_bismark(mr,r);
-  else if (mapper.compare("bsmap") == 0)
-    get_mr_bsmap(mr,r);
-  else if (mapper.compare("bs_seeker") == 0)
-    get_mr_bsseeker(mr,r);
-  else
-    get_mr_general(mr,r);
-
-  return mr;
-}
-
-void
-SAM::get_mr_bsmap(MappedRead &mr, GenomicRegion &r) const {
-  // bsmap stores the original seq of each read regardless of which strand
-  // it mapped to.
-  string new_seq, new_qual;
-  apply_CIGAR(new_seq, new_qual);
-
-  if (is_revcomp())
-    r.set_strand('-');
-  else
-    r.set_strand('+');
-
-  r.set_score(mismatch);
-  mr.r = r;
-  mr.r.set_end(r.get_start() + new_seq.size()); //update region length
-  mr.seq = new_seq;
-  mr.scr = new_qual;
-
-  string strand, bs_forward;
-  get_strand(strand, bs_forward);
-
-  if (is_pairend()) {
-    if (is_Trich()) {
-      mr.r.set_name(name + "/1");
-    }
-    else {
-      mr.r.set_name(name + "/2");
-    }
-    assert((is_Trich() && bs_forward == "+")
-      || (is_Arich() && bs_forward == "-"));
-  }
-  else {
-    //single end
-    assert(bs_forward == "+");
-    assert(is_revcomp() == (strand != bs_forward));
-    mr.r.set_name(name);
-  }
-  mr.r.set_strand(strand[0]);
-}
-
-void
-SAM::get_mr_bismark(MappedRead &mr, GenomicRegion &r) {
-  
-  // string new_seq, new_qual;
-  // apply_CIGAR(new_seq, new_qual);
-
-  // if (is_revcomp())
-  //   r.set_strand('-');
-  // else
-  //   r.set_strand('+');
-
-  // // if a read is mapped to - strand, bismark stores the + strand seq of
-  // // reference genome rather than the seq of that read. I'm not sure
-  // // about the orientation of CIGAR string in bismark. But we do need the
-  // // original sequence in .mr
-  // if (is_revcomp())
-  // {
-  //   revcomp_inplace(new_seq);
-  //   std::reverse(new_qual.begin(), new_qual.end());
-  // }
-
-  // if (CIGAR.find_first_of("IDSHPX") != string::npos)
-  // {
-  //   throw SMITHLABException("Only support bowtie 1 reaults without gaps");
-  // }
-  
-  const string read_conv_mode = read_conv_str.substr(read_conv_str.size() - 2);
-  const string genome_conv_mode =
-      genome_conv_str.substr(genome_conv_str.size() - 2);
-  if (genome_conv_mode == "CT")
+  if ((file_handler = samopen(filename.c_str(), mode.c_str(), NULL))
+      == NULL)
   {
-    r.set_strand('+');
-    
-    string new_seq, new_qual;
-    if (read_conv_mode == "CT")
-      apply_CIGAR(new_seq, new_qual);
-    else
-    {
-      revcomp_inplace(seq);
-      std::reverse(qual.begin(), qual.end());
-      apply_CIGAR(new_seq, new_qual);
-      revcomp_inplace(new_seq);
-      std::reverse(new_qual.begin(), new_qual.end());
-      revcomp_inplace(seq);
-      std::reverse(qual.begin(), qual.end());
-    }
-    
-    r.set_score(mismatch);
-    mr.r = r;
-    mr.r.set_end(r.get_start() + new_seq.size()); //update region length
-    mr.seq = new_seq;
-    mr.scr = new_qual;
-    mr.r.set_name(name);
-
-//    std::cout << mr << std::endl;
-    
+    cerr << "Fail to open SAM/BAM file " << filename << endl;
+    exit(-1);
   }
-  else if (genome_conv_mode == "GA") 
+  
+  algn_p = bam_init1();
+  GOOD = true;
+}
+
+SAMReader::~SAMReader()
+{
+  close();
+}
+
+void
+SAMReader::close()
+{
+  if (algn_p)
   {
-    r.set_strand('-');
-
-    string new_seq, new_qual;
-    if (read_conv_mode == "GA")
-      apply_CIGAR(new_seq, new_qual);
-    else
-    {
-      revcomp_inplace(seq);
-      std::reverse(qual.begin(), qual.end());
-      apply_CIGAR(new_seq, new_qual);
-      revcomp_inplace(new_seq);
-      std::reverse(new_qual.begin(), new_qual.end());
-      revcomp_inplace(seq);
-      std::reverse(qual.begin(), qual.end());
-    }
-
-    std::transform(new_seq.begin(), new_seq.end(), new_seq.begin(), complement);
-    r.set_score(mismatch);
-    mr.r = r;
-    mr.r.set_end(r.get_start() + new_seq.size()); //update region length
-    mr.seq = new_seq;
-    mr.scr = new_qual;
-    mr.r.set_name(name);
-
-//    std::cout << mr << std::endl;
-
+    bam_destroy1(algn_p);
+    algn_p = NULL;
   }
-}
-
-void
-SAM::get_mr_bsseeker(MappedRead &mr, GenomicRegion &r) const {
-  throw SMITHLABException("NOT FULLY SUPPORTED");
-
-  // string new_seq, new_qual;
-
-  // apply_CIGAR(new_seq, new_qual);
-
-  // if (is_revcomp())
-  //   r.set_strand('-');
-  // else
-  //   r.set_strand('+');
-
-  // // if a read is mapped to - strand, bs_seeker stores the + strand seq of
-  // // reference genome rather than the seq of that read. I'm not sure
-  // // about the orientation of CIGAR string in bs_seeker. But we do need the
-  // // original sequence in .mr
-  // if (is_revcomp())
-  // {
-  //   revcomp_inplace(new_seq);
-  //   std::reverse(new_qual.begin(), new_qual.end());
-  // }
-
-  // r.set_score(mismatch);
-  // mr.r = r;
-  // mr.r.set_end(r.get_start() + new_seq.size()); //update region length
-  // mr.seq = new_seq;
-  // mr.scr = new_qual;
-
-  // mr.r.set_name(name);
-}
-
-void
-SAM::get_mr_general(MappedRead &mr, GenomicRegion &r) const {
-  string new_seq, new_qual;
-  apply_CIGAR(new_seq, new_qual);
-
-  if (is_revcomp())
-    r.set_strand('-');
-  else
-    r.set_strand('+');
-
-  r.set_score(mismatch);
-  mr.r = r;
-  mr.r.set_end(r.get_start() + new_seq.size()); //update region length
-  mr.seq = new_seq;
-  mr.scr = new_qual;
-
-  mr.r.set_name(name);
+  if (file_handler)
+  {
+    samclose(file_handler);
+    file_handler = NULL;
+    filename = "";
+    mode = "";
+    GOOD = false;
+  }
 }
 
 bool
-SAM::load_read_from_line(std::istream& the_stream) {
-  if (mapper.compare("bsmap") == 0) {
-    if (!(the_stream >> name >> flag >> chrom >> start
-          >> mapq_score >> CIGAR >> mate_name >> mate_start
-          >> seg_len >> seq >> qual >> mismatch_str >> strand_str))
-      return false;
-
-    get_mismatch_bsmap();
-    return true;
-  }
-  else if (mapper.compare("bismark") == 0) {
-    if (!(the_stream >> name >> flag >> chrom >> start
-          >> mapq_score >> CIGAR >> mate_name
-          >> mate_start >> seg_len >> seq >> qual
-          >> edit_distance_str >> mismatch_str >> meth_call_str
-          >> read_conv_str >> genome_conv_str))
-      return false;
-
-    get_mismatch_bismark();
-    return true;
-  }
-  else if (mapper.compare("bs_seeker") == 0) {
-    if (!(the_stream >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
-        >> mate_name >> mate_start >> seg_len >> seq >> qual))
-      return false;
-
-    // seems bs_seeker doesn't keep mismatch information.
-    mismatch = 0;
-
-    // bs_seeker also doesn't keep sequencing quality information?
-    string new_qual(seq.size(), 'h');
-    qual = new_qual;
-    return true;
-  }
-  else if (mapper.compare("unknown") == 0) {
-    if (!(the_stream >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
-        >> mate_name >> mate_start >> seg_len >> seq >> qual))
-      return false;
-
-    mismatch = 0;
-    return true;
-  }
-  
+SAMReader::get_SAMRecord(const string &str, SAMRecord &samr)
+{
+  if (mapper == "bsmap")
+    return get_SAMRecord_bsmap(str, samr);
+  else if (mapper == "bismark")
+    return get_SAMRecord_bismark(str, samr);
+  else if (mapper == "bsseeker")
+    return get_SAMRecord_bsseeker(str, samr);
+  else
+    GOOD = false;
   return false;
 }
 
-void
-SAM::apply_CIGAR(string &new_seq, string &new_qual) const {
+SAMReader&
+operator>>(SAMReader &sam_stream, SAMRecord& samr)
+{
+  if (samread(sam_stream.file_handler, sam_stream.algn_p) >= 0)
+  {
+    const char *str = bam_format1_core(sam_stream.file_handler->header,
+                                       sam_stream.algn_p,
+                                       sam_stream.file_handler->type>>2&3);
+    sam_stream.GOOD = sam_stream.get_SAMRecord(str, samr);
+  }
+  else
+    sam_stream.GOOD = false;
+
+  return sam_stream;
+}
+
+/////////////////////////////////////////////
+//// general facility for SAM format
+/////////////////////////////////////////////
+
+void static
+apply_CIGAR(const string &seq, const string &qual,
+            const string &CIGAR, string &new_seq, string &new_qual)
+{
     assert(seq.size() == qual.size());
     assert(new_seq.size() == 0 && new_qual.size() == 0);
     size_t n;
@@ -372,13 +162,96 @@ SAM::apply_CIGAR(string &new_seq, string &new_qual) const {
     assert(new_seq.size() == new_qual.size());
 }
 
-void
-SAM::get_mismatch_bsmap() {
-  mismatch = atoi(mismatch_str.substr(5).c_str());
+class FLAG 
+{
+public:  
+  FLAG(const size_t f) : flag(f) {}
+  bool is_pairend() const {return flag & 0x1;}
+  bool is_singlend() const {return !(is_pairend());}
+  bool is_mapping_paired() const {return flag & 0x2;}
+  bool is_unmapped() const {return flag & 0x4;}
+  bool is_mapped() const {return !(is_unmapped());}
+  bool is_revcomp() const {return flag & 0x10;}
+  bool is_Trich() const {return flag & 0x40;}
+  bool is_Arich() const {return flag & 0x80;}
+  bool is_secondary() const {return flag & 0x100;}
+  bool is_primary() const {return !(is_secondary());}
+
+private:
+  size_t flag;
+};
+
+////////////////////////////////////////
+// BSMAP
+////////////////////////////////////////
+
+class BSMAPFLAG : public FLAG
+{
+public:  
+  BSMAPFLAG(const size_t f) : FLAG(f) {}
+};
+
+inline static void
+bsmap_get_strand(const string &strand_str, string &strand, string &bs_forward)
+{
+    strand = strand_str.substr(5, 1);
+    bs_forward = strand_str.substr(6, 1);
+    if (bs_forward == "-") strand = strand == "+" ? "-" : "+";
 }
 
-void
-SAM::get_mismatch_bismark() {
+bool
+SAMReader::get_SAMRecord_bsmap(const string &str, SAMRecord &samr)
+{
+  string name, chrom, CIGAR, mate_name, seq, qual, strand_str, mismatch_str;
+  size_t flag, start, mapq_score, mate_start;
+  int seg_len;
+
+  std::istringstream iss(str);
+  if (!(iss >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
+        >> mate_name >> mate_start >> seg_len >> seq >> qual
+        >> mismatch_str >> strand_str))
+  {
+    GOOD = false;
+    throw SMITHLABException("malformed line in bsmap SAM format:\n" + str);
+  }
+  
+  BSMAPFLAG Flag(flag);
+
+  samr.mr.r.set_chrom(chrom);
+  samr.mr.r.set_start(start - 1);
+  samr.mr.r.set_name(name);
+  samr.mr.r.set_score(atoi(mismatch_str.substr(5).c_str()));
+  
+  string strand, bs_forward;
+  bsmap_get_strand(strand_str, strand, bs_forward);
+  samr.mr.r.set_strand(strand[0]);
+
+  string new_seq, new_qual;
+  apply_CIGAR(seq, qual, CIGAR, new_seq, new_qual);
+
+  samr.mr.r.set_end(samr.mr.r.get_start() + new_seq.size()); 
+  samr.mr.seq = new_seq;
+  samr.mr.scr = new_qual;
+
+  samr.is_Trich = Flag.is_Trich();
+  samr.is_mapping_paired = Flag.is_mapping_paired();
+  return GOOD;
+}
+
+////////////////////////////////////////
+// Bismark
+////////////////////////////////////////
+
+class BISMARKFLAG : public FLAG
+{
+public:  
+  BISMARKFLAG(const size_t f) : FLAG(f) {}
+};
+
+static size_t
+get_mismatch_bismark(const string &edit_distance_str,
+                     const string &meth_call_str)
+{
   /*
   the result of this function might not be accurate, because if a sequencing
   error occurs on a cytosine, then it probably will be reported as a convertion
@@ -394,42 +267,108 @@ SAM::get_mismatch_bismark() {
     ++temp;
   }
 
-  mismatch = edit_distance - convert_count;
+  return edit_distance - convert_count;
 }
 
-void
-SAM::get_strand(string &strand, string &bs_forward) const {
-  strand = strand_str.substr(5, 1);
-  bs_forward = strand_str.substr(6, 1);
-  if (bs_forward == "-") strand = strand == "+" ? "-" : "+";
+bool
+SAMReader::get_SAMRecord_bismark(const string &str, SAMRecord &samr)
+{
+  string name, chrom, CIGAR, mate_name, seq, qual, strand_str,
+    edit_distance_str, mismatch_str, meth_call_str,
+    read_conv_str, genome_conv_str;
+  size_t flag, start, mapq_score, mate_start;
+  int seg_len;
+  
+  std::istringstream iss(str);
+  if (!(iss >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
+        >> mate_name >> mate_start >> seg_len >> seq >> qual
+        >> edit_distance_str >> mismatch_str >> meth_call_str
+        >> read_conv_str >> genome_conv_str))
+  {
+    GOOD = false;
+    throw SMITHLABException("malformed line in bismark SAM format:\n" + str);
+  }
+
+  BISMARKFLAG Flag(flag);
+
+  samr.mr.r.set_chrom(chrom);
+  samr.mr.r.set_start(start - 1);
+  samr.mr.r.set_name(name);
+  samr.mr.r.set_score(get_mismatch_bismark(edit_distance_str, meth_call_str));
+  samr.mr.r.set_strand(Flag.is_revcomp() ? '-' : '+');
+  
+  string new_seq, new_qual;
+  apply_CIGAR(seq, qual, CIGAR, new_seq, new_qual);
+
+  if ( (Flag.is_revcomp() && Flag.is_Trich())
+       || (!(Flag.is_revcomp()) && Flag.is_Arich()) )
+  {
+    revcomp_inplace(new_seq);
+    std::reverse(new_qual.begin(), new_qual.end());
+  }
+
+  samr.mr.r.set_end(samr.mr.r.get_start() + new_seq.size()); 
+  samr.mr.seq = new_seq;
+  samr.mr.scr = new_qual;
+
+  samr.is_Trich = Flag.is_Trich();
+  samr.is_mapping_paired = Flag.is_mapping_paired();
+
+  return GOOD;
 }
 
-std::istream& 
-operator>>(std::istream& the_stream, SAM &r) {
-  //To-do: do not load unmapped reads?
-  if (!r.load_read_from_line(the_stream))
-      //throw SMITHLABException("Unable to load read from input file.");
-      the_stream.setstate(std::ios::badbit);
-    
-    char c;
-    while ((c = the_stream.get()) != '\n' && the_stream);
-    
-    if (c != '\n')
-      //throw SMITHLABException("Unable to load read from input file.");
-      the_stream.setstate(std::ios::badbit);
-    
-    // the_stream.peek();
-    if (the_stream.eof())
-      //throw SMITHLABException("Unable to load read from input file.");
-      the_stream.setstate(std::ios::badbit);
+////////////////////////////////////////
+// BS Seeker
+////////////////////////////////////////
 
-  return the_stream;
+class BSSEEKERFLAG : public FLAG
+{
+public:  
+  BSSEEKERFLAG(const size_t f) : FLAG(f) {}
+};
+
+bool
+SAMReader::get_SAMRecord_bsseeker(const string &str, SAMRecord &samr)
+{
+  string name, chrom, CIGAR, mate_name, seq, qual, strand_str;
+  size_t flag, start, mapq_score, mate_start;
+  int seg_len;
+  
+  std::istringstream iss(str);
+  if (!(iss >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
+        >> mate_name >> mate_start >> seg_len >> seq >> qual))
+  {
+    GOOD = false;
+    throw SMITHLABException("malformed line in bs_seeker SAM format:\n" + str);
+  }
+
+  // bs_seeker also doesn't keep sequencing quality information?
+  qual = string(seq.size(), 'h');
+
+  BSSEEKERFLAG Flag(flag);
+  
+  samr.mr.r.set_chrom(chrom);
+  samr.mr.r.set_start(start - 1);
+  samr.mr.r.set_name(name);
+  samr.mr.r.set_score(0); // seems bs_seeker doesn't keep mismatch information.
+  samr.mr.r.set_strand(Flag.is_revcomp() ? '-' : '+'); 
+
+  string new_seq, new_qual;
+  apply_CIGAR(seq, qual, CIGAR, new_seq, new_qual);
+  
+  if (Flag.is_revcomp())
+  {
+    revcomp_inplace(new_seq);
+    std::reverse(new_qual.begin(), new_qual.end());
+  }
+  
+  samr.mr.r.set_end(samr.mr.r.get_start() + new_seq.size()); 
+  samr.mr.seq = new_seq;
+  samr.mr.scr = new_qual;
+
+  samr.is_Trich = Flag.is_Trich();
+  samr.is_mapping_paired = Flag.is_mapping_paired();
+  
+  return GOOD;
 }
 
-std::ostream& 
-operator<<(std::ostream& the_stream, SAM &r) {
-  //output as .mr format
-  MappedRead mr = r.GetMappedRead();
-
-  return the_stream << mr;
-}
