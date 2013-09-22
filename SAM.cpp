@@ -202,6 +202,10 @@ bsmap_get_strand(const string &strand_str, string &strand, string &bs_forward)
 bool
 SAMReader::get_SAMRecord_bsmap(const string &str, SAMRecord &samr)
 {
+/////
+  cerr << "WARNING: "<< "[BSMAP Converter] test version: may contain bugs" << endl;
+/////
+
   string name, chrom, CIGAR, mate_name, seq, qual, strand_str, mismatch_str;
   size_t flag, start, mapq_score, mate_start;
   int seg_len;
@@ -300,8 +304,7 @@ SAMReader::get_SAMRecord_bismark(const string &str, SAMRecord &samr)
   string new_seq, new_qual;
   apply_CIGAR(seq, qual, CIGAR, new_seq, new_qual);
 
-  if ( (Flag.is_revcomp() && Flag.is_Trich())
-       || (!(Flag.is_revcomp()) && Flag.is_Arich()) )
+  if (Flag.is_revcomp())
   {
     revcomp_inplace(new_seq);
     std::reverse(new_qual.begin(), new_qual.end());
@@ -314,6 +317,11 @@ SAMReader::get_SAMRecord_bismark(const string &str, SAMRecord &samr)
   samr.is_Trich = Flag.is_Trich();
   samr.is_mapping_paired = Flag.is_mapping_paired();
 
+// /////
+//   cerr << "check 1: "<< (samr.is_Trich ? "T-rich" : "A-rich") << "\t"
+//        << samr.is_mapping_paired << endl
+//        << samr.mr << endl;
+// /////
   return GOOD;
 }
 
@@ -330,6 +338,10 @@ public:
 bool
 SAMReader::get_SAMRecord_bsseeker(const string &str, SAMRecord &samr)
 {
+/////
+  cerr << "WARNING: "<< "[BSSeeker Converter] test version: may contain bugs" << endl;
+/////
+  
   string name, chrom, CIGAR, mate_name, seq, qual, strand_str;
   size_t flag, start, mapq_score, mate_start;
   int seg_len;
