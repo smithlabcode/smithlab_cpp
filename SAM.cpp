@@ -44,7 +44,7 @@ SAMReader::SAMReader(const string fn, const string mapper_used) :
 
   const string ext_name = filename.substr(filename.find_last_of('.'));
   mode = ext_name == ".bam" ? "rb" : "r";
-
+  
   if ((file_handler = samopen(filename.c_str(), mode.c_str(), NULL))
       == NULL)
   {
@@ -250,6 +250,7 @@ class BISMARKFLAG : public FLAG
 {
 public:  
   BISMARKFLAG(const size_t f) : FLAG(f) {}
+  bool is_Trich() const {return is_pairend() ? FLAG::is_Trich() : true;}
 };
 
 static size_t
