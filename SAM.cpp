@@ -98,10 +98,11 @@ operator>>(SAMReader &sam_stream, SAMRecord& samr)
 {
   if (samread(sam_stream.file_handler, sam_stream.algn_p) >= 0)
   {
-    const char *str = bam_format1_core(sam_stream.file_handler->header,
+    char *str = bam_format1_core(sam_stream.file_handler->header,
                                        sam_stream.algn_p,
                                        sam_stream.file_handler->type>>2&3);
     sam_stream.GOOD = sam_stream.get_SAMRecord(str, samr);
+    free(str);
   }
   else
     sam_stream.GOOD = false;
@@ -343,13 +344,16 @@ SAMReader::get_SAMRecord_bsseeker(const string &str, SAMRecord &samr)
   cerr << "WARNING: "<< "[BSSeeker Converter] test version: may contain bugs" << endl;
 /////
   
-  string name, chrom, CIGAR, mate_name, seq, qual, strand_str;
+  string name, chrom, CIGAR, mate_name, seq, qual, orientation_str,
+      conversion_str, mismatch_str, mismatch_type_str, seq_genome_str;
   size_t flag, start, mapq_score, mate_start;
   int seg_len;
   
   std::istringstream iss(str);
   if (!(iss >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
-        >> mate_name >> mate_start >> seg_len >> seq >> qual))
+        >> mate_name >> mate_start >> seg_len >> seq >> qual
+        >> orientation_str >> conversion_str >> mismatch_str
+        >> mismatch_type_str >> seq_genome_str))
   {
     GOOD = false;
     throw SMITHLABException("malformed line in bs_seeker SAM format:\n" + str);
@@ -363,7 +367,7 @@ SAMReader::get_SAMRecord_bsseeker(const string &str, SAMRecord &samr)
   samr.mr.r.set_chrom(chrom);
   samr.mr.r.set_start(start - 1);
   samr.mr.r.set_name(name);
-  samr.mr.r.set_score(0); // seems bs_seeker doesn't keep mismatch information.
+  samr.mr.r.set_score(atoi(mismatch_str.substr(5).c_str())); 
   samr.mr.r.set_strand(Flag.is_revcomp() ? '-' : '+'); 
 
   string new_seq, new_qual;
