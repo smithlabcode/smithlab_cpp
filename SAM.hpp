@@ -35,6 +35,8 @@ struct SAMRecord {
   MappedRead mr;
   bool is_Trich;
   bool is_mapping_paired;
+  bool is_primary;
+  bool is_mapped;
 };
 
 class SAMReader
@@ -61,6 +63,8 @@ private:
   get_SAMRecord_bismark(const std::string&, SAMRecord&);
   bool
   get_SAMRecord_bsseeker(const std::string&, SAMRecord&);
+  bool
+  get_SAMRecord_general(const std::string&, SAMRecord&);
   
   // data
   std::string filename;

@@ -39,7 +39,8 @@ SAMReader::SAMReader(const string fn, const string mapper_used) :
   filename(fn), mapper(mapper_used), file_handler(NULL),
   algn_p(NULL), GOOD(false) 
 {
-  if (mapper != "bsmap" && mapper != "bismark" && mapper != "bsseeker")
+  if (mapper != "bsmap" && mapper != "bismark" 
+      && mapper != "bsseeker" && mapper != "general")
     throw SMITHLABException("Mapper unsupported:" + mapper);
 
   const string ext_name = filename.substr(filename.find_last_of('.'));
@@ -88,6 +89,8 @@ SAMReader::get_SAMRecord(const string &str, SAMRecord &samr)
     return get_SAMRecord_bismark(str, samr);
   else if (mapper == "bsseeker")
     return get_SAMRecord_bsseeker(str, samr);
+  else if (mapper == "general")
+    return get_SAMRecord_general(str, samr);
   else
     GOOD = false;
   return false;
@@ -151,14 +154,20 @@ apply_CIGAR(const string &seq, const string &qual,
             ;
             break;
         case '=':
-            ;
+	    new_seq += seq.substr(i, n);
+            new_qual += qual.substr(i, n);
+            i += n;
             break;
         case 'X':
-            ;
+            new_seq += seq.substr(i, n);
+            new_qual += qual.substr(i, n);
+            i += n;
             break;
         }
     }
-    
+    // Sum of lengths of the M/I/S/=/X operations 
+    // shall equal the length of seq.
+
     assert(i == seq.length());
     assert(new_seq.size() == new_qual.size());
 }
@@ -389,3 +398,61 @@ SAMReader::get_SAMRecord_bsseeker(const string &str, SAMRecord &samr)
   return GOOD;
 }
 
+////////////////////////////////////////
+// general: for non-BSseq mappers
+////////////////////////////////////////
+
+class GENERALFLAG : public FLAG
+{
+public:  
+  GENERALFLAG(const size_t f) : FLAG(f) {}
+  bool is_Trich() const {return is_pairend() ? FLAG::is_Trich() : true;}
+};
+
+bool
+SAMReader::get_SAMRecord_general(const string &str, SAMRecord &samr)
+{
+  string name, chrom, CIGAR, mate_name, seq, qual;
+  size_t flag, start, mapq_score, mate_start;
+  int seg_len;
+  
+  std::istringstream iss(str);
+  if (!(iss >> name >> flag >> chrom >> start >> mapq_score >> CIGAR
+        >> mate_name >> mate_start >> seg_len >> seq >> qual))
+  {
+    GOOD = false;
+    throw SMITHLABException("malformed line in SAM format:\n" + str);
+  }
+
+ 
+  GENERALFLAG Flag(flag);
+  samr.is_primary = Flag.is_primary();
+  samr.is_mapped = Flag.is_mapped();
+  samr.mr.r.set_name(name);
+
+  if(samr.is_primary && samr.is_mapped){
+    samr.mr.r.set_chrom(chrom);
+    samr.mr.r.set_start(start - 1);
+    samr.mr.r.set_score(0);
+    samr.mr.r.set_strand(Flag.is_revcomp() ? '-' : '+');
+  
+    string new_seq, new_qual;
+    apply_CIGAR(seq, qual, CIGAR, new_seq, new_qual);
+
+    
+    if (Flag.is_revcomp())
+    {
+      revcomp_inplace(new_seq);
+      std::reverse(new_qual.begin(), new_qual.end());
+    }
+    
+
+    samr.mr.r.set_end(samr.mr.r.get_start() + new_seq.size()); 
+    samr.mr.seq = new_seq;
+    samr.mr.scr = new_qual;
+  }
+  samr.is_Trich = Flag.is_Trich();
+  samr.is_mapping_paired = Flag.is_mapping_paired();
+
+  return GOOD;
+}
