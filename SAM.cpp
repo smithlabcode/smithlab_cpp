@@ -428,6 +428,8 @@ SAMReader::get_SAMRecord_general(const string &str, SAMRecord &samr)
   GENERALFLAG Flag(flag);
   samr.is_primary = Flag.is_primary();
   samr.is_mapped = Flag.is_mapped();
+
+  samr.seg_len = seg_len;
   samr.mr.r.set_name(name);
 
   if(samr.is_primary && samr.is_mapped){
@@ -447,9 +449,11 @@ SAMReader::get_SAMRecord_general(const string &str, SAMRecord &samr)
     }
     
 
-    samr.mr.r.set_end(samr.mr.r.get_start() + new_seq.size()); 
+    samr.mr.r.set_end(samr.mr.r.get_start() + new_seq.size());
+     
     samr.mr.seq = new_seq;
     samr.mr.scr = new_qual;
+
   }
   samr.is_Trich = Flag.is_Trich();
   samr.is_mapping_paired = Flag.is_mapping_paired();

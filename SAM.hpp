@@ -37,6 +37,7 @@ struct SAMRecord {
   bool is_mapping_paired;
   bool is_primary;
   bool is_mapped;
+  int seg_len;
 };
 
 class SAMReader
