@@ -40,7 +40,7 @@ SAMReader::SAMReader(const string fn, const string mapper_used) :
   algn_p(NULL), GOOD(false) 
 {
   if (mapper != "bsmap" && mapper != "bismark" 
-      && mapper != "bsseeker" && mapper != "general")
+      && mapper != "bs_seeker" && mapper != "general")
     throw SMITHLABException("Mapper unsupported:" + mapper);
 
   const string ext_name = filename.substr(filename.find_last_of('.'));
@@ -87,7 +87,7 @@ SAMReader::get_SAMRecord(const string &str, SAMRecord &samr)
     return get_SAMRecord_bsmap(str, samr);
   else if (mapper == "bismark")
     return get_SAMRecord_bismark(str, samr);
-  else if (mapper == "bsseeker")
+  else if (mapper == "bs_seeker")
     return get_SAMRecord_bsseeker(str, samr);
   else if (mapper == "general")
     return get_SAMRecord_general(str, samr);
@@ -344,14 +344,17 @@ class BSSEEKERFLAG : public FLAG
 {
 public:  
   BSSEEKERFLAG(const size_t f) : FLAG(f) {}
+  // in bs_seeker, the flag is different:
+  // if T-rich mate is +, then both mates are +;
+  // if T-rich mate is -, then both mates are -.
+  bool is_revcomp() const {
+    return FLAG::is_revcomp() ? FLAG::is_Trich() : FLAG::is_Arich();
+  }
 };
 
 bool
 SAMReader::get_SAMRecord_bsseeker(const string &str, SAMRecord &samr)
 {
-/////
-  cerr << "WARNING: "<< "[BSSeeker Converter] test version: may contain bugs" << endl;
-/////
   
   string name, chrom, CIGAR, mate_name, seq, qual, orientation_str,
       conversion_str, mismatch_str, mismatch_type_str, seq_genome_str;
