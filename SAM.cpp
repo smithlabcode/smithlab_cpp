@@ -344,12 +344,24 @@ class BSSEEKERFLAG : public FLAG
 {
 public:  
   BSSEEKERFLAG(const size_t f) : FLAG(f) {}
-  // in bs_seeker, the flag is different:
-  // if T-rich mate is +, then both mates are +;
-  // if T-rich mate is -, then both mates are -.
-  bool is_revcomp() const {
-    return FLAG::is_revcomp() ? FLAG::is_Trich() : FLAG::is_Arich();
+  // pair-end:
+  //  if T-rich mate is +, then both mates are +;
+  //  if T-rich mate is -, then both mates are -;
+  // single-end:
+  //  0 for +; 16 for -.
+  bool is_Trich() const {
+    return FLAG::is_pairend() ? FLAG::is_Trich() : true;
   }
+  bool is_Arich() const {
+    return FLAG::is_pairend() && FLAG::is_Arich();
+  }
+  bool is_revcomp() const {
+    if (FLAG::is_pairend())
+      return FLAG::is_revcomp() ? is_Trich() : is_Arich();
+    else
+      return FLAG::is_revcomp();
+  }
+
 };
 
 bool
