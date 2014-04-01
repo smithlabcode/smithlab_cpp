@@ -31,9 +31,9 @@ bool Runif::seed_set = false;
 
 static const size_t 
 DUMMY_SEED = std::numeric_limits<size_t>::max();
-static const size_t
-MODULUS_MASK = static_cast<size_t>(-1);
-static const double
+//static const size_t
+//MODULUS_MASK = static_cast<size_t>(-1);
+static const double 
 DOUBLE_DENOMINATOR = static_cast<double>(std::numeric_limits<int>::max());
 
 #include <iostream>
