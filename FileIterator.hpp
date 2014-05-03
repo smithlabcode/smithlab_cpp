@@ -79,7 +79,7 @@ void
 fill_buffer(std::ifstream &in, const size_t buffer_start, 
 	    std::vector<FASTQRecord> &buffer);
 
-class MappedRead;
+struct MappedRead;
 void 
 fill_buffer(std::ifstream &in, const size_t buffer_start, 
 	    std::vector<MappedRead> &buffer);
