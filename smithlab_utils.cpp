@@ -21,9 +21,58 @@
  */
 
 #include "smithlab_utils.hpp"
-
 #include <cstring>
 #include <cmath>
+using std::vector;
+
+/* Performs Hochberg step-up p-value adjustment.
+ */
+void smithlab::correct_pvals(const size_t n_tests, vector<double> &pvals ) {
+  assert(!pvals.empty());
+
+  vector<std::pair<double, vector<size_t> > > idx;
+  for (size_t i = 0; i < pvals.size(); ++i)
+    idx.push_back(std::make_pair(pvals[i], vector<size_t>(1, i)));
+  std::sort(idx.begin(), idx.end());
+  
+  size_t j = 0;
+  for (size_t i = 1; i < idx.size(); ++i)
+    if (idx[j].first == idx[i].first)
+      idx[j].second.push_back(idx[i].second.front());
+    else std::swap(idx[++j], idx[i]);
+  idx.erase(idx.begin() + j + 1, idx.end());
+  
+  double running_count = idx.front().second.size();
+  idx.front().first *= (n_tests/running_count);
+  for (size_t i = 1; i < idx.size(); ++i) {
+    running_count += idx[i].second.size();
+    idx[i].first = std::max(idx[i-1].first, idx[i].first*(n_tests/running_count));
+  }
+  
+  for (size_t i = 0; i < idx.size(); ++i) {
+    for (size_t j = 0; j < idx[i].second.size(); ++j)
+      pvals[idx[i].second[j]] = idx[i].first;
+  }
+
+}
+
+/* Benjamini-Hochberg step-up FDR cutoff
+ */
+double
+smithlab::get_fdr_cutoff(const size_t n_tests, vector<double> &pvals, 
+	       const double alpha) {
+  if (alpha <= 0) return std::numeric_limits<double>::max();
+  else if (alpha > 1) return std::numeric_limits<double>::min();
+  
+  std::sort(pvals.begin(), pvals.end());
+  
+  const size_t n_pvals = pvals.size();
+  size_t i = 0;
+  while (i < n_pvals - 1 && pvals[i+1] < 
+           alpha*static_cast<double>(i+1)/n_tests)
+    ++i;
+  return pvals[i];
+}
 
 char
 complement(int i) {

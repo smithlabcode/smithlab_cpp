@@ -30,6 +30,7 @@
 #include <vector>
 #include <iostream>
 #include <ostream>
+#include <limits>
 #include <iterator>
 #include <cassert>
 #include <cmath>
@@ -49,6 +50,12 @@ namespace smithlab {
 typedef size_t MASK_t;
 
 namespace smithlab {
+
+  // Code dealing with false discovery rate
+  double get_fdr_cutoff(const size_t n_tests, std::vector<double> &pvals, 
+                        const double alpha);
+
+  void correct_pvals(const size_t n_tests, std::vector<double> &pvals); 
 
   // Assumes 4 nucleotide DNA alphabet
   static const size_t alphabet_size = 4;
