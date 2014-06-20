@@ -29,14 +29,11 @@
 size_t Runif::state = 0;
 bool Runif::seed_set = false;
 
-static const size_t 
-DUMMY_SEED = std::numeric_limits<size_t>::max();
 //static const size_t
 //MODULUS_MASK = static_cast<size_t>(-1);
+
 static const double 
 DOUBLE_DENOMINATOR = static_cast<double>(std::numeric_limits<int>::max());
-
-#include <iostream>
 
 static inline size_t
 rng_integer(size_t &state) {
@@ -52,6 +49,7 @@ rng_double(size_t &state) {
 }
 
 Runif::Runif(size_t seed) {
+  static const size_t DUMMY_SEED = std::numeric_limits<size_t>::max();
   if (seed != DUMMY_SEED)
     state = seed;
   else if (!seed_set)

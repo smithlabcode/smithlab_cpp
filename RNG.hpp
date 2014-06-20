@@ -29,7 +29,6 @@
 class Runif {
 public:
   Runif(size_t seed = std::numeric_limits<size_t>::max());
-  ~Runif() {}
   int runif(int min_val, int max_val) const;
   size_t runif(size_t min_val, size_t max_val) const;
   double runif(double min_val, double max_val) const;  
