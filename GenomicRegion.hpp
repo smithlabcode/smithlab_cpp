@@ -45,7 +45,7 @@ public:
     std::swap(start, rhs.start);
     std::swap(end, rhs.end);
   }
-  SimpleGenomicRegion& operator=(const SimpleGenomicRegion& rhs) {
+  SimpleGenomicRegion &operator=(const SimpleGenomicRegion &rhs) {
     SimpleGenomicRegion tmp(rhs);
     swap(tmp);
     return *this;
@@ -68,28 +68,28 @@ public:
   size_t get_width() const {return (end > start) ? end - start : 0;}
   
   // mutators
-  void set_chrom(const std::string& new_chrom) {chrom = assign_chrom(new_chrom);}
+  void set_chrom(const std::string &new_chrom) {chrom = assign_chrom(new_chrom);}
   void set_start(size_t new_start) {start = new_start;}
   void set_end(size_t new_end) {end = new_end;}
 
   // comparison functions
-  bool contains(const SimpleGenomicRegion& other) const;
-  bool overlaps(const SimpleGenomicRegion& other) const;
-  size_t distance(const SimpleGenomicRegion& other) const;
-  bool operator<(const SimpleGenomicRegion& rhs) const;
-  bool less1(const SimpleGenomicRegion& rhs) const;
-  bool operator<=(const SimpleGenomicRegion& rhs) const;
-  bool operator==(const SimpleGenomicRegion& rhs) const;
-  bool operator!=(const SimpleGenomicRegion& rhs) const;
+  bool contains(const SimpleGenomicRegion &other) const;
+  bool overlaps(const SimpleGenomicRegion &other) const;
+  size_t distance(const SimpleGenomicRegion &other) const;
+  bool operator<(const SimpleGenomicRegion &rhs) const;
+  bool less1(const SimpleGenomicRegion &rhs) const;
+  bool operator<=(const SimpleGenomicRegion &rhs) const;
+  bool operator==(const SimpleGenomicRegion &rhs) const;
+  bool operator!=(const SimpleGenomicRegion &rhs) const;
   
   bool same_chrom(const SimpleGenomicRegion &other) const {
     return chrom == other.chrom;
   }
   
   friend void
-  separate_chromosomes(const std::vector<SimpleGenomicRegion>& regions,
-		       std::vector<std::vector<SimpleGenomicRegion> >& 
-		       separated_by_chrom);
+  separate_chromosomes(const std::vector<SimpleGenomicRegion> &regions,
+		       std::vector<std::vector<SimpleGenomicRegion> > 
+		       &separated_by_chrom);
 private:
 
   static chrom_id_type assign_chrom(const std::string &c);
@@ -105,10 +105,10 @@ private:
 };
 
 std::ostream& 
-operator<<(std::ostream& the_stream, const SimpleGenomicRegion& region);
+operator<<(std::ostream &the_stream, const SimpleGenomicRegion &region);
 
 std::istream& 
-operator>>(std::istream& the_stream, SimpleGenomicRegion& region);
+operator>>(std::istream &the_stream, SimpleGenomicRegion &region);
 
 class GenomicRegion {
 public:
@@ -125,7 +125,7 @@ public:
   GenomicRegion(const GenomicRegion &other) :
     chrom(other.chrom), name(other.name), start(other.start), end(other.end),
     score(other.score), strand(other.strand) {}
-  GenomicRegion& operator=(const GenomicRegion& rhs) {
+  GenomicRegion &operator=(const GenomicRegion &rhs) {
     GenomicRegion tmp(rhs);
     swap(tmp);
     return *this;
@@ -157,31 +157,31 @@ public:
   bool neg_strand() const {return (strand == '-');}
 
   // mutators
-  void set_chrom(const std::string& new_chrom) {chrom = assign_chrom(new_chrom);}
+  void set_chrom(const std::string &new_chrom) {chrom = assign_chrom(new_chrom);}
   void set_start(size_t new_start) {start = new_start;}
   void set_end(size_t new_end) {end = new_end;}
-  void set_name(const std::string& n) {name = n;}
+  void set_name(const std::string &n) {name = n;}
   void set_score(float s) {score = s;}
   void set_strand(char s) {strand = s;}
   
   // comparison functions
-  bool contains(const GenomicRegion& other) const;
-  bool overlaps(const GenomicRegion& other) const;
-  size_t distance(const GenomicRegion& other) const;
-  bool operator<(const GenomicRegion& rhs) const;
-  bool less1(const GenomicRegion& rhs) const;
-  bool operator<=(const GenomicRegion& rhs) const;
-  bool operator!=(const GenomicRegion& rhs) const;
-  bool operator==(const GenomicRegion& rhs) const;
+  bool contains(const GenomicRegion &other) const;
+  bool overlaps(const GenomicRegion &other) const;
+  size_t distance(const GenomicRegion &other) const;
+  bool operator<(const GenomicRegion &rhs) const;
+  bool less1(const GenomicRegion &rhs) const;
+  bool operator<=(const GenomicRegion &rhs) const;
+  bool operator!=(const GenomicRegion &rhs) const;
+  bool operator==(const GenomicRegion &rhs) const;
 
   bool same_chrom(const GenomicRegion &other) const {
     return chrom == other.chrom;
   }
 
   friend void
-  separate_chromosomes(const std::vector<GenomicRegion>& regions,
-		       std::vector<std::vector<GenomicRegion> >& 
-		       separated_by_chrom);
+  separate_chromosomes(const std::vector<GenomicRegion> &regions,
+		       std::vector<std::vector<GenomicRegion> > 
+		       &separated_by_chrom);
   
 private:
   
@@ -219,10 +219,10 @@ public:
 };
 
 std::ostream&
-operator<<(std::ostream& the_stream, const GenomicRegion& region);
+operator<<(std::ostream &the_stream, const GenomicRegion &region);
 
 std::istream&
-operator>>(std::istream& the_stream, GenomicRegion& region);
+operator>>(std::istream &the_stream, GenomicRegion &region);
 
 
 template <class T, class U> 
@@ -274,23 +274,17 @@ separate_regions(const std::vector<T> &big_regions,
 
 
 template <class T> bool 
-check_sorted(const std::vector<T> &regions, bool require_unique = false) {
-  if (require_unique) {
-    for (size_t i = 1; i < regions.size(); ++i)
-      if (regions[i] <= regions[i - 1])
-	return false;
-  }
-  else 
-    for (size_t i = 1; i < regions.size(); ++i)
-      if (regions[i] < regions[i - 1])
-	return false;
+check_sorted(const std::vector<T> &regions) {
+  for (size_t i = 1; i < regions.size(); ++i)
+    if (regions[i] < regions[i - 1])
+      return false;
   return true;
 }
 
 
 template <class T> 
 typename std::vector<T>::const_iterator
-find_closest(const std::vector<T>& regions, const T& region) {
+find_closest(const std::vector<T> &regions, const T &region) {
   typename std::vector<T>::const_iterator closest =
     lower_bound(regions.begin(), regions.end(), region);
   if (closest == regions.begin()) return closest;
@@ -302,7 +296,7 @@ find_closest(const std::vector<T>& regions, const T& region) {
 
 template <class T> 
 typename std::vector<T>::iterator
-find_closest(std::vector<T>& regions, const T& region) {
+find_closest(std::vector<T> &regions, const T &region) {
   typename std::vector<T>::iterator closest =
     lower_bound(regions.begin(), regions.end(), region);
   if (closest == regions.begin()) return closest;
@@ -313,7 +307,7 @@ find_closest(std::vector<T>& regions, const T& region) {
 
 
 template <class T> void
-collapse(std::vector<T>& regions) {
+collapse(std::vector<T> &regions) {
   typename std::vector<T>::iterator i, good = regions.begin();
   for (i = regions.begin() + 1; i != regions.end(); ++i)
     if (i->overlaps(*good)) {
@@ -326,7 +320,7 @@ collapse(std::vector<T>& regions) {
 
 
 template <class T> T
-genomic_region_intersection(const T& a, const T& b) {
+genomic_region_intersection(const T &a, const T &b) {
   if (!a.overlaps(b)) return T(a.get_chrom(), 0, 0);
   else if (a.contains(b)) return b;
   else if (b.contains(a)) return a;
@@ -337,9 +331,9 @@ genomic_region_intersection(const T& a, const T& b) {
 
 template <class T> 
 void
-genomic_region_intersection(const std::vector<T>& regions_a, 
-			    const std::vector<T>& regions_b,
-			    std::vector<T>& regions_c) {
+genomic_region_intersection(const std::vector<T> &regions_a, 
+			    const std::vector<T> &regions_b,
+			    std::vector<T> &regions_c) {
   typename std::vector<T>::const_iterator a(regions_a.begin());
   typename std::vector<T>::const_iterator a_lim(regions_a.end());
   typename std::vector<T>::const_iterator b(regions_b.begin());
@@ -356,9 +350,9 @@ genomic_region_intersection(const std::vector<T>& regions_a,
 
 template <class T> 
 void
-genomic_region_intersection_by_base(const std::vector<T>& regions_a, 
-				    const std::vector<T>& regions_b,
-				    std::vector<T>& regions_c) {
+genomic_region_intersection_by_base(const std::vector<T> &regions_a, 
+				    const std::vector<T> &regions_b,
+				    std::vector<T> &regions_c) {
   typename std::vector<T>::const_iterator a(regions_a.begin());
   typename std::vector<T>::const_iterator a_lim(regions_a.end());
   typename std::vector<T>::const_iterator b(regions_b.begin());
@@ -409,7 +403,7 @@ public:
 
 void
 parse_region_name(std::string region_name,
-		  std::string& chrom, size_t &start, size_t &end);
+		  std::string &chrom, size_t &start, size_t &end);
 
 template <class T>
 std::string
