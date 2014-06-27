@@ -25,6 +25,7 @@
 #define GENOMIC_REGION_HPP
 
 #include "smithlab_utils.hpp"
+#include "smithlab_os.hpp"
 
 #include <string>
 #include <vector>
@@ -424,5 +425,29 @@ assemble_region_name(const T &region, const std::string sep) {
   return (region.get_chrom() + sep + smithlab::toa(region.get_start()) + sep +
 	  smithlab::toa(region.get_end()));
 }
+
+void
+extract_regions_chrom_fasta(const std::string &chrom_name, 
+			    const std::string &filename,
+			    const std::vector<GenomicRegion> &regions, 
+			    std::vector<std::string> &sequences);
+
+
+void
+extract_regions_chrom_fasta(const std::string &chrom_name, 
+			    const std::string &filename,
+			    const std::vector<SimpleGenomicRegion> &regions, 
+			    std::vector<std::string> &sequences);
+
+void
+extract_regions_fasta(const std::string &dirname, 
+		      const std::vector<SimpleGenomicRegion> &regions_in, 
+		      std::vector<std::string> &sequences);
+
+void
+extract_regions_fasta(const std::string &dirname, 
+		      const std::vector<GenomicRegion> &regions_in, 
+		      std::vector<std::string> &sequences);
+
 
 #endif
