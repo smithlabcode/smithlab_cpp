@@ -30,7 +30,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include "GenomicRegion.hpp"
+//#include "GenomicRegion.hpp"
 
 bool
 isdir(const char *filename);
@@ -97,30 +97,6 @@ strip_path(std::string full_path);
 
 std::string
 strip_path_and_suffix(std::string full_path);
-
-
-void
-extract_regions_chrom_fasta(const std::string &chrom_name, 
-			    const std::string &filename,
-			    const std::vector<GenomicRegion> &regions, 
-			    std::vector<std::string> &sequences);
-
-
-void
-extract_regions_chrom_fasta(const std::string &chrom_name, 
-			    const std::string &filename,
-			    const std::vector<SimpleGenomicRegion> &regions, 
-			    std::vector<std::string> &sequences);
-
-void
-extract_regions_fasta(const std::string &dirname, 
-		      const std::vector<SimpleGenomicRegion> &regions_in, 
-		      std::vector<std::string> &sequences);
-
-void
-extract_regions_fasta(const std::string &dirname, 
-		      const std::vector<GenomicRegion> &regions_in, 
-		      std::vector<std::string> &sequences);
 
 void 
 read_dir(const std::string& dirname, std::vector<std::string> &filenames);
