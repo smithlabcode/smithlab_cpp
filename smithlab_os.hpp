@@ -26,11 +26,11 @@
 
 #include <string>
 #include <vector>
-
+#include <tr1/unordered_map>
 #include <errno.h>
 #include <dirent.h>
 #include <sys/stat.h>
-//#include "GenomicRegion.hpp"
+#include "GenomicRegion.hpp"
 
 bool
 isdir(const char *filename);
@@ -44,6 +44,14 @@ is_valid_filename(const std::string name,
 
 std::string 
 path_join(const std::string& a, const std::string& b);
+
+void identify_chromosomes(const std::string chrom_file,
+        const std::string fasta_suffix,
+        std::tr1::unordered_map<std::string,std::string> &chrom_files);
+
+void identify_and_read_chromosomes(const std::string chrom_file,
+        const std::string fasta_suffix,
+        std::tr1::unordered_map<std::string,std::string> &chrom_files);
 
 void 
 read_dir(const std::string& dirname, 
@@ -97,6 +105,30 @@ strip_path(std::string full_path);
 
 std::string
 strip_path_and_suffix(std::string full_path);
+
+
+void
+extract_regions_chrom_fasta(const std::string &chrom_name, 
+			    const std::string &filename,
+			    const std::vector<GenomicRegion> &regions, 
+			    std::vector<std::string> &sequences);
+
+
+void
+extract_regions_chrom_fasta(const std::string &chrom_name, 
+			    const std::string &filename,
+			    const std::vector<SimpleGenomicRegion> &regions, 
+			    std::vector<std::string> &sequences);
+
+void
+extract_regions_fasta(const std::string &dirname, 
+		      const std::vector<SimpleGenomicRegion> &regions_in, 
+		      std::vector<std::string> &sequences);
+
+void
+extract_regions_fasta(const std::string &dirname, 
+		      const std::vector<GenomicRegion> &regions_in, 
+		      std::vector<std::string> &sequences);
 
 void 
 read_dir(const std::string& dirname, std::vector<std::string> &filenames);
