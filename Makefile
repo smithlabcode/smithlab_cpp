@@ -27,10 +27,6 @@ CXXFLAGS = -Wall
 OPTFLAGS = -O2
 DEBUGFLAGS = -g
 
-ifeq "$(shell uname)" "Darwin"
-CXXFLAGS += -arch x86_64
-endif
-
 ifdef DEBUG
 CXXFLAGS += $(DEBUGFLAGS)
 endif
