@@ -39,7 +39,10 @@ SAMReader::SAMReader(const string fn, const string mapper_used) :
   filename(fn), mapper(mapper_used), file_handler(NULL),
   algn_p(NULL), GOOD(false) 
 {
-  if (mapper != "bsmap" && mapper != "bismark" 
+  if (mapper == "bsmap")
+    throw SMITHLABException(
+        "bsmap is no longer supported. Please use general instead.");
+  if (mapper != "bismark" 
       && mapper != "bs_seeker" && mapper != "general")
     throw SMITHLABException("Mapper unsupported:" + mapper);
 
