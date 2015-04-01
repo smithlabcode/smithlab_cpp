@@ -454,6 +454,7 @@ SAMReader::get_SAMRecord_general(const string &str, SAMRecord &samr)
   samr.is_primary = Flag.is_primary();
   samr.is_mapped = Flag.is_mapped();
 
+
   samr.seg_len = seg_len;
   samr.mr.r.set_name(name);
 
@@ -482,6 +483,12 @@ SAMReader::get_SAMRecord_general(const string &str, SAMRecord &samr)
   }
   samr.is_Trich = Flag.is_Trich();
   samr.is_mapping_paired = Flag.is_mapping_paired();
+  // if the mapped chromosomes differ but the mapping
+  // is "concordant", then change the mapping to 
+  // disconcordant
+  if(samr.is_mapping_paired &&
+     ((mate_name != "=") || (mate_name != chrom)))
+    samr.is_mapping_paired = false; 
 
   return GOOD;
 }
