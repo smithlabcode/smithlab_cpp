@@ -487,8 +487,9 @@ SAMReader::get_SAMRecord_general(const string &str, SAMRecord &samr)
   // is "concordant", then change the mapping to 
   // disconcordant
   if(samr.is_mapping_paired &&
-     ((mate_name != "=") || (mate_name != chrom)))
+     !((mate_name == "=") || (mate_name == chrom))){
     samr.is_mapping_paired = false; 
+  }
 
   return GOOD;
 }
