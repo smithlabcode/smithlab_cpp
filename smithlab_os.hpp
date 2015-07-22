@@ -27,9 +27,6 @@
 #include <string>
 #include <vector>
 #include <tr1/unordered_map>
-#include <errno.h>
-#include <dirent.h>
-#include <sys/stat.h>
 
 bool
 isdir(const char *filename);
@@ -107,5 +104,8 @@ strip_path_and_suffix(std::string full_path);
 
 void 
 read_dir(const std::string& dirname, std::vector<std::string> &filenames);
+
+bool
+is_valid_output_file(const std::string &filename);
 
 #endif
