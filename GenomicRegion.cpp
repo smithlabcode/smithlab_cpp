@@ -685,7 +685,7 @@ extract_regions_fasta(const string &dirname,
       chrom_regions_map.find(chrom_file);
     if (f_idx == chrom_regions_map.end())
       throw SMITHLABException("chrom not found:\t" + chrom_file);
-    extract_regions_chrom_fasta(chrom_name, filenames[f_idx->second], 
+    extract_regions_chrom_fasta(chrom_name, filenames[f_idx->second],
                                 regions[i], sequences);
   }
 }
@@ -716,7 +716,7 @@ extract_regions_fasta(const string &dirname,
       chrom_regions_map.find(chrom_file);
     if (f_idx == chrom_regions_map.end())
       throw SMITHLABException("chrom not found:\t" + chrom_file);
-    extract_regions_chrom_fasta(chrom_name, filenames[f_idx->second], 
+    extract_regions_chrom_fasta(chrom_name, filenames[f_idx->second],
                                 regions[i], sequences);
   }
 }
