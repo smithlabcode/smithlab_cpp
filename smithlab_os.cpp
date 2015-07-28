@@ -21,10 +21,6 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "smithlab_os.hpp"
-#include "smithlab_utils.hpp"
-#include "QualityScore.hpp"
-
 #include <fstream>
 #include <iostream>
 #include <algorithm>
@@ -32,6 +28,16 @@
 #include <cstring>
 #include <cmath>
 #include <tr1/unordered_map>
+
+#include "smithlab_os.hpp"
+#include "smithlab_utils.hpp"
+#include "QualityScore.hpp"
+
+#include <errno.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
 
 using std::string;
 using std::vector;
@@ -532,4 +538,10 @@ void read_prb_file(string filename, vector<vector<vector<double> > > &scores) {
     }
     in.peek();
   }
+}
+
+bool
+is_valid_output_file(const string &filename) {
+  const int result = access(filename.c_str(), W_OK);
+  return (result == 0);
 }
