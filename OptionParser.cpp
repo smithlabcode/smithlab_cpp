@@ -406,6 +406,8 @@ OptionParser::help_message() const {
   
   if (options.size() > 2) {
     ss << "Options:" << endl;
+    // the loop below begins at 2 because the help and usage messages
+    // are always the first two and treated separately
     for (size_t i = 2; i < options.size(); ++i)
       ss << SPACE_BEFORE_SHORT << std::left << std::setw(max_name_len) 
 	 << option_names[i] << SPACE_BTWN_SHRT_LNG
