@@ -542,6 +542,11 @@ void read_prb_file(string filename, vector<vector<vector<double> > > &scores) {
 
 bool
 is_valid_output_file(const string &filename) {
-  const int result = access(filename.c_str(), W_OK);
-  return (result == 0);
+  const int result = access(filename.c_str(), F_OK);
+  if(result==0) {
+    const int writeable = access(filename.c_str(), W_OK);
+    return (writeable == 0);
+  }
+  else // BD: This DOES NOT check if the directory is writeable.
+    return 1;
 }
