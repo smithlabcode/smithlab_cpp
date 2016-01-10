@@ -673,7 +673,7 @@ extract_regions_fasta(const string &dirname,
   vector<vector<GenomicRegion> > regions;
   separate_chromosomes(regions_in, regions);
 
-  std::tr1::unordered_map<string, size_t> chrom_regions_map;
+  unordered_map<string, size_t> chrom_regions_map;
   for (size_t i = 0; i < filenames.size(); ++i)
     chrom_regions_map[strip_path(filenames[i])] = i;
 
@@ -681,7 +681,7 @@ extract_regions_fasta(const string &dirname,
     // GET THE RIGHT FILE
     const string chrom_name(regions[i].front().get_chrom());
     const string chrom_file(chrom_name + FASTA_SUFFIX);
-    std::tr1::unordered_map<string, size_t>::const_iterator f_idx =
+    unordered_map<string, size_t>::const_iterator f_idx =
       chrom_regions_map.find(chrom_file);
     if (f_idx == chrom_regions_map.end())
       throw SMITHLABException("chrom not found:\t" + chrom_file);
@@ -704,7 +704,7 @@ extract_regions_fasta(const string &dirname,
   vector<vector<SimpleGenomicRegion> > regions;
   separate_chromosomes(regions_in, regions);
 
-  std::tr1::unordered_map<string, size_t> chrom_regions_map;
+  unordered_map<string, size_t> chrom_regions_map;
   for (size_t i = 0; i < filenames.size(); ++i)
     chrom_regions_map[strip_path(filenames[i])] = i;
 
@@ -712,7 +712,7 @@ extract_regions_fasta(const string &dirname,
     // GET THE RIGHT FILE
     const string chrom_name(regions[i].front().get_chrom());
     const string chrom_file(chrom_name + FASTA_SUFFIX);
-    std::tr1::unordered_map<string, size_t>::const_iterator f_idx =
+    unordered_map<string, size_t>::const_iterator f_idx =
       chrom_regions_map.find(chrom_file);
     if (f_idx == chrom_regions_map.end())
       throw SMITHLABException("chrom not found:\t" + chrom_file);
