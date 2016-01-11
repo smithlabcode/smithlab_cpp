@@ -1,9 +1,9 @@
 /*
  *    Part of SMITHLAB software
  *
- *    Copyright (C) 2008 Cold Spring Harbor Laboratory, 
- *                       University of Southern California and
- *                       Andrew D. Smith
+ *    Copyright (C) 2008-2016 Cold Spring Harbor Laboratory,
+ *                            University of Southern California and
+ *                            Andrew D. Smith
  *
  *    Authors: Andrew D. Smith
  *
@@ -113,8 +113,8 @@ string path_join(const string& a, const string& b) {
 }
 
 void
-identify_chromosomes(const string chrom_file, const string fasta_suffix, 
-		     unordered_map<string, string> &chrom_files) {
+identify_chromosomes(const string chrom_file, const string fasta_suffix,
+                     unordered_map<string, string> &chrom_files) {
   vector<string> the_files;
   if (isdir(chrom_file.c_str())) {
     read_dir(chrom_file, fasta_suffix, the_files);
@@ -125,8 +125,8 @@ identify_chromosomes(const string chrom_file, const string fasta_suffix,
 }
 
 void
-identify_and_read_chromosomes(const string chrom_file, const string fasta_suffix, 
-		     unordered_map<string, string> &chrom_files) {
+identify_and_read_chromosomes(const string chrom_file, const string fasta_suffix,
+                     unordered_map<string, string> &chrom_files) {
   vector<string> the_files;
   if (isdir(chrom_file.c_str())) {
     read_dir(chrom_file, fasta_suffix, the_files);
@@ -542,11 +542,18 @@ void read_prb_file(string filename, vector<vector<vector<double> > > &scores) {
 
 bool
 is_valid_output_file(const string &filename) {
-  const int result = access(filename.c_str(), F_OK);
-  if(result==0) {
-    const int writeable = access(filename.c_str(), W_OK);
-    return (writeable == 0);
+  const bool file_exists = (access(filename.c_str(), F_OK) == 0);
+  if (file_exists)
+    return (!isdir(filename.c_str()) &&
+            access(filename.c_str(), W_OK) == 0);
+  else {
+    // ADS: check if dir exists and is writeable
+    // first get directory part
+    string base_name, dir_part, suffix;
+    parse_dir_baseanme_suffix(filename, dir_part, base_name, suffix);
+    if (dir_part.empty())
+      dir_part = "./";
+    // check if directory part exists and is writeable
+    return (access(dir_part.c_str(), F_OK | W_OK) == 0);
   }
-  else // BD: This DOES NOT check if the directory is writeable.
-    return 1;
 }
