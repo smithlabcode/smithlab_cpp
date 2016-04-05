@@ -69,7 +69,9 @@ public:
   size_t get_width() const {return (end > start) ? end - start : 0;}
 
   // mutators
-  void set_chrom(const std::string &new_chrom) {chrom = assign_chrom(new_chrom);}
+  void set_chrom(const std::string &new_chrom) {
+    chrom = assign_chrom(new_chrom);
+  }
   void set_start(size_t new_start) {start = new_start;}
   void set_end(size_t new_end) {end = new_end;}
 
@@ -216,7 +218,8 @@ score_greater(const T &a, const T &b) {
 
 class GenomicRegionException : public SMITHLABException {
 public:
-  GenomicRegionException(std::string s = std::string()) : SMITHLABException(s) {}
+  GenomicRegionException(std::string s = std::string()) :
+    SMITHLABException(s) {}
 };
 
 std::ostream&
@@ -393,13 +396,15 @@ WriteBEDFile(const std::string filename,
   std::ofstream out(filename.c_str());
   if (track_name.length() > 0)
     out << "track name=" << track_name << std::endl;
-  std::copy(regions.begin(), regions.end(), std::ostream_iterator<T>(out, "\n"));
+  std::copy(regions.begin(), regions.end(),
+            std::ostream_iterator<T>(out, "\n"));
   out.close();
 }
 
 class BEDFileException : public SMITHLABException {
 public:
-  BEDFileException(std::string s = std::string()) throw() : SMITHLABException(s) {}
+  BEDFileException(std::string s = std::string())
+    throw() : SMITHLABException(s) {}
 };
 
 void
