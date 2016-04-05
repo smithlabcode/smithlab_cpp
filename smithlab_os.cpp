@@ -67,7 +67,7 @@ string strip_path_and_suffix(string full_path) {
 }
 
 void parse_dir_baseanme_suffix(string full_path, string &dirname,
-    string &base_name, string &suffix) {
+                               string &base_name, string &suffix) {
   size_t base_index = full_path.find_last_of("/\\");
   size_t suffix_index = full_path.find_last_of(".");
   if (suffix_index <= base_index)
@@ -78,7 +78,7 @@ void parse_dir_baseanme_suffix(string full_path, string &dirname,
     suffix = "";
   else
     suffix = full_path.substr(
-        suffix_index + 1, full_path.length() - 1 - suffix_index);
+                              suffix_index + 1, full_path.length() - 1 - suffix_index);
 }
 
 bool isdir(const char *filename) {
@@ -125,8 +125,9 @@ identify_chromosomes(const string chrom_file, const string fasta_suffix,
 }
 
 void
-identify_and_read_chromosomes(const string chrom_file, const string fasta_suffix,
-                     unordered_map<string, string> &chrom_files) {
+identify_and_read_chromosomes(const string chrom_file,
+                              const string fasta_suffix,
+                              unordered_map<string, string> &chrom_files) {
   vector<string> the_files;
   if (isdir(chrom_file.c_str())) {
     read_dir(chrom_file, fasta_suffix, the_files);
@@ -143,7 +144,7 @@ identify_and_read_chromosomes(const string chrom_file, const string fasta_suffix
 }
 
 void read_dir(const string& dirname, string filename_suffix,
-    vector<string> &filenames) {
+              vector<string> &filenames) {
   DIR *dir;
   if (!(dir = opendir(dirname.c_str())))
     throw SMITHLABException("could not open directory: " + dirname);
@@ -188,8 +189,9 @@ inline bool is_fastq_score_line(size_t line_count) {
   return ((line_count & 3ul) == 3ul);
 }
 
-void read_fastq_file(const char *filename, vector<string> &names,
-    vector<string> &sequences, vector<vector<double> > &scores) {
+void
+read_fastq_file(const char *filename, vector<string> &names,
+                vector<string> &sequences, vector<vector<double> > &scores) {
 
   static const size_t INPUT_BUFFER_SIZE = 1000000;
 
@@ -208,8 +210,8 @@ void read_fastq_file(const char *filename, vector<string> &names,
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
       throw SMITHLABException(
-          "Line in " + name + "\nexceeds max length: "
-              + toa(INPUT_BUFFER_SIZE));
+                              "Line in " + name + "\nexceeds max length: "
+                              + toa(INPUT_BUFFER_SIZE));
     if (in.gcount() == 0)
       break;
 
@@ -239,8 +241,8 @@ void read_fastq_file(const char *filename, vector<string> &names,
     }
     if (is_fastq_score_name_line(line_count)) {
       if (buffer[0] != '+')
-        throw SMITHLABException(
-            "invalid FASTQ score name line: " + string(buffer));
+        throw SMITHLABException("invalid FASTQ score name line: " +
+                                string(buffer));
       is_score_line = true;
     }
     if (is_fastq_score_line(line_count)) {
@@ -261,13 +263,13 @@ void read_fastq_file(const char *filename, vector<string> &names,
   bool phred_scores = true, solexa_scores = true;
   for (size_t i = 0; i < scrs.size() && phred_scores && solexa_scores; ++i) {
     phred_scores = (phred_scores
-        && (find_if(
-            scrs[i].begin(), scrs[i].end(), not1(ptr_fun(&valid_phred_score)))
-            == scrs[i].end()));
+                    && (find_if(scrs[i].begin(), scrs[i].end(),
+                                not1(ptr_fun(&valid_phred_score)))
+                        == scrs[i].end()));
     solexa_scores = (solexa_scores
-        && (find_if(
-            scrs[i].begin(), scrs[i].end(), not1(ptr_fun(&valid_solexa_score)))
-            == scrs[i].end()));
+                     && (find_if(scrs[i].begin(), scrs[i].end(),
+                                 not1(ptr_fun(&valid_solexa_score)))
+                         == scrs[i].end()));
   }
 
   if (!phred_scores && !solexa_scores)
@@ -277,15 +279,15 @@ void read_fastq_file(const char *filename, vector<string> &names,
     scores.push_back(vector<double>(scrs[i].size()));
     for (size_t j = 0; j < scrs[i].size(); ++j)
       scores[i][j] =
-          (solexa_scores) ?
-              quality_character_to_solexa(scrs[i][j] - 5) :
-              quality_character_to_phred(scrs[i][j]);
+        (solexa_scores) ?
+        quality_character_to_solexa(scrs[i][j] - 5) :
+        quality_character_to_phred(scrs[i][j]);
     scrs[i].clear();
   }
 }
 
 void read_fastq_file(const char *filename, vector<string> &names,
-    vector<string> &sequences, vector<string> &scores) {
+                     vector<string> &sequences, vector<string> &scores) {
 
   static const size_t INPUT_BUFFER_SIZE = 1000000;
 
@@ -302,8 +304,8 @@ void read_fastq_file(const char *filename, vector<string> &names,
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
       throw SMITHLABException(
-          "Line in " + name + "\nexceeds max length: "
-              + toa(INPUT_BUFFER_SIZE));
+                              "Line in " + name + "\nexceeds max length: "
+                              + toa(INPUT_BUFFER_SIZE));
     if (in.gcount() == 0)
       break;
 
@@ -331,8 +333,8 @@ void read_fastq_file(const char *filename, vector<string> &names,
     }
     if (is_fastq_score_name_line(line_count)) {
       if (buffer[0] != '+')
-        throw SMITHLABException(
-            "invalid FASTQ score name line: " + string(buffer));
+        throw SMITHLABException("invalid FASTQ score name line: " +
+                                string(buffer));
       is_score_line = true;
     }
     if (is_fastq_score_line(line_count)) {
@@ -350,7 +352,7 @@ void read_fastq_file(const char *filename, vector<string> &names,
 }
 
 void read_fasta_file(const string filename, vector<string> &names,
-    vector<string> &sequences) {
+                     vector<string> &sequences) {
 
   std::ifstream in(filename.c_str(), std::ios::binary);
   if (!in) {
@@ -367,8 +369,8 @@ void read_fasta_file(const string filename, vector<string> &names,
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
       throw SMITHLABException(
-          "Line in " + name + "\nexceeds max length: "
-              + toa(INPUT_BUFFER_SIZE));
+                              "Line in " + name + "\nexceeds max length: "
+                              + toa(INPUT_BUFFER_SIZE));
     // correct for dos carriage returns before newlines
     if (buffer[strlen(buffer) - 1] == '\r')
       buffer[strlen(buffer) - 1] = '\0';
@@ -396,7 +398,7 @@ void read_fasta_file(const string filename, vector<string> &names,
 }
 
 void read_fasta_file(const string filename, const string &target,
-    string &sequence) {
+                     string &sequence) {
 
   // read the sequence with the given name from a fasta file
 
@@ -417,8 +419,8 @@ void read_fasta_file(const string filename, const string &target,
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
       throw SMITHLABException(
-          "Line in " + name + "\nexceeds max length: "
-              + toa(INPUT_BUFFER_SIZE));
+                              "Line in " + name + "\nexceeds max length: "
+                              + toa(INPUT_BUFFER_SIZE));
     // correct for dos carriage returns before newlines
     if (buffer[strlen(buffer) - 1] == '\r')
       buffer[strlen(buffer) - 1] = '\0';
@@ -456,9 +458,9 @@ void read_filename_file(const char *filename, vector<string> &filenames) {
     char buffer[INPUT_BUFFER_SIZE + 1];
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw SMITHLABException(
-          "Line in " + string(filename) + "\nexceeds max length: "
-              + toa(INPUT_BUFFER_SIZE));
+      throw SMITHLABException("Line in " + string(filename) +
+                              "\nexceeds max length: "
+                              + toa(INPUT_BUFFER_SIZE));
     filenames.push_back(buffer);
     in.peek();
   }
@@ -519,17 +521,17 @@ void read_prb_file(string filename, vector<vector<vector<double> > > &scores) {
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
       throw SMITHLABException(
-          "Line in " + filename + "\nexceeds max length: "
-              + toa(INPUT_BUFFER_SIZE));
+                              "Line in " + filename + "\nexceeds max length: "
+                              + toa(INPUT_BUFFER_SIZE));
     if (buffer[strlen(buffer) - 1] == '\r')
       buffer[strlen(buffer) - 1] = '\0';
 
     vector<string> parts;
     smithlab::split_whitespace(buffer, parts);
     if (parts.size() % smithlab::alphabet_size != 0)
-      throw SMITHLABException(
-          "Incorrect number of values on line " + toa(line_number) + " in file "
-              + filename);
+      throw SMITHLABException("Incorrect number of values on line "
+                              + toa(line_number) + " in file "
+                              + filename);
     scores.push_back(vector<vector<double> >());
     for (size_t i = 0; i < parts.size(); i += smithlab::alphabet_size) {
       scores.back().push_back(vector<double>());
