@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <tr1/unordered_map>
+#include <unordered_map>
 #include <limits>
 
 typedef unsigned chrom_id_type;
@@ -98,8 +98,8 @@ private:
   static chrom_id_type assign_chrom(const std::string &c);
   static std::string retrieve_chrom(chrom_id_type i);
 
-  static std::tr1::unordered_map<std::string, chrom_id_type> fw_table_in;
-  static std::tr1::unordered_map<chrom_id_type, std::string> fw_table_out;
+  static std::unordered_map<std::string, chrom_id_type> fw_table_in;
+  static std::unordered_map<chrom_id_type, std::string> fw_table_out;
 
   // std::string chrom;
   chrom_id_type chrom;
@@ -191,8 +191,8 @@ private:
   static chrom_id_type assign_chrom(const std::string &c);
   static std::string retrieve_chrom(chrom_id_type i);
 
-  static std::tr1::unordered_map<std::string, chrom_id_type> fw_table_in;
-  static std::tr1::unordered_map<chrom_id_type, std::string> fw_table_out;
+  static std::unordered_map<std::string, chrom_id_type> fw_table_in;
+  static std::unordered_map<chrom_id_type, std::string> fw_table_out;
 
   // std::string chrom;
   chrom_id_type chrom;
@@ -233,14 +233,14 @@ template <class T, class U>
 void
 sync_chroms(const std::vector<std::vector<T> > &stable,
             std::vector<std::vector<U> > &to_sync) {
-  std::tr1::unordered_map<std::string, size_t> chrom_index;
+  std::unordered_map<std::string, size_t> chrom_index;
   for (size_t i = 0; i < stable.size(); ++i)
     if (!stable[i].empty())
       chrom_index[stable[i].front().get_chrom()] = i;
   std::vector<std::vector<U> > syncd(stable.size());
   for (size_t i = 0; i < to_sync.size(); ++i) {
     if (!to_sync[i].empty()) {
-      std::tr1::unordered_map<std::string, size_t>::const_iterator j =
+      std::unordered_map<std::string, size_t>::const_iterator j =
         chrom_index.find(to_sync[i].front().get_chrom());
       if (j != chrom_index.end())
         to_sync[i].swap(syncd[j->second]);

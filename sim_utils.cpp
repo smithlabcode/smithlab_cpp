@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <set>
 #include <cmath>
-#include <tr1/unordered_map>
+#include <unordered_map>
 
 using std::string;
 using std::vector;
@@ -55,7 +55,7 @@ sequence_to_consensus_matrix(const string &sequence,
   }
 }
 
-typedef std::tr1::unordered_map<size_t, double> err_map;
+typedef std::unordered_map<size_t, double> err_map;
 
 static void
 get_error_set(const Runif &rng, const size_t seq_len,
