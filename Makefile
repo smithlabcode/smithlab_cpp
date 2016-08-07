@@ -22,7 +22,7 @@
 SOURCES = $(filter-out SAM.cpp,$(wildcard *.cpp))
 OBJECTS = $(patsubst %.cpp,%.o,$(SOURCES))
 
-CXX = g++-6.1.0
+CXX = g++
 CXXFLAGS = -Wall -std=c++11
 OPTFLAGS = -O2
 DEBUGFLAGS = -g
