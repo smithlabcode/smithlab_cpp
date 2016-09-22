@@ -34,6 +34,7 @@
 #include <iterator>
 #include <cassert>
 #include <cmath>
+#include <numeric>
 
 
 namespace smithlab {
@@ -319,6 +320,8 @@ bits2string_masked(size_t mask, size_t bits) {
   return s;
 }
 
+
+
 inline std::string 
 bits2string_for_positions(size_t positions, size_t bits) {
   std::string s;
@@ -335,4 +338,57 @@ percent(const size_t a, const size_t b) {
   return static_cast<size_t>((100.0*a)/b);
 }
 
+
+
+
+
+////////////////////Code from Alphabet//////////////////////
+
+
+
+bool
+inline valid_base(char c) {
+  char i = std::toupper(c);
+  return (i == 'A' || i == 'C' || i == 'G' || i == 'T');
+}
+
+size_t
+inline mer2index(const char *s, size_t n) {
+  size_t multiplier = 1, index = 0;
+  do {
+    --n;
+    index += base2int(s[n])*multiplier;
+    multiplier *= smithlab::alphabet_size;
+  } while (n > 0);
+  return index;
+}
+
+size_t
+inline kmer_counts(const std::vector<std::string> &seqs,
+            std::vector<size_t> &counts, size_t k) {
+  counts.clear();
+  size_t nwords = static_cast<size_t>(pow(static_cast<float>(smithlab::alphabet_size),
+                                          static_cast<int>(k)));
+  counts.resize(nwords, 0);
+  size_t total = 0;
+  for (size_t i = 0; i < seqs.size(); ++i) {
+    char seq[seqs[i].length() + 1];
+    seq[seqs[i].length()] = '\0';
+    copy(seqs[i].begin(), seqs[i].end(), seq);
+    for (size_t j = 0; j < seqs[i].length() - k + 1; ++j)
+      if (std::count_if(seq + j, seq + j + k, &valid_base) ==
+          static_cast<int>(k)) {
+        counts[mer2index(seq + j, k)]++;
+        ++total;
+      }
+  }
+  return total;
+}
+
+
 #endif
+
+
+
+
+

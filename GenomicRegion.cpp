@@ -24,12 +24,12 @@
 
 #include <cassert>
 #include <fstream>
-#include <tr1/unordered_map>
+#include <unordered_map>
 
 using std::string;
 using std::vector;
 using std::ostringstream;
-using std::tr1::unordered_map;
+using std::unordered_map;
 unordered_map<string, chrom_id_type> SimpleGenomicRegion::fw_table_in;
 unordered_map<chrom_id_type, string> SimpleGenomicRegion::fw_table_out;
 

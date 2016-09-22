@@ -26,7 +26,7 @@
 
 #include <string>
 #include <vector>
-#include <tr1/unordered_map>
+#include <unordered_map>
 
 bool
 isdir(const char *filename);
@@ -43,11 +43,11 @@ path_join(const std::string& a, const std::string& b);
 
 void identify_chromosomes(const std::string chrom_file,
         const std::string fasta_suffix,
-        std::tr1::unordered_map<std::string,std::string> &chrom_files);
+        std::unordered_map<std::string,std::string> &chrom_files);
 
 void identify_and_read_chromosomes(const std::string chrom_file,
         const std::string fasta_suffix,
-        std::tr1::unordered_map<std::string,std::string> &chrom_files);
+        std::unordered_map<std::string,std::string> &chrom_files);
 
 void 
 read_dir(const std::string& dirname, 

@@ -27,7 +27,7 @@
 #include <map>
 #include <cstring>
 #include <cmath>
-#include <tr1/unordered_map>
+#include <unordered_map>
 
 #include "smithlab_os.hpp"
 #include "smithlab_utils.hpp"
@@ -43,7 +43,7 @@ using std::string;
 using std::vector;
 using std::ios_base;
 using std::cout;
-using std::tr1::unordered_map;
+using std::unordered_map;
 
 string strip_path(string full_path) {
   size_t start = full_path.find_last_of('/');

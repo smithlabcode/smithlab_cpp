@@ -84,14 +84,14 @@ extract_regions_fasta(const std::string &dirname,
 void
 identify_chromosomes(const std::string chrom_file,
 		     const std::string fasta_suffix,
-		     std::tr1::unordered_map<std::string, 
+		     std::unordered_map<std::string, 
 					     std::string> &chrom_files);
 
 
 void
 identify_and_read_chromosomes(const std::string chrom_file,
 			      const std::string fasta_suffix,
-			      std::tr1::unordered_map<std::string,
+			      std::unordered_map<std::string,
 						      std::string> &chrom_files);
 
 #endif
