@@ -367,7 +367,7 @@ genomic_region_intersection_by_base(const std::vector<T> &regions_a,
                             std::max(a->get_start(), b->get_start()),
                             std::min(a->get_end(), b->get_end())));
     if (a == b) {++a; ++b;}
-    else if (*a < *b) ++a;
+    else if (a->less1(*b)) ++a;
     else ++b; //  if (*b < *a)
   }
 }
