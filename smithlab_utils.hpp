@@ -1,7 +1,7 @@
 /*
  *    Part of SMITHLAB software
  *
- *    Copyright (C) 2008 Cold Spring Harbor Laboratory, 
+ *    Copyright (C) 2008 Cold Spring Harbor Laboratory,
  *                       University of Southern California and
  *                       Andrew D. Smith
  *
@@ -53,24 +53,24 @@ typedef size_t MASK_t;
 namespace smithlab {
 
   // Code dealing with false discovery rate
-  double get_fdr_cutoff(const size_t n_tests, std::vector<double> &pvals, 
+  double get_fdr_cutoff(const size_t n_tests, std::vector<double> &pvals,
                         const double alpha);
 
-  void correct_pvals(const size_t n_tests, std::vector<double> &pvals); 
+  void correct_pvals(const size_t n_tests, std::vector<double> &pvals);
 
   // Assumes 4 nucleotide DNA alphabet
   static const size_t alphabet_size = 4;
 
-  std::vector<std::string> split(std::string, const char *, 
-				 bool get_empty_fields = false);
+  std::vector<std::string> split(std::string, const char *,
+                                 bool get_empty_fields = false);
   std::vector<std::string> split_whitespace_quoted(std::string to_split);
   void split_whitespace(const std::string& s, std::vector<std::string> &v);
-  
+
   std::string strip(const std::string& s);
 
-  std::vector<std::string> 
+  std::vector<std::string>
   squash(const std::vector<std::string> &v);
-  
+
   template <class T> std::string toa(T t) {
     std::ostringstream s;
     s << t;
@@ -108,7 +108,7 @@ base2int(char c) {
   case 'a' : return 0;
   case 'c' : return 1;
   case 'g' : return 2;
-  case 't' : return 3; 
+  case 't' : return 3;
   default  : return 4;
   }
 }
@@ -134,7 +134,7 @@ base2int_bs(char c) {
   case 'a' : return 0;
   case 'c' : return 3;
   case 'g' : return 2;
-  case 't' : return 3; 
+  case 't' : return 3;
   default  : return 4;
   }
 }
@@ -163,7 +163,7 @@ base2int_bs_ag(char c) {
   case 'a' : return 0;
   case 'c' : return 1;
   case 'g' : return 0;
-  case 't' : return 3; 
+  case 't' : return 3;
   default  : return 4;
   }
 }
@@ -179,7 +179,7 @@ base2int_bs_rc(char c) {
   case 'a' : return 0;
   case 'c' : return 1;
   case 'g' : return 0;
-  case 't' : return 3; 
+  case 't' : return 3;
   }
   return 4;
 }
@@ -194,7 +194,7 @@ base2int_rc(char c) {
   case 'a' : return 3;
   case 'c' : return 2;
   case 'g' : return 1;
-  case 't' : return 0; 
+  case 't' : return 0;
   }
   return 4;
 }
@@ -269,9 +269,8 @@ mer2i_rc(std::string::const_iterator a, const std::string::const_iterator b) {
   return index;
 }
 
-struct SMITHLABException {
-  SMITHLABException(std::string m) : message(m) {}
-  std::string what() const {return message;}
+struct SMITHLABException : public std::runtime_error {
+  SMITHLABException(std::string m) : std::runtime_error(m), message(m) {}
   std::string message;
 };
 
@@ -309,7 +308,7 @@ revcomp_inplace(std::string::iterator first, std::string::iterator last) {
   std::reverse(first, last);
 }
 
-inline std::string 
+inline std::string
 bits2string_masked(size_t mask, size_t bits) {
   std::string s;
   size_t selector = smithlab_bits::high_bit;
@@ -322,7 +321,7 @@ bits2string_masked(size_t mask, size_t bits) {
 
 
 
-inline std::string 
+inline std::string
 bits2string_for_positions(size_t positions, size_t bits) {
   std::string s;
   size_t selector = smithlab_bits::high_bit;
@@ -387,8 +386,3 @@ inline kmer_counts(const std::vector<std::string> &seqs,
 
 
 #endif
-
-
-
-
-
