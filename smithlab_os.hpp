@@ -1,7 +1,7 @@
 /*
  *    Part of SMITHLAB software
  *
- *    Copyright (C) 2008 Cold Spring Harbor Laboratory, 
+ *    Copyright (C) 2008 Cold Spring Harbor Laboratory,
  *                       University of Southern California and
  *                       Andrew D. Smith
  *
@@ -35,56 +35,56 @@ bool
 is_fastq(const std::string filename);
 
 bool
-is_valid_filename(const std::string name, 
-		  const std::string& filename_suffix);
+is_valid_filename(const std::string name,
+                  const std::string& filename_suffix);
 
-std::string 
+std::string
 path_join(const std::string& a, const std::string& b);
 
 void identify_chromosomes(const std::string chrom_file,
-        const std::string fasta_suffix,
-        std::unordered_map<std::string,std::string> &chrom_files);
+                          const std::string fasta_suffix,
+                          std::unordered_map<std::string,std::string> &chrom_files);
 
 void identify_and_read_chromosomes(const std::string chrom_file,
-        const std::string fasta_suffix,
-        std::unordered_map<std::string,std::string> &chrom_files);
+                                   const std::string fasta_suffix,
+                                   std::unordered_map<std::string,std::string> &chrom_files);
 
-void 
-read_dir(const std::string& dirname, 
-	 std::string filename_suffix,
-	 std::vector<std::string> &filenames);
+void
+read_dir(const std::string& dirname,
+         std::string filename_suffix,
+         std::vector<std::string> &filenames);
 
 void
 read_fasta_file(const std::string filename,
-		std::vector<std::string> &names, 
-		std::vector<std::string> &sequences);
+                std::vector<std::string> &names,
+                std::vector<std::string> &sequences);
 
 void
 read_fasta_file(const std::string filename,
-        const std::string &name,
-        std::string &sequence);
+                const std::string &name,
+                std::string &sequence);
 
 void
-read_fastq_file(const char *filename, 
-		std::vector<std::string> &names, 
-		std::vector<std::string> &sequences,
-		std::vector<std::vector<double> > &scores);
+read_fastq_file(const char *filename,
+                std::vector<std::string> &names,
+                std::vector<std::string> &sequences,
+                std::vector<std::vector<double> > &scores);
 
 void
-read_fastq_file(const char *filename, 
-		std::vector<std::string> &names, 
-		std::vector<std::string> &sequences,
-		std::vector<std::string> &scores);
+read_fastq_file(const char *filename,
+                std::vector<std::string> &names,
+                std::vector<std::string> &sequences,
+                std::vector<std::string> &scores);
 
 void
-read_prb_file(std::string filename, 
-	      std::vector<std::vector<std::vector<double> > > &scores);
+read_prb_file(std::string filename,
+              std::vector<std::vector<std::vector<double> > > &scores);
 
 void
-read_filename_file(const char *filename, 
-		   std::vector<std::string> &filenames);
+read_filename_file(const char *filename,
+                   std::vector<std::string> &filenames);
 
-size_t 
+size_t
 get_filesize(std::string filename);
 
 std::string
@@ -92,9 +92,9 @@ basename(std::string filename);
 
 void
 parse_dir_baseanme_suffix(std::string full_path,
-			  std::string &dirname,
-			  std::string &base_name,
-			  std::string &suffix);
+                          std::string &dirname,
+                          std::string &base_name,
+                          std::string &suffix);
 
 std::string
 strip_path(std::string full_path);
@@ -102,7 +102,7 @@ strip_path(std::string full_path);
 std::string
 strip_path_and_suffix(std::string full_path);
 
-void 
+void
 read_dir(const std::string& dirname, std::vector<std::string> &filenames);
 
 bool
