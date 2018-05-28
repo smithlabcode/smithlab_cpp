@@ -17,9 +17,11 @@
 #define HTSLIB_WRAPPER
 
 #include <string>
-#include <GenomicRegion.hpp>
 
 #include <htslib/sam.h>
+
+class GenomicRegion;
+class MappedRead;
 
 struct HTSFile {
   HTSFile(const std::string &fn);
@@ -33,5 +35,8 @@ struct HTSFile {
 
 HTSFile &
 operator>>(HTSFile &h, GenomicRegion &r);
+
+HTSFile &
+operator>>(HTSFile &h, MappedRead &mr);
 
 #endif
