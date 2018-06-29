@@ -28,6 +28,7 @@
 #include <fstream>
 #include <cassert>
 #include <iomanip>
+#include <stdexcept>
 
 #include "smithlab_utils.hpp"
 
@@ -167,13 +168,19 @@ Option::parse(vector<string> &command_line) {
   if (!command_line.empty()) {
     for (size_t i = 0; i < command_line.size();)
       if (option_match(command_line[i])) {
-	if (i < command_line.size() - 1) {
-	  format_option(command_line[i + 1]);
-        } else { format_option(dummy);}
-	specified = true;
-	command_line.erase(command_line.begin() + i);
-	if (arg_type != SMITHLAB_ARG_BOOL) {
-	  command_line.erase(command_line.begin() + i);
+        if(specified && arg_type != SMITHLAB_ARG_BOOL)
+          throw std::runtime_error("Duplicate assignment of " + long_name);
+
+        if (i < command_line.size() - 1) {
+          format_option(command_line[i + 1]);
+        } else { 
+          format_option(dummy);
+        }
+
+        specified = true;
+        command_line.erase(command_line.begin() + i);
+        if (arg_type != SMITHLAB_ARG_BOOL) {
+          command_line.erase(command_line.begin() + i);
         }
       }
       else {
