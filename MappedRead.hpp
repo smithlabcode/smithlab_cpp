@@ -34,12 +34,12 @@ struct MappedRead {
 };
 
 void
-LoadMappedReadsFile(std::string filename, 
-		    std::vector<MappedRead> &the_mapped_reads);
+LoadMappedReadsFile(std::string filename,
+                    std::vector<MappedRead> &the_mapped_reads);
 
-std::istream& 
+std::istream&
 operator>>(std::istream& the_stream, MappedRead &mr);
-std::ostream& 
+std::ostream&
 operator<<(std::ostream& the_stream, const MappedRead &mr);
 
 #endif

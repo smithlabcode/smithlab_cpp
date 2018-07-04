@@ -32,13 +32,13 @@ using std::string;
 using std::vector;
 
 static void
-find_sixth_and_seventh_whitespace(const char *buffer, 
-				  size_t &sixth_ws, size_t &seventh_ws) {
+find_sixth_and_seventh_whitespace(const char *buffer,
+                                  size_t &sixth_ws, size_t &seventh_ws) {
   size_t ws_count = 0;
   const char *position = buffer;
   while (ws_count < 6 && *position != '\0') {
     if (*position == '\t' || *position == ' ') ++ws_count;
-    if (ws_count < 6) 
+    if (ws_count < 6)
       ++position;
   }
   if (ws_count != 6)
@@ -59,40 +59,40 @@ MappedRead::MappedRead(const char *line) : r(line) {
   scr = string(line + seventh_ws + 1);
 }
 
-std::istream& 
+std::istream&
 operator>>(std::istream& the_stream, MappedRead &mr) {
   string chr, name;
   size_t start = 0ul, end = 0ul;
   char strand = '\0';
   double score;
-  if (!(the_stream >> chr >> start >> end >> name >> 
-	score >> strand >> mr.seq >> mr.scr))
+  if (!(the_stream >> chr >> start >> end >> name >>
+        score >> strand >> mr.seq >> mr.scr))
     the_stream.setstate(std::ios::badbit);
-  
+
   mr.r = GenomicRegion(chr, start, end, name, score, strand);
-  
+
   char c;
   while ((c = the_stream.get()) != '\n' && the_stream);
-  
+
   if (c != '\n')
     the_stream.setstate(std::ios::badbit);
-  
+
   // the_stream.peek();
   if (the_stream.eof())
     the_stream.setstate(std::ios::badbit);
-  
+
   return the_stream;
 }
 
 void
-LoadMappedReadsFile(string filename, 
-		    vector<MappedRead> &the_mapped_reads) {
+LoadMappedReadsFile(string filename,
+                    vector<MappedRead> &the_mapped_reads) {
   static const size_t buffer_size = 10000; // Magic
   // open and check the file
   std::ifstream in(filename.c_str());
-  if (!in) 
+  if (!in)
     throw SMITHLABException("cannot open input file " + filename);
-  
+
   char buffer[buffer_size];
   while (!in.eof()) {
     in.getline(buffer, buffer_size);
@@ -104,7 +104,7 @@ LoadMappedReadsFile(string filename,
   in.close();
 }
 
-std::ostream& 
+std::ostream&
 operator<<(std::ostream& the_stream, const MappedRead &mr) {
   return the_stream << mr.r << '\t' << mr.seq << '\t' << mr.scr;
 }
