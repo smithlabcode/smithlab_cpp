@@ -1,24 +1,19 @@
-/*
- *    Part of SMITHLAB software
+/* Part of SMITHLAB software
  *
- *    Copyright (C) 2008-2016 Cold Spring Harbor Laboratory,
- *                            University of Southern California and
- *                            Andrew D. Smith
+ * Copyright (C) 2008-2018 University of Southern California and
+ *                         Andrew D. Smith
  *
- *    Authors: Andrew D. Smith
+ * Authors: Andrew D. Smith
  *
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
  */
 
 #include <fstream>
@@ -28,6 +23,7 @@
 #include <cstring>
 #include <cmath>
 #include <unordered_map>
+#include <exception>
 
 #include "smithlab_os.hpp"
 #include "smithlab_utils.hpp"
@@ -42,10 +38,11 @@
 using std::string;
 using std::vector;
 using std::ios_base;
-using std::cout;
 using std::unordered_map;
+using std::runtime_error;
 
-string strip_path(string full_path) {
+string
+strip_path(string full_path) {
   size_t start = full_path.find_last_of('/');
   if (start == string::npos)
     start = 0;
@@ -54,7 +51,8 @@ string strip_path(string full_path) {
   return full_path.substr(start);
 }
 
-string strip_path_and_suffix(string full_path) {
+string
+strip_path_and_suffix(string full_path) {
   size_t start = full_path.find_last_of('/');
   if (start == string::npos)
     start = 0;
@@ -66,8 +64,10 @@ string strip_path_and_suffix(string full_path) {
   return full_path.substr(start, end - start);
 }
 
-void parse_dir_baseanme_suffix(string full_path, string &dirname,
-                               string &base_name, string &suffix) {
+void
+parse_dir_baseanme_suffix(const string &full_path,
+                          string &dirname,
+                          string &base_name, string &suffix) {
   size_t base_index = full_path.find_last_of("/\\");
   size_t suffix_index = full_path.find_last_of(".");
   if (suffix_index <= base_index)
@@ -77,17 +77,19 @@ void parse_dir_baseanme_suffix(string full_path, string &dirname,
   if (suffix_index == full_path.length() - 1)
     suffix = "";
   else
-    suffix = full_path.substr(
-                              suffix_index + 1, full_path.length() - 1 - suffix_index);
+    suffix = full_path.substr(suffix_index + 1,
+                              full_path.length() - 1 - suffix_index);
 }
 
-bool isdir(const char *filename) {
+bool
+isdir(const char *filename) {
   struct stat buffer;
   stat(filename, &buffer);
   return S_ISDIR(buffer.st_mode);
 }
 
-bool is_fastq(const string filename) {
+bool
+is_fastq(const string &filename) {
   std::ifstream f(filename.c_str());
   char c = '\0';
   f >> c;
@@ -98,14 +100,16 @@ bool is_fastq(const string filename) {
 ////////////////////////////////////////////////////////////////////////
 // Stuff dealing with FASTA format sequence files
 
-bool is_valid_filename(const string name, const string& filename_suffix) {
+bool
+is_valid_filename(const string &name, const string &filename_suffix) {
   const string suffix(name.substr(name.find_last_of(".") + 1));
   return (suffix == filename_suffix);
 }
 
-string path_join(const string& a, const string& b) {
+string
+path_join(const string &a, const string &b) {
   if (b.empty() || b[0] == '/')
-    throw SMITHLABException("cannot prepend dir to file \"" + b + "\"");
+    throw runtime_error("cannot prepend dir to file \"" + b + "\"");
   if (!a.empty() && a[a.length() - 1] == '/')
     return a + b;
   else
@@ -113,7 +117,7 @@ string path_join(const string& a, const string& b) {
 }
 
 void
-identify_chromosomes(const string chrom_file, const string fasta_suffix,
+identify_chromosomes(const string &chrom_file, const string fasta_suffix,
                      unordered_map<string, string> &chrom_files) {
   vector<string> the_files;
   if (isdir(chrom_file.c_str())) {
@@ -125,7 +129,7 @@ identify_chromosomes(const string chrom_file, const string fasta_suffix,
 }
 
 void
-identify_and_read_chromosomes(const string chrom_file,
+identify_and_read_chromosomes(const string &chrom_file,
                               const string fasta_suffix,
                               unordered_map<string, string> &chrom_files) {
   vector<string> the_files;
@@ -143,11 +147,12 @@ identify_and_read_chromosomes(const string chrom_file,
   }
 }
 
-void read_dir(const string& dirname, string filename_suffix,
-              vector<string> &filenames) {
+void
+read_dir(const string& dirname, string filename_suffix,
+         vector<string> &filenames) {
   DIR *dir;
   if (!(dir = opendir(dirname.c_str())))
-    throw SMITHLABException("could not open directory: " + dirname);
+    throw runtime_error("could not open directory: " + dirname);
 
   errno = 0;
   struct dirent *ent;
@@ -158,46 +163,53 @@ void read_dir(const string& dirname, string filename_suffix,
   }
   // check for some errors
   if (errno)
-    throw SMITHLABException("error reading directory: " + dirname);
+    throw runtime_error("error reading directory: " + dirname);
   if (filenames.empty())
-    throw SMITHLABException("no valid files found in: " + dirname);
+    throw runtime_error("no valid files found in: " + dirname);
   closedir(dir);
 }
 
-bool is_sequence_line(const char *buffer) {
+bool
+is_sequence_line(const char *buffer) {
   return isvalid(buffer[0]);
 }
 
-void parse_score_line(const char *buffer, vector<char> &scr) {
+void
+parse_score_line(const char *buffer, vector<char> &scr) {
   for (const char *i = buffer; *i != '\0'; ++i)
     scr.push_back(*i);
 }
 
-inline bool is_fastq_name_line(size_t line_count) {
+inline bool
+is_fastq_name_line(size_t line_count) {
   return ((line_count & 3ul) == 0ul);
 }
 
-inline bool is_fastq_sequence_line(size_t line_count) {
+inline bool
+is_fastq_sequence_line(size_t line_count) {
   return ((line_count & 3ul) == 1ul);
 }
 
-inline bool is_fastq_score_name_line(size_t line_count) {
+inline bool
+is_fastq_score_name_line(size_t line_count) {
   return ((line_count & 3ul) == 2ul);
 }
 
-inline bool is_fastq_score_line(size_t line_count) {
+inline bool
+is_fastq_score_line(size_t line_count) {
   return ((line_count & 3ul) == 3ul);
 }
 
 void
-read_fastq_file(const char *filename, vector<string> &names,
+read_fastq_file(const char *filename,
+                vector<string> &names,
                 vector<string> &sequences, vector<vector<double> > &scores) {
 
   static const size_t INPUT_BUFFER_SIZE = 1000000;
 
   std::ifstream in(filename);
   if (!in)
-    throw SMITHLABException("cannot open input file " + string(filename));
+    throw runtime_error("cannot open input file " + string(filename));
 
   string s, name;
   vector<char> scr;
@@ -209,9 +221,9 @@ read_fastq_file(const char *filename, vector<string> &names,
     char buffer[INPUT_BUFFER_SIZE + 1];
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw SMITHLABException(
-                              "Line in " + name + "\nexceeds max length: "
-                              + toa(INPUT_BUFFER_SIZE));
+      throw runtime_error(
+                          "Line in " + name + "\nexceeds max length: "
+                          + toa(INPUT_BUFFER_SIZE));
     if (in.gcount() == 0)
       break;
 
@@ -221,7 +233,7 @@ read_fastq_file(const char *filename, vector<string> &names,
 
     if (is_fastq_name_line(line_count)) {
       if (buffer[0] != '@')
-        throw SMITHLABException("invalid FASTQ name line: " + string(buffer));
+        throw runtime_error("invalid FASTQ name line: " + string(buffer));
       if (first_line == false && s.length() > 0) {
         names.push_back(name);
         sequences.push_back(s);
@@ -241,8 +253,8 @@ read_fastq_file(const char *filename, vector<string> &names,
     }
     if (is_fastq_score_name_line(line_count)) {
       if (buffer[0] != '+')
-        throw SMITHLABException("invalid FASTQ score name line: " +
-                                string(buffer));
+        throw runtime_error("invalid FASTQ score name line: " +
+                            string(buffer));
       is_score_line = true;
     }
     if (is_fastq_score_line(line_count)) {
@@ -273,7 +285,7 @@ read_fastq_file(const char *filename, vector<string> &names,
   }
 
   if (!phred_scores && !solexa_scores)
-    throw SMITHLABException("invalid quality scores in FASTQ file");
+    throw runtime_error("invalid quality scores in FASTQ file");
 
   for (size_t i = 0; i < scrs.size(); ++i) {
     scores.push_back(vector<double>(scrs[i].size()));
@@ -293,7 +305,7 @@ void read_fastq_file(const char *filename, vector<string> &names,
 
   std::ifstream in(filename);
   if (!in)
-    throw SMITHLABException("cannot open input file " + string(filename));
+    throw runtime_error("cannot open input file " + string(filename));
 
   string s, name, scr;
   bool first_line = true;
@@ -303,9 +315,9 @@ void read_fastq_file(const char *filename, vector<string> &names,
     char buffer[INPUT_BUFFER_SIZE + 1];
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw SMITHLABException(
-                              "Line in " + name + "\nexceeds max length: "
-                              + toa(INPUT_BUFFER_SIZE));
+      throw runtime_error(
+                          "Line in " + name + "\nexceeds max length: "
+                          + toa(INPUT_BUFFER_SIZE));
     if (in.gcount() == 0)
       break;
 
@@ -315,7 +327,7 @@ void read_fastq_file(const char *filename, vector<string> &names,
 
     if (is_fastq_name_line(line_count)) {
       if (buffer[0] != '@')
-        throw SMITHLABException("invalid FASTQ name line: " + string(buffer));
+        throw runtime_error("invalid FASTQ name line: " + string(buffer));
       if (first_line == false && s.length() > 0) {
         names.push_back(name);
         sequences.push_back(s);
@@ -333,8 +345,8 @@ void read_fastq_file(const char *filename, vector<string> &names,
     }
     if (is_fastq_score_name_line(line_count)) {
       if (buffer[0] != '+')
-        throw SMITHLABException("invalid FASTQ score name line: " +
-                                string(buffer));
+        throw runtime_error("invalid FASTQ score name line: " +
+                            string(buffer));
       is_score_line = true;
     }
     if (is_fastq_score_line(line_count)) {
@@ -352,12 +364,13 @@ void read_fastq_file(const char *filename, vector<string> &names,
 }
 
 void
-read_fasta_file(const string filename, vector<string> &names,
+read_fasta_file(const string &filename,
+                vector<string> &names,
                 vector<string> &sequences) {
 
   std::ifstream in(filename.c_str());
   if (!in)
-    throw SMITHLABException("cannot open input file " + string(filename));
+    throw runtime_error("cannot open input file " + filename);
 
   names.clear();
   sequences.clear();
@@ -373,17 +386,17 @@ read_fasta_file(const string filename, vector<string> &names,
   }
 }
 
-void read_fasta_file(const string filename, const string &target,
-                     string &sequence) {
+void
+read_fasta_file(const string &filename,
+                const string &target,
+                string &sequence) {
 
   // read the sequence with the given name from a fasta file
 
   sequence = "";
-
   std::ifstream in(filename.c_str(), std::ios::binary);
-  if (!in) {
-    throw SMITHLABException("cannot open input file " + string(filename));
-  }
+  if (!in)
+    throw runtime_error("cannot open input file " + filename);
 
   static const size_t INPUT_BUFFER_SIZE = 1000000;
 
@@ -394,9 +407,9 @@ void read_fasta_file(const string filename, const string &target,
     char buffer[INPUT_BUFFER_SIZE + 1];
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw SMITHLABException(
-                              "Line in " + name + "\nexceeds max length: "
-                              + toa(INPUT_BUFFER_SIZE));
+      throw runtime_error(
+                          "Line in " + name + "\nexceeds max length: "
+                          + toa(INPUT_BUFFER_SIZE));
     // correct for dos carriage returns before newlines
     if (buffer[strlen(buffer) - 1] == '\r')
       buffer[strlen(buffer) - 1] = '\0';
@@ -405,56 +418,61 @@ void read_fasta_file(const string filename, const string &target,
         std::swap(sequence, s);
         in.close();
         return;
-      } else
-        first_line = false;
+      }
+      else first_line = false;
       name = buffer;
       name = name.substr(name.find_first_not_of("> "));
       const size_t first_whitespace = name.find_first_of(" \t");
       if (first_whitespace != std::string::npos)
         name = name.substr(0, first_whitespace);
       s = "";
-    } else if (name == target)
+    }
+    else if (name == target)
       s += buffer;
     in.peek();
   } //while
-  if (!first_line && s.length() > 0 && name == target) {
+
+  if (!first_line && s.length() > 0 && name == target)
     std::swap(sequence, s);
-  }
-  in.close();
 }
 
-void read_filename_file(const char *filename, vector<string> &filenames) {
+void
+read_filename_file(const char *filename, vector<string> &filenames) {
 
   static const size_t INPUT_BUFFER_SIZE = 1000000;
 
   std::ifstream in(filename);
   if (!in)
-    throw SMITHLABException("cannot open input file " + string(filename));
+    throw runtime_error("cannot open input file " + string(filename));
+
   while (!in.eof()) {
     char buffer[INPUT_BUFFER_SIZE + 1];
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw SMITHLABException("Line in " + string(filename) +
-                              "\nexceeds max length: "
-                              + toa(INPUT_BUFFER_SIZE));
+      throw runtime_error("Line in " + string(filename) +
+                          "\nexceeds max length: "
+                          + toa(INPUT_BUFFER_SIZE));
     filenames.push_back(buffer);
     in.peek();
   }
 }
 
-size_t get_filesize(string filename) {
+size_t
+get_filesize(string filename) {
   std::ifstream f(filename.c_str());
-  if (!f.good()) {
+  if (!f.good())
     return 0;
-  }
+
   size_t begin_pos = f.tellg();
   f.seekg(0, ios_base::end);
   size_t end_pos = f.tellg();
   f.close();
+
   return end_pos - begin_pos;
 }
 
-string basename(string filename) {
+string
+basename(string filename) {
   const string s(filename.substr(0, filename.find_last_of(".")));
   const size_t final_slash = s.find_last_of("/");
   if (final_slash != string::npos)
@@ -463,7 +481,8 @@ string basename(string filename) {
     return s;
 }
 
-void read_dir(const string& dirname, vector<string> &filenames) {
+void
+read_dir(const string& dirname, vector<string> &filenames) {
   DIR *dir;
   if (!(dir = opendir(dirname.c_str())))
     throw "could not open directory: " + dirname;
@@ -483,12 +502,13 @@ void read_dir(const string& dirname, vector<string> &filenames) {
 }
 
 
-void read_prb_file(string filename, vector<vector<vector<double> > > &scores) {
+void
+read_prb_file(string filename, vector<vector<vector<double> > > &scores) {
   static const size_t INPUT_BUFFER_SIZE = 1000000;
   scores.clear();
   std::ifstream in(filename.c_str());
   if (!in)
-    throw SMITHLABException("cannot open input file " + filename);
+    throw runtime_error("cannot open input file " + filename);
   string s;
   size_t line_number = 0;
   while (!in.eof()) {
@@ -496,18 +516,18 @@ void read_prb_file(string filename, vector<vector<vector<double> > > &scores) {
     char buffer[INPUT_BUFFER_SIZE + 1];
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw SMITHLABException(
-                              "Line in " + filename + "\nexceeds max length: "
-                              + toa(INPUT_BUFFER_SIZE));
+      throw runtime_error(
+                          "Line in " + filename + "\nexceeds max length: "
+                          + toa(INPUT_BUFFER_SIZE));
     if (buffer[strlen(buffer) - 1] == '\r')
       buffer[strlen(buffer) - 1] = '\0';
 
     vector<string> parts;
     smithlab::split_whitespace(buffer, parts);
     if (parts.size() % smithlab::alphabet_size != 0)
-      throw SMITHLABException("Incorrect number of values on line "
-                              + toa(line_number) + " in file "
-                              + filename);
+      throw runtime_error("Incorrect number of values on line "
+                          + toa(line_number) + " in file "
+                          + filename);
     scores.push_back(vector<vector<double> >());
     for (size_t i = 0; i < parts.size(); i += smithlab::alphabet_size) {
       scores.back().push_back(vector<double>());
