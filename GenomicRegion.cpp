@@ -22,6 +22,8 @@
 
 #include "GenomicRegion.hpp"
 
+#include <exception>
+
 #include <cassert>
 #include <fstream>
 #include <unordered_map>
@@ -30,6 +32,8 @@ using std::string;
 using std::vector;
 using std::ostringstream;
 using std::unordered_map;
+using std::runtime_error;
+
 unordered_map<string, chrom_id_type> SimpleGenomicRegion::fw_table_in;
 unordered_map<chrom_id_type, string> SimpleGenomicRegion::fw_table_out;
 
@@ -573,8 +577,7 @@ static size_t adjust_start_pos(const size_t orig_start,
 }
 
 static size_t
-adjust_region_size(const size_t orig_start,
-                   const string &chrom_name, const size_t orig_size) {
+adjust_region_size(const size_t orig_start, const size_t orig_size) {
   static const double LINE_WIDTH = 50.0;
   const size_t preceding_newlines_start =
     static_cast<size_t>(std::floor(orig_start / LINE_WIDTH));
@@ -591,8 +594,10 @@ extract_regions_chrom_fasta(const string &chrom_name,
                             vector<string> &sequences) {
 
   std::ifstream in(filename.c_str());
-  for (vector<SimpleGenomicRegion>::const_iterator i(regions.begin());
-       i != regions.end(); ++i) {
+  if (!in)
+    throw runtime_error("cannot read file: " + filename);
+
+  for (auto i = regions.begin(); i != regions.end(); ++i) {
 
     const size_t orig_start_pos = i->get_start();
     const size_t orig_end_pos = i->get_end();
@@ -600,8 +605,7 @@ extract_regions_chrom_fasta(const string &chrom_name,
 
     const size_t start_pos = adjust_start_pos(orig_start_pos, chrom_name);
     const size_t region_size =
-      adjust_region_size(orig_start_pos, chrom_name, orig_region_size);
-    assert(start_pos >= 0);
+      adjust_region_size(orig_start_pos, orig_region_size);
 
     in.seekg(start_pos);
     char buffer[region_size + 1];
@@ -617,7 +621,6 @@ extract_regions_chrom_fasta(const string &chrom_name,
                    sequences.back().begin(), std::ptr_fun(&toupper));
     assert(i->get_width() == sequences.back().length());
   }
-  in.close();
 }
 
 void
@@ -627,8 +630,10 @@ extract_regions_chrom_fasta(const string &chrom_name,
                             vector<string> &sequences) {
 
   std::ifstream in(filename.c_str());
-  for (vector<GenomicRegion>::const_iterator i(regions.begin());
-       i != regions.end(); ++i) {
+  if (!in)
+    throw runtime_error("cannot read file: " + filename);
+
+  for (auto i(regions.begin()); i != regions.end(); ++i) {
 
     const size_t orig_start_pos = i->get_start();
     const size_t orig_end_pos = i->get_end();
@@ -636,16 +641,14 @@ extract_regions_chrom_fasta(const string &chrom_name,
 
     const size_t start_pos = adjust_start_pos(orig_start_pos, chrom_name);
     const size_t region_size =
-      adjust_region_size(orig_start_pos, chrom_name, orig_region_size);
-    assert(start_pos >= 0);
+      adjust_region_size(orig_start_pos, orig_region_size);
 
     in.seekg(start_pos);
     char buffer[region_size + 1];
     buffer[region_size] = '\0';
     in.read(buffer, region_size);
 
-    std::remove_if(
-                   buffer, buffer + region_size,
+    std::remove_if(buffer, buffer + region_size,
                    std::bind2nd(std::equal_to<char>(), '\n'));
     buffer[orig_region_size] = '\0';
 
@@ -656,7 +659,6 @@ extract_regions_chrom_fasta(const string &chrom_name,
       revcomp_inplace(sequences.back());
     assert(i->get_width() == sequences.back().length());
   }
-  in.close();
 }
 
 void
