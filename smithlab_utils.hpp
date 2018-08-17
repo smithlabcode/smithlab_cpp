@@ -35,6 +35,7 @@
 #include <cassert>
 #include <cmath>
 #include <numeric>
+#include <iomanip>
 
 
 namespace smithlab {
@@ -384,5 +385,41 @@ inline kmer_counts(const std::vector<std::string> &seqs,
   return total;
 }
 
+
+/*
+ * How to use the ProgressBar:
+ *
+ * //====================================
+ * const size_t lim = v.size();
+ * ProgressBar progress(lim);
+ * if (VERBOSE)
+ *   progress.report(cerr, 0);
+ * for (size_t i = 0; i < lim; ++i) {
+ *   if (VERBOSE && progress.time_to_report(i))
+ *     progress.report(cerr, i);
+ *   v[i] += x;
+ *  }
+ * if (VERBOSE)
+ *   progress.report(cerr, lim);
+ */
+class ProgressBar {
+public:
+  ProgressBar(const size_t x, size_t bw = 50) :
+    total(x), prev(0), bar_width(bw) {
+    bar = std::string(bar_width, ' ');
+  }
+  bool time_to_report(const size_t i) const {
+    return (static_cast<size_t>((100.0*i)/total) > prev);
+  }
+  void
+  report(std::ostream &out, const size_t i);
+private:
+  size_t total;
+  size_t prev;
+  size_t bar_width;
+  std::string left_tag = "\r[completion: |";
+  std::string bar;
+  std::string right_tag = "\%]";
+};
 
 #endif
