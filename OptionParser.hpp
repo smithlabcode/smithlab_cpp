@@ -19,10 +19,9 @@
 #ifndef OPTION_PARSER_HPP
 #define OPTION_PARSER_HPP
 
-#include "smithlab_utils.hpp"
-
 #include <string>
 #include <vector>
+#include <limits>
 
 class Option {
 public:
