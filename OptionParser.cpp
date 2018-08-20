@@ -31,7 +31,6 @@
 #include <exception>
 #include <cstring>
 
-
 #include "smithlab_utils.hpp"
 
 using std::vector;
@@ -312,8 +311,8 @@ read_config_file(const string &config_filename, vector<string> &config_file_opti
 }
 
 void
-OptionParser::parse(const int argc, const char **argv, vector<string> &arguments)
-{
+OptionParser::parse(const int argc, const char **argv,
+                    vector<string> &arguments) {
   // The "2" below corresponds to the "about" and "help" options
   assert(options.size() >=  2);
 
@@ -349,6 +348,8 @@ OptionParser::parse(const int argc, const char **argv, vector<string> &arguments
   for (size_t i = 0; i < options.size(); ++i)
     if (!options[i].parse(arguments) && first_missing_option_name.empty())
       first_missing_option_name = options[i].format_option_name();
+
+  leftover_args = arguments;
 }
 
 void
@@ -372,12 +373,14 @@ OptionParser::parse(const int argc, const char **argv, vector<string> &arguments
   for (size_t i = 0; i < options.size(); ++i)
     if (!options[i].parse(arguments) && first_missing_option_name.empty())
       first_missing_option_name = options[i].format_option_name();
+
+  leftover_args = arguments;
 }
 
 OptionParser::OptionParser(const string nm, const string descr,
-                           string noflag_msg) :
+                           string noflag_msg, const size_t n_left) :
   prog_name(nm), prog_descr(descr), noflag_message(noflag_msg),
-  help_request(false), about_request(false) {
+  help_request(false), about_request(false), n_leftover(n_left) {
   add_opt("help", '?', "print this help message", false, help_request);
   add_opt("about", '\0', "print about message", false, about_request);
 }
@@ -449,6 +452,24 @@ OptionParser::about_message() const {
   }
   return ss.str();
 }
+
+
+string
+OptionParser::invalid_leftover() const {
+  static const string left_tag("invalid leftover args [should be ");
+  static const string right_tag("]");
+
+  std::ostringstream ss;
+  if (n_leftover != std::numeric_limits<size_t>::max()) {
+    ss << left_tag << n_leftover << right_tag << endl;
+  }
+  for (size_t i = 0; i < leftover_args.size(); ++i) {
+    ss << "leftover arg #" << (i + 1) << "=\""
+       << leftover_args[i] << "\"";
+  }
+  return ss.str();
+}
+
 
 string
 OptionParser::option_missing_message() const {

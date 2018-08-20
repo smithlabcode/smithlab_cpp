@@ -19,10 +19,9 @@
 #ifndef OPTION_PARSER_HPP
 #define OPTION_PARSER_HPP
 
-#include "smithlab_utils.hpp"
-
 #include <string>
 #include <vector>
+#include <limits>
 
 class Option {
 public:
@@ -81,7 +80,8 @@ class OptionParser {
 public:
 
   OptionParser(const std::string nm, const std::string descr,
-               std::string noflag_msg = "");
+               std::string noflag_msg = "",
+               const size_t n_left = std::numeric_limits<size_t>::max());
 
   void add_opt(const std::string l_name, const char s_name,
                const std::string descr,  const bool reqd, int &val);
@@ -114,10 +114,17 @@ public:
 
   bool about_requested() const {return about_request;}
   std::string about_message() const;
+  std::string invalid_leftover() const;
 
   bool option_missing() const {
     return !first_missing_option_name.empty();
   }
+
+  bool wrong_number_leftover() const {
+    return n_leftover != std::numeric_limits<size_t>::max() &&
+      leftover_args.size() != n_leftover;
+  }
+
   std::string option_missing_message() const;
 
   static const bool OPTIONAL = false;
@@ -132,6 +139,9 @@ private:
   bool help_request;
   bool about_request;
   std::string first_missing_option_name;
+  std::vector<std::string> leftover_args;
+
+  size_t n_leftover;
 };
 
 #endif
