@@ -41,11 +41,23 @@ operator>>(std::istream& the_stream, MappedRead &mr) {
     std::istringstream is;
     is.rdbuf()->pubsetbuf(const_cast<char*>(buffer.c_str()), buffer.size());
 
-    string chrom, name;
+    string chrom, name, tmp;
     size_t start = 0ul, end = 0ul;
     char strand = '\0';
     double score;
-    if (is >> chrom >> start >> end >> name >> score >> strand >> mr.seq) {
+    if (is >> chrom >> start >> tmp) {
+      if (find_if(tmp.begin(), tmp.end(),
+                  [](char c) {return !std::isdigit(c);}) == tmp.end()) {
+        end = std::stol(tmp);
+        if (!(is >> name >> score >> strand >> mr.seq))
+          throw runtime_error("bad line in MappedRead file: " + buffer);
+      }
+      else {
+        name = tmp;
+        if (!(is >> score >> strand >> mr.seq))
+          throw runtime_error("bad line in MappedRead file: " + buffer);
+        end = start + mr.seq.length();
+      }
       mr.r = GenomicRegion(chrom, start, end, name, score, strand);
       is >> mr.scr;
     }
