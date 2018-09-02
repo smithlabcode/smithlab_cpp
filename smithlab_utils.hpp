@@ -365,10 +365,11 @@ inline mer2index(const char *s, size_t n) {
 
 size_t
 inline kmer_counts(const std::vector<std::string> &seqs,
-            std::vector<size_t> &counts, size_t k) {
+                   std::vector<size_t> &counts, size_t k) {
   counts.clear();
-  size_t nwords = static_cast<size_t>(pow(static_cast<float>(smithlab::alphabet_size),
-                                          static_cast<int>(k)));
+  size_t nwords =
+    static_cast<size_t>(pow(static_cast<float>(smithlab::alphabet_size),
+                            static_cast<int>(k)));
   counts.resize(nwords, 0);
   size_t total = 0;
   for (size_t i = 0; i < seqs.size(); ++i) {
@@ -404,8 +405,9 @@ inline kmer_counts(const std::vector<std::string> &seqs,
  */
 class ProgressBar {
 public:
-  ProgressBar(const size_t x, size_t bw = 50) :
-    total(x), prev(0), bar_width(bw) {
+  ProgressBar(const size_t x, const std::string message = "completion") :
+    total(x), prev(0), mid_tag(message) {
+    bar_width = max_bar_width - message.length() - 3 - 5;
     bar = std::string(bar_width, ' ');
   }
   bool time_to_report(const size_t i) const {
@@ -413,13 +415,18 @@ public:
   }
   void
   report(std::ostream &out, const size_t i);
+
 private:
+
   size_t total;
   size_t prev;
   size_t bar_width;
-  std::string left_tag = "\r[completion: |";
+  std::string left_tag = "\r[";
+  std::string mid_tag;
   std::string bar;
   std::string right_tag = "\%]";
+
+  static const size_t max_bar_width = 72;
 };
 
 #endif

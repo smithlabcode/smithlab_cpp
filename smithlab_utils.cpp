@@ -222,11 +222,14 @@ smithlab::squash(const std::vector<std::string>& v) {
   return res;
 }
 
+using std::endl;
 void
 ProgressBar::report(std::ostream &out, const size_t i) {
-  prev = (100.0*i)/total;
-  bar[bar_width*(prev/100.0)] = '=';
-  out << left_tag << bar << "|"
+  prev = (100.0/total)*i;
+  const size_t x =
+    std::min(static_cast<size_t>(bar_width*(prev/100.0)), bar_width);
+  fill_n(begin(bar), x, '=');
+  out << left_tag << mid_tag << "|" << bar << "|"
       << std::setw(3) << prev << right_tag;
   if (prev == 100)
     out << '\n';
