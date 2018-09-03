@@ -27,15 +27,10 @@
 
 struct MappedRead {
   MappedRead() {}
-  MappedRead(const char *line);
   GenomicRegion r;
   std::string seq;
   std::string scr;
 };
-
-void
-LoadMappedReadsFile(std::string filename,
-                    std::vector<MappedRead> &the_mapped_reads);
 
 std::istream&
 operator>>(std::istream& the_stream, MappedRead &mr);
