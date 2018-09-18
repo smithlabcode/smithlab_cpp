@@ -234,3 +234,21 @@ ProgressBar::report(std::ostream &out, const size_t i) {
   if (prev == 100)
     out << '\n';
 }
+
+using std::endl;
+void
+ProgressBar2::report(std::ostream &out) {
+
+  next = std::min (next + inc, double(finish - start));
+  percent = std::min(100.0, next*100.0*inc_block/total);
+  block += inc_block;
+  
+  const size_t x =
+    std::min(block, bar_width);
+  fill_n(begin(bar), x, '=');
+  out << left_tag << mid_tag << "|" << bar << "|"
+      << std::setw(3) << percent << right_tag << std::flush;
+  
+  if (next == finish)
+    out <<  endl;
+}
