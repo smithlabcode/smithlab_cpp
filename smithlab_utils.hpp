@@ -406,18 +406,30 @@ inline kmer_counts(const std::vector<std::string> &seqs,
 class ProgressBar {
 public:
   ProgressBar(const size_t x, const std::string message = "completion") :
-    total(x), prev(0), mid_tag(message) {
+    total(x-1), prev(0), start(0), finish(x), mid_tag(message) {
     bar_width = max_bar_width - message.length() - 3 - 5;
     bar = std::string(bar_width, ' ');
   }
-  bool time_to_report(const size_t i) const {
-    return (static_cast<size_t>((100.0*i)/total) > prev);
+
+  ProgressBar(const int start_, const int finish_,
+	      const std::string message = "completion") :
+    start(start_), finish(finish_), total(abs(finish - start)-1),
+    prev(0),  mid_tag(message) {
+    bar_width = max_bar_width - message.length() - 3 - 5;
+    bar = std::string(bar_width, ' ');
+  }
+  
+  
+  bool time_to_report(const int i) const {
+    return (static_cast<size_t>((100.0*abs(i - start))/total) > prev);
   }
   void
   report(std::ostream &out, const size_t i);
 
 private:
 
+  int start;
+  int finish;
   size_t total;
   size_t prev;
   size_t bar_width;
@@ -429,66 +441,7 @@ private:
   static const size_t max_bar_width = 72;
 };
 
-class ProgressBar2 {
-public:
 
-  void initialize(){
-    bar = std::string(bar_width, ' ');
-    mult = direction ? 1 : -1 ;
-    total = finish - start -1;
-    inc = double(total)/bar_width;
-    next = inc;
-    block = 0;
-    inc_block = total > bar_width ?  1 : bar_width / total;
-  }
-
-  ProgressBar2(const int finish_,
-	       const std::string message = "completion") :
-    mid_tag(message) {
-    bar_width = max_bar_width - message.length() - 3 - 5;
-    direction = finish_ > 0;
-    start = 0;
-    finish = direction ? finish_ : -finish_;
-    initialize();
-  }
-    
-  
-  ProgressBar2(const int start_, const int finish_,
-	       const std::string message = "completion") :
-    mid_tag(message) {
-    bar_width = max_bar_width - message.length() - 3 - 5;
-    direction = start_ < finish_;
-    start = direction ? start_ : - start_;
-    finish =  direction ? finish_ : - finish_;
-    initialize();
-     
-  }
-  bool time_to_report(const size_t i) const {
-    return (i*mult - start >= next);
-  }
-  void
-  report(std::ostream &out);
-
-private:
-  bool direction;
-  size_t total;
-  size_t bar_width;
-  std::string left_tag = "\r[";
-  std::string mid_tag;
-  std::string bar;
-  std::string right_tag = "\%]";
-  int start;
-  int finish;
-  int mult;
-  int percent = 0;
-  double next;
-  double inc;
-  size_t block = 0;
-  size_t inc_block;
-
-  
-  static const size_t max_bar_width = 72;
-};
 
 
 
