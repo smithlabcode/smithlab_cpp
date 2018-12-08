@@ -45,10 +45,13 @@ public:
          const std::string descr,  const bool reqd, char &val);
 
   bool parse(std::vector<std::string> &command_line);
+
   void parse_config_file(std::vector<std::string> &options);
 
   std::string format_option_name() const;
   std::string format_option_description(const size_t offset) const;
+
+
 
 private:
 
@@ -136,6 +139,8 @@ private:
   std::string noflag_message;
   std::vector<Option> options;
 
+  bool config_specified;
+  size_t config_filename;
   bool help_request;
   bool about_request;
   std::string first_missing_option_name;

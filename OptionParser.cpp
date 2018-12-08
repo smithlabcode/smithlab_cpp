@@ -30,6 +30,10 @@
 #include <iomanip>
 #include <exception>
 #include <cstring>
+#include <cctype>
+#include <functional>
+#include <regex>
+#include <iterator>
 
 #include "smithlab_utils.hpp"
 
@@ -37,6 +41,9 @@ using std::vector;
 using std::string;
 using std::endl;
 using std::runtime_error;
+using std::regex;
+using std::begin;
+using std::end;
 
 static const size_t MAX_LINE_LENGTH = 72;
 
@@ -68,6 +75,7 @@ Option::format_option(const string &argument) {
       *bool_value = false;
   }
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -163,12 +171,12 @@ Option::option_match(const string &other) {
 
 bool
 Option::parse(vector<string> &command_line) {
-  static const string dummy("");
+  static const string dummy;
   if (!command_line.empty()) {
     for (size_t i = 0; i < command_line.size();)
       if (option_match(command_line[i])) {
         if (specified && arg_type != SMITHLAB_ARG_BOOL)
-          throw runtime_error("Duplicate assignment top option: " + long_name);
+          throw runtime_error("duplicate assignment to option: " + long_name);
 
         if (i < command_line.size() - 1) {
           format_option(command_line[i + 1]);
@@ -274,39 +282,61 @@ OptionParser::add_opt(const string l_name, const char s_name, const string descr
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 
+bool valid_option_char(char ch) {
+  return std::isalnum(ch) || ch == '_';
+}
+
 static void
-read_config_file(const string &config_filename, vector<string> &config_file_options) {
-  static const char COMMENT_CHARACTER = '#';
-  static const size_t INPUT_BUFFER_SIZE = 1000;
+read_config_file(const string &config_filename,
+                 vector<string> &config_file_options) {
+  static const char comment_character = '#';
+  static const char separator_character = ':';
+  static const string outer_space = "^[:space:]+|[:space:]+$";
+  static const string inner_space = "([:space:])[:space:]+";
+
   config_file_options.clear();
 
-  std::ifstream in(config_filename.c_str());
+  std::ifstream in(config_filename);
   if (!in)
     throw runtime_error("cannot open config file: " + config_filename);
 
+  string line;
   size_t line_number = 0;
-  while (!in.eof()) {
-    ++line_number;
-    char buffer[INPUT_BUFFER_SIZE + 1];
-    in.getline(buffer, INPUT_BUFFER_SIZE);
-    if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw runtime_error("Line in " + config_filename +
-                          "\nexceeds max length: " +
-                          toa(INPUT_BUFFER_SIZE));
-    if (in.gcount() == 0)
-      throw runtime_error("Problem reading file \"" + config_filename +
-                          "\" (empty?)");
-    const size_t final_char = in.gcount() - 1;
-    if (buffer[final_char] == '\r') buffer[final_char] = '\0';
-    if (buffer[0] != '\0' && buffer[0] != COMMENT_CHARACTER) {
-      string line(buffer);
-      line = smithlab::strip(line);
-      if (line.length() == 0 || line.find('=') == string::npos)
-        throw runtime_error("Line " + toa(line_number) +
-                            " malformed in config file " + config_filename);
+  while (in) {
+
+    if (!getline(in, line))
+      throw runtime_error("failed to config line from " + config_filename);
+
+    // remove leading and trailing space
+    line = regex_replace(line, regex(outer_space), "");
+    line = regex_replace(line, regex(inner_space), " ");
+
+    if (!line.empty() && line.front() != comment_character) {
+
+      const size_t sep_pos = line.find_first_of(separator_character);
+
+      if (sep_pos == 0 || // catches ": "
+          sep_pos >= line.length() - 1) // catches no sep or final char sep
+        throw runtime_error("bad config file line: " + line);
+
+      string option_label(line.substr(0, sep_pos));
+
+      if (!all_of(begin(option_label), end(option_label), valid_option_char))
+        throw runtime_error("bad option label: " + line);
+
+      string option_value(line.substr(sep_pos + 1));
+      // remove leading space
+      option_value = regex_replace(line, regex(outer_space), "");
+
+      if (!all_of(begin(option_value), end(option_value), valid_option_char))
+        throw runtime_error("bad option label: " + line);
+
+      // cerr << option_label << '\t' << option_value << endl;
+
       config_file_options.push_back(line);
     }
     in.peek();
+    ++line_number;
   }
 }
 
@@ -325,22 +355,24 @@ OptionParser::parse(const int argc, const char **argv,
   int i = 0;
   int arg_num = argc - 1;
   while (i < arg_num)
-    if (arguments[i] == "-config-file")
-      {
-        vector<string> config_file_options;
-        string config_filename;
-        if (i + 1 < argc - 1)
-          config_filename =  arguments[i+1];
-        else
-          throw runtime_error("-config-line requires config filename");
-        read_config_file(config_filename, config_file_options);
-        for (size_t j = 0; j < options.size(); ++j)
-          options[j].parse_config_file(config_file_options);
+    if (arguments[i] == "--config") {
+      vector<string> config_file_options;
+      string config_filename;
+      if (i + 1 < argc - 1)
+        config_filename =  arguments[i+1];
+      else
+        // ads: need to check that this is really a filename
+        throw runtime_error("--config requires config filename");
+      read_config_file(config_filename, config_file_options);
+      for (size_t j = 0; j < options.size(); ++j)
+        options[j].parse_config_file(config_file_options);
 
-        arguments.erase(arguments.begin() + i);
-        arguments.erase(arguments.begin() + i);
-        arg_num -= 2;
-      }
+      // ads: do we need to remove this arg? what if we need to know
+      // that a config file was used?
+      arguments.erase(arguments.begin() + i);
+      arguments.erase(arguments.begin() + i);
+      arg_num -= 2;
+    }
     else
       ++i;
 
