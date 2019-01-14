@@ -406,7 +406,7 @@ inline kmer_counts(const std::vector<std::string> &seqs,
 class ProgressBar {
 public:
   ProgressBar(const size_t x, const std::string message = "completion") :
-    prev(0), start(0), finish(x), mid_tag(message) {
+    start(0), finish(x), prev(0), mid_tag(message) {
     total = x > 1 ? x-1 : 1;
     if(message.length() > max_steps ||
 	max_steps - message.length() < min_steps){
