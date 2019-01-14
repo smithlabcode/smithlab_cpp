@@ -406,8 +406,14 @@ inline kmer_counts(const std::vector<std::string> &seqs,
 class ProgressBar {
 public:
   ProgressBar(const size_t x, const std::string message = "completion") :
-    total(x-1), prev(0), start(0), finish(x), mid_tag(message) {
-    bar_width = max_bar_width - message.length() - 3 - 5;
+    prev(0), start(0), finish(x), mid_tag(message) {
+    total = x > 1 ? x-1 : 1;
+    if(message.length() > max_steps ||
+	max_steps - message.length() < min_steps){
+      bar_width = min_steps;
+      mid_tag.resize(max_steps - bar_width);
+      }
+    else bar_width = max_steps - message.length();
     bar = std::string(bar_width, ' ');
   }
 
@@ -415,7 +421,12 @@ public:
 	      const std::string message = "completion") :
     start(start_), finish(finish_), total(abs(finish - start)-1),
     prev(0),  mid_tag(message) {
-    bar_width = max_bar_width - message.length() - 3 - 5;
+    if(message.length() > max_steps ||
+	max_steps - message.length() < min_steps){
+      bar_width = min_steps;
+      mid_tag.resize(max_steps - bar_width);
+      }
+    else bar_width = max_steps - message.length();
     bar = std::string(bar_width, ' ');
   }
   
@@ -439,6 +450,13 @@ private:
   std::string right_tag = "\%]";
 
   static const size_t max_bar_width = 72;
+  // Reserve 3 characters for percentage value
+  // and 5 for the frame ('[' '|' '|' '%' ']')
+  static const size_t reserved_width = 3 + 5;
+  // maximum number of progress steps
+  static const size_t max_steps = max_bar_width - reserved_width;
+  // minimum number of progress steps
+  static const size_t min_steps = 5;
 };
 
 
