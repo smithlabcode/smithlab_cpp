@@ -222,7 +222,6 @@ smithlab::squash(const std::vector<std::string>& v) {
   return res;
 }
 
-using std::endl;
 void
 ProgressBar::report(std::ostream &out, const size_t i) {
   prev = (100.0/total)*abs(i-start);
@@ -234,5 +233,3 @@ ProgressBar::report(std::ostream &out, const size_t i) {
   if (prev == 100)
     out << '\n';
 }
-
-
