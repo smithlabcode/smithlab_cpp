@@ -406,40 +406,18 @@ inline kmer_counts(const std::vector<std::string> &seqs,
 class ProgressBar {
 public:
   ProgressBar(const size_t x, const std::string message = "completion") :
-    start(0), finish(x), prev(0), mid_tag(message) {
-    total = x > 1 ? x - 1 : 1;
-    if (message.length() > max_steps ||
-        max_steps - message.length() < min_steps) {
-      bar_width = min_steps;
-      mid_tag.resize(max_steps - bar_width);
-    }
-    else bar_width = max_steps - message.length();
+    total(x), prev(0), mid_tag(message) {
+    bar_width = max_bar_width - message.length() - 3 - 5;
     bar = std::string(bar_width, ' ');
   }
-
-  ProgressBar(const int start_, const int finish_,
-              const std::string message = "completion") :
-    start(start_), finish(finish_), total(abs(finish - start)-1),
-    prev(0),  mid_tag(message) {
-    if (message.length() > max_steps ||
-        max_steps - message.length() < min_steps){
-      bar_width = min_steps;
-      mid_tag.resize(max_steps - bar_width);
-    }
-    else bar_width = max_steps - message.length();
-    bar = std::string(bar_width, ' ');
-  }
-
-  bool time_to_report(const int i) const {
-    return (static_cast<size_t>((100.0*abs(i - start))/total) > prev);
+  bool time_to_report(const size_t i) const {
+    return (static_cast<size_t>((100.0*i)/total) > prev);
   }
   void
   report(std::ostream &out, const size_t i);
 
 private:
 
-  int start;
-  int finish;
   size_t total;
   size_t prev;
   size_t bar_width;
@@ -449,13 +427,6 @@ private:
   std::string right_tag = "\%]";
 
   static const size_t max_bar_width = 72;
-  // Reserve 3 characters for percentage value
-  // and 5 for the frame ('[' '|' '|' '%' ']')
-  static const size_t reserved_width = 3 + 5;
-  // maximum number of progress steps
-  static const size_t max_steps = max_bar_width - reserved_width;
-  // minimum number of progress steps
-  static const size_t min_steps = 5;
 };
 
 #endif
