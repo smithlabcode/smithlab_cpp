@@ -49,9 +49,9 @@ public:
   void parse_config_file(std::vector<std::string> &options);
 
   std::string format_option_name() const;
-  std::string format_option_description(const size_t offset) const;
-
-
+  std::string format_option_description(const size_t offset,
+                                        const bool show_default = false) const;
+  std::string format_default_value() const;
 
 private:
 
@@ -85,6 +85,8 @@ public:
   OptionParser(const std::string nm, const std::string descr,
                std::string noflag_msg = "",
                const size_t n_left = std::numeric_limits<size_t>::max());
+
+  void set_show_defaults() {show_defaults = true;}
 
   void add_opt(const std::string l_name, const char s_name,
                const std::string descr,  const bool reqd, int &val);
@@ -143,6 +145,7 @@ private:
   size_t config_filename;
   bool help_request;
   bool about_request;
+  bool show_defaults;
   std::string first_missing_option_name;
   std::vector<std::string> leftover_args;
 

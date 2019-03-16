@@ -48,9 +48,9 @@ using std::end;
 static const size_t MAX_LINE_LENGTH = 72;
 
 enum {
-  SMITHLAB_ARG_INT,    SMITHLAB_ARG_UINT,    SMITHLAB_ARG_LONG,
-  SMITHLAB_ARG_ULONG,  SMITHLAB_ARG_FLOAT,   SMITHLAB_ARG_DOUBLE,
-  SMITHLAB_ARG_STRING, SMITHLAB_ARG_BOOL, SMITHLAB_ARG_CHAR
+  SMITHLAB_ARG_INT,    SMITHLAB_ARG_UINT,  SMITHLAB_ARG_LONG,
+  SMITHLAB_ARG_ULONG,  SMITHLAB_ARG_FLOAT, SMITHLAB_ARG_DOUBLE,
+  SMITHLAB_ARG_STRING, SMITHLAB_ARG_BOOL,  SMITHLAB_ARG_CHAR
 };
 
 void
@@ -74,6 +74,56 @@ Option::format_option(const string &argument) {
     if (argument == "false" || argument == "off")
       *bool_value = false;
   }
+}
+
+using std::numeric_limits;
+using std::to_string;
+
+template<class T> string
+format_int_like(T &val) {
+  return "[" +
+    (val == numeric_limits<T>::max()) ? "infty" :
+    ((val == -numeric_limits<T>::max()) ? "-infty" : to_string(val)) + "]";
+}
+
+template<class T> string
+format_unsigned_like(T &val) {
+  return "[" +
+    ((val == numeric_limits<T>::max()) ? "infty" : to_string(val)) + "]";
+}
+
+template<class T> string
+format_float_like(T &val) {
+  return "[" +
+    ((val == numeric_limits<T>::max()) ? "infty" :
+     ((val == -numeric_limits<T>::max()) ? "-infty" :
+      ((val == numeric_limits<T>::min()) ? "eps" :
+       ((val == -numeric_limits<T>::min()) ? "-eps" :
+        ((std::abs(val) < numeric_limits<T>::min()) ? "0.0" :
+         to_string(val)))))) + "]";
+}
+
+string
+Option::format_default_value() const {
+  std::istringstream ss;
+  if (arg_type == SMITHLAB_ARG_INT)
+    return format_int_like(*int_value);
+  else if (arg_type == SMITHLAB_ARG_LONG)
+    return format_int_like(*long_value);
+  else if (arg_type == SMITHLAB_ARG_UINT)
+    return format_unsigned_like(*uint_value);
+  else if (arg_type == SMITHLAB_ARG_ULONG)
+    return format_unsigned_like(*ulong_value);
+  else if (arg_type == SMITHLAB_ARG_FLOAT)
+    return format_float_like(*float_value);
+  else if (arg_type == SMITHLAB_ARG_DOUBLE)
+    return format_float_like(*double_value);
+  else if (arg_type == SMITHLAB_ARG_STRING)
+    return *string_value;
+  else if (arg_type == SMITHLAB_ARG_CHAR)
+    return "[" + string(1, *char_value) + "]";
+  else // if (arg_type == SMITHLAB_ARG_BOOL)
+    return ""; //*bool_value ? "true" : "false";
 }
 
 
@@ -140,11 +190,16 @@ Option::format_option_name() const {
 }
 
 string
-Option::format_option_description(const size_t offset) const {
+Option::format_option_description(const size_t offset,
+                                  const bool show_default) const {
   std::ostringstream ss;
   if (!description.empty()) {
     vector<string> parts;
     smithlab::split_whitespace(description, parts);
+    if (required)
+      parts.push_back("[requird]");
+    if (!required && show_default)
+      parts.push_back(format_default_value());
 
     size_t line_len = 0;
     for (size_t i = 0; i < parts.size(); ++i) {
@@ -412,7 +467,8 @@ OptionParser::parse(const int argc, const char **argv, vector<string> &arguments
 OptionParser::OptionParser(const string nm, const string descr,
                            string noflag_msg, const size_t n_left) :
   prog_name(nm), prog_descr(descr), noflag_message(noflag_msg),
-  help_request(false), about_request(false), n_leftover(n_left) {
+  help_request(false), about_request(false),
+  show_defaults(false), n_leftover(n_left) {
   add_opt("help", '?', "print this help message", false, help_request);
   add_opt("about", '\0', "print about message", false, about_request);
 }
@@ -427,8 +483,8 @@ OptionParser::OptionParser(const string nm, const string descr,
 string
 OptionParser::help_message() const {
   // corresponds to the two spaces before and
-  static const char *SPACE_BEFORE_SHORT = "  ";
-  static const char *SPACE_BTWN_SHRT_LNG = "  ";
+  static const string SPACE_BEFORE_SHORT = "  ";
+  static const string SPACE_BTWN_SHRT_LNG = "  ";
   static const size_t TOTAL_ADDED_SPACE = 4;
 
   vector<string> option_names;
@@ -452,15 +508,17 @@ OptionParser::help_message() const {
       ss << SPACE_BEFORE_SHORT << std::left << std::setw(max_name_len)
          << option_names[i] << SPACE_BTWN_SHRT_LNG
          << options[i].format_option_description(max_name_len +
-                                                 TOTAL_ADDED_SPACE) << endl;
+                                                 TOTAL_ADDED_SPACE,
+                                                 show_defaults) << endl;
   }
 
   ss << endl << "Help options:" << endl;
-  for (size_t i = 0; i < std::min(static_cast<size_t>(2), options.size()); ++i)
+  for (size_t i = 0; i < std::min(2ul, options.size()); ++i)
     ss << SPACE_BEFORE_SHORT << std::left << std::setw(max_name_len)
        << option_names[i] << SPACE_BTWN_SHRT_LNG
        << options[i].format_option_description(max_name_len +
-                                               TOTAL_ADDED_SPACE) << endl;
+                                               TOTAL_ADDED_SPACE,
+                                               show_defaults) << endl;
   return ss.str();
 }
 
