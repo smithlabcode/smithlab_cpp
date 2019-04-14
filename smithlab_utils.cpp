@@ -230,6 +230,6 @@ ProgressBar::report(std::ostream &out, const size_t i) {
   fill_n(begin(bar), x, '=');
   out << left_tag << mid_tag << "|" << bar << "|"
       << std::setw(3) << prev << right_tag;
-  if (i == total)
+  if (i >= total)
     out << '\n';
 }
