@@ -137,14 +137,11 @@ smithlab::strip(const std::string& s) {
 
 void
 smithlab::split_whitespace(const std::string& s, std::vector<std::string> &v) {
-  size_t i = 0, len = s.length();
-  while (i < len) {
-    while (i < len && isspace(s[i])) ++i;
-    size_t j = i;
-    while (i < len && !isspace(s[i])) ++i;
-    if (j < i)
-      v.push_back(s.substr(j, i - j));
-  }
+  v.clear();
+  std::istringstream iss(s);
+  copy(std::istream_iterator<std::string>(iss),
+       std::istream_iterator<std::string>(),
+       std::back_inserter(v));
 }
 
 std::vector<std::string>
