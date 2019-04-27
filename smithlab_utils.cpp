@@ -22,8 +22,11 @@
 
 #include "smithlab_utils.hpp"
 #include <cstring>
+#include <string>
 #include <cmath>
+
 using std::vector;
+using std::string;
 
 /* Performs Hochberg step-up p-value adjustment.
  */
@@ -136,15 +139,12 @@ smithlab::strip(const std::string& s) {
 }
 
 void
-smithlab::split_whitespace(const std::string& s, std::vector<std::string> &v) {
-  size_t i = 0, len = s.length();
-  while (i < len) {
-    while (i < len && isspace(s[i])) ++i;
-    size_t j = i;
-    while (i < len && !isspace(s[i])) ++i;
-    if (j < i)
-      v.push_back(s.substr(j, i - j));
-  }
+smithlab::split_whitespace(const string &s, vector<string> &v) {
+  v.clear();
+  std::istringstream iss(s);
+  copy(std::istream_iterator<string>(iss),
+       std::istream_iterator<string>(),
+       std::back_inserter(v));
 }
 
 std::vector<std::string>
