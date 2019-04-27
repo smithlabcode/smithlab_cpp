@@ -73,3 +73,11 @@ operator<<(std::ostream& the_stream, const MappedRead &mr) {
     the_stream << '\t' << mr.scr;
   return the_stream;
 }
+
+#include <sstream>
+std::string
+MappedRead::tostring() const {
+  std::ostringstream oss;
+  oss << *this;
+  return oss.str();
+}
