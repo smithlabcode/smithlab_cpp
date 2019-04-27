@@ -91,10 +91,16 @@ std::string
 basename(std::string filename);
 
 void
-parse_dir_baseanme_suffix(const std::string &full_path,
+parse_dir_basename_suffix(const std::string &full_path,
                           std::string &dirname,
                           std::string &base_name,
                           std::string &suffix);
+
+void
+format_dir_basename_suffix(const std::string &directory_name,
+                           const std::string &file_base_name,
+                           const std::string &file_name_suffix,
+                           std::string &full_path);
 
 std::string
 strip_path(std::string full_path);

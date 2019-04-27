@@ -65,20 +65,35 @@ strip_path_and_suffix(string full_path) {
 }
 
 void
-parse_dir_baseanme_suffix(const string &full_path,
+parse_dir_basename_suffix(const string &full_path,
                           string &dirname,
                           string &base_name, string &suffix) {
-  size_t base_index = full_path.find_last_of("/\\");
-  size_t suffix_index = full_path.find_last_of(".");
-  if (suffix_index <= base_index)
-    suffix_index = full_path.length() - 1;
-  dirname = full_path.substr(0, base_index + 1);
-  base_name = full_path.substr(base_index + 1, suffix_index - base_index - 1);
-  if (suffix_index == full_path.length() - 1)
-    suffix = "";
-  else
-    suffix = full_path.substr(suffix_index + 1,
-                              full_path.length() - 1 - suffix_index);
+  const size_t base_index = full_path.find_last_of("/\\");
+  if (base_index != string::npos)
+    dirname = full_path.substr(0, base_index);
+  else dirname = "";
+
+  const size_t suffix_index = full_path.find_last_of(".");
+  if (suffix_index != string::npos &&
+      (base_index == string::npos || suffix_index > base_index))
+    suffix = string(begin(full_path) + suffix_index + 1, end(full_path));
+  else suffix = "";
+
+  base_name = string(begin(full_path) + base_index + 1,
+                     begin(full_path) + suffix_index);
+}
+
+void
+format_dir_basename_suffix(const string &dn, const string &bn,
+                           const string &sf, string &full_path) {
+  full_path = dn;
+  if (!dn.empty() && bn.back() != '/')
+    full_path += '/';
+
+  full_path += bn;
+
+  if (!sf.empty())
+    full_path += (sf[0] == '.' || full_path.back() == '.') ? sf : "." + sf;
 }
 
 bool
@@ -548,7 +563,7 @@ is_valid_output_file(const string &filename) {
     // ADS: check if dir exists and is writeable
     // first get directory part
     string base_name, dir_part, suffix;
-    parse_dir_baseanme_suffix(filename, dir_part, base_name, suffix);
+    parse_dir_basename_suffix(filename, dir_part, base_name, suffix);
     if (dir_part.empty())
       dir_part = "./";
     // check if directory part exists and is writeable
