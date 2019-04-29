@@ -210,7 +210,7 @@ Option::format_option_description(const size_t offset,
       if (i > 0 && line_len == 0)
         ss << string(offset, ' ');
       ss << parts[i] << " ";
-      line_len += parts[i].size();
+      line_len += parts[i].size()+1; //+1 for the added space
     }
   }
   return ss.str();
