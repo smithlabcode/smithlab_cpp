@@ -529,16 +529,18 @@ OptionParser::about_message() const {
   vector<string> parts;
   smithlab::split_whitespace(prog_descr, parts);
 
-  size_t line_len = 0;
   std::ostringstream ss;
   ss << PROGRAM_NAME_TAG << prog_name << endl;
-  for (size_t i = 0; i < parts.size(); ++i) {
-    if (line_len + parts[i].size() >= MAX_LINE_LENGTH && i > 0) {
+  ss << parts.front();
+  size_t line_len = parts.front().length();
+  for (size_t i = 1; i < parts.size(); ++i) {
+    if (line_len + parts[i].size() >= MAX_LINE_LENGTH) {
       line_len = 0;
       ss << endl;
     }
-    ss << parts[i] << " ";
-    line_len += parts[i].size();
+    else ss << ' ';
+    ss << parts[i];
+    line_len += parts[i].length() + 1; // the "+1" is for the space
   }
   return ss.str();
 }
