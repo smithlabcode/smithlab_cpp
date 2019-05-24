@@ -48,8 +48,7 @@ public:
   
   friend SAMReader& 
   operator>>(SAMReader& sam_stream, SAMRecord &samr);
-  
-  const bool is_good() const {return GOOD;}
+  operator bool() const;
 
 private:  
   void

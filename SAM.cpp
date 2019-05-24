@@ -106,6 +106,11 @@ SAMReader::get_SAMRecord(const string &str, SAMRecord &samr)
   return false;
 }
 
+SAMReader::operator bool() const
+{
+  return GOOD;
+}
+
 SAMReader&
 operator>>(SAMReader &sam_stream, SAMRecord& samr)
 {
