@@ -90,19 +90,21 @@ SAMReader::get_SAMRecord(const string &str, SAMRecord &samr) {
 
 SAMReader&
 operator>>(SAMReader &reader, SAMRecord &aln) {
-  int sam_read1_ret = 0;
-  if ((sam_read1_ret = sam_read1(reader.hts, reader.hdr, reader.b)) >= 0) {
-    int sam_format1_ret = 0;
-    if ((sam_format1_ret = sam_format1(reader.hdr, reader.b,
-                                       &reader.hts->line)) <= 0)
-      throw runtime_error("failed reading alignment from file: " +
-                          reader.filename);
+  int rd_ret = 0;
+  if ((rd_ret = sam_read1(reader.hts, reader.hdr, reader.b)) >= 0) {
+    int fmt_ret = 0;
+    if ((fmt_ret = sam_format1(reader.hdr, reader.b, &reader.hts->line)) <= 0)
+      throw runtime_error("failed reading record from: " + reader.filename);
     reader.good = reader.get_SAMRecord(reader.hts->line.s, aln);
+    // ADS: line below seems to be needed when the file format is SAM
+    // because the hts_getline for parsing SAM format files within
+    // sam_read1 only get called when "(fp->line.l == 0)". For BAM
+    // format, it does not seem to matter.
     reader.hts->line.l = 0;
   }
-  if (sam_read1_ret == -1)
+  if (rd_ret == -1)
     reader.good = false;
-  if (sam_read1_ret < -1)
+  else if (rd_ret < -1)
     throw runtime_error("failed to read record from file: " + reader.filename);
   return reader;
 }
