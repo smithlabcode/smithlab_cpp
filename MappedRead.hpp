@@ -27,15 +27,26 @@
 
 struct MappedRead {
   MappedRead() {}
+  explicit MappedRead(const std::string &line);
   GenomicRegion r;
   std::string seq;
   std::string scr;
   std::string tostring() const;
 };
 
-std::istream&
-operator>>(std::istream& the_stream, MappedRead &mr);
-std::ostream&
-operator<<(std::ostream& the_stream, const MappedRead &mr);
+template <class T> T&
+operator>>(T &the_stream, MappedRead &mr) {
+  std::string buffer;
+  if (getline(the_stream, buffer)) {
+    mr = MappedRead(buffer);
+  }
+  return the_stream;
+}
+
+template <class T> T&
+operator<<(T &the_stream, const MappedRead &mr) {
+  the_stream << mr.tostring();
+  return the_stream;
+}
 
 #endif

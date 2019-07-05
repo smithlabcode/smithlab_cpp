@@ -23,61 +23,46 @@
 #include "MappedRead.hpp"
 #include "smithlab_utils.hpp"
 
-#include <cassert>
 #include <fstream>
 #include <algorithm>
-#include <stdexcept>
+#include <sstream>
+#include <string>
 
 using std::string;
-using std::vector;
 using std::runtime_error;
 
-std::istream&
-operator>>(std::istream& the_stream, MappedRead &mr) {
+MappedRead::MappedRead(const string &line) {
+  std::istringstream is;
+  is.rdbuf()->pubsetbuf(const_cast<char*>(line.c_str()), line.size());
 
-  string buffer;
-  if (getline(the_stream, buffer)) {
-
-    std::istringstream is;
-    is.rdbuf()->pubsetbuf(const_cast<char*>(buffer.c_str()), buffer.size());
-
-    string chrom, name, tmp;
-    size_t start = 0ul, end = 0ul;
-    char strand = '\0';
-    double score;
-    if (is >> chrom >> start >> tmp) {
-      if (find_if(tmp.begin(), tmp.end(),
-                  [](char c) {return !std::isdigit(c);}) == tmp.end()) {
-        end = std::stol(tmp);
-        if (!(is >> name >> score >> strand >> mr.seq))
-          throw runtime_error("bad line in MappedRead file: " + buffer);
-      }
-      else {
-        name = tmp;
-        if (!(is >> score >> strand >> mr.seq))
-          throw runtime_error("bad line in MappedRead file: " + buffer);
-        end = start + mr.seq.length();
-      }
-      mr.r = GenomicRegion(chrom, start, end, name, score, strand);
-      is >> mr.scr;
+  string chrom, name, tmp;
+  size_t start = 0ul, end = 0ul;
+  char strand = '\0';
+  double score;
+  if (is >> chrom >> start >> tmp) {
+    if (find_if(tmp.begin(), tmp.end(),
+                [](char c) {return !std::isdigit(c);}) == tmp.end()) {
+      end = std::stol(tmp);
+      if (!(is >> name >> score >> strand >> seq))
+        throw runtime_error("bad line in MappedRead file: " + line);
     }
-    else throw runtime_error("bad line in MappedRead file: " + buffer);
+    else {
+      name = tmp;
+      if (!(is >> score >> strand >> seq))
+        throw runtime_error("bad line in MappedRead file: " + line);
+      end = start + seq.length();
+    }
+    r = GenomicRegion(chrom, start, end, name, score, strand);
+    is >> scr;
   }
-  return the_stream;
+  else throw runtime_error("bad line in MappedRead file: " + line);
 }
 
-std::ostream&
-operator<<(std::ostream& the_stream, const MappedRead &mr) {
-  the_stream << mr.r << '\t' << mr.seq;
-  if (!mr.scr.empty())
-    the_stream << '\t' << mr.scr;
-  return the_stream;
-}
-
-#include <sstream>
-std::string
+string
 MappedRead::tostring() const {
   std::ostringstream oss;
-  oss << *this;
+  oss << r << '\t' << seq;
+  if (!scr.empty())
+    oss << '\t' << scr;
   return oss.str();
 }
