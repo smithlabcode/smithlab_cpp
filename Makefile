@@ -1,7 +1,7 @@
 # Makefile from smithlab_cpp C++ code library
 #
-# Copyright (C) 2010 University of Southern California and
-#                    Andrew D. Smith
+# Copyright (C) 2010-2019 University of Southern California and
+#                         Andrew D. Smith
 #
 # Authors: Andrew D. Smith
 #
@@ -18,6 +18,9 @@
 
 SOURCES = $(filter-out SAM.cpp,$(wildcard *.cpp))
 OBJECTS = $(patsubst %.cpp,%.o,$(SOURCES))
+HEADERS = $(wildcard *.hpp)
+
+STATIC_LIB = libsmithlab_cpp.a
 
 CXX = g++
 CXXFLAGS = -Wall -std=c++11
@@ -37,6 +40,13 @@ all: $(OBJECTS)
 %.o: %.cpp %.hpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(INCLUDEARGS)
 
+%.o: %.cpp %.hpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $< $(INCLUDEARGS)
+
+static: $(OBJECTS) $(HEADERS)
+	ar cru $(STATIC_LIB) $^
+
+
 clean:
-	@-rm -f *.o *~
+	@-rm -f *.o *.a *~
 .PHONY: clean
