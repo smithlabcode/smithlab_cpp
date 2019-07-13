@@ -19,11 +19,19 @@
 
 using std::string;
 
+char
+igzfstream::peek() {
+  const char c = gzgetc(fileobj);
+  if (!gzeof(fileobj))
+    gzungetc(c, fileobj);
+  return c;
+}
+
 igzfstream&
 getline(igzfstream &in, string &line) {
   if (gzgets(in.fileobj, &in.buf[0], in.chunk_size)) {
-      auto eol = std::find(begin(in.buf), end(in.buf), '\n');
-      line = string(begin(in.buf), eol);
+    auto eol = std::find(begin(in.buf), end(in.buf), '\n');
+    line = string(begin(in.buf), eol);
   }
   return in;
 }

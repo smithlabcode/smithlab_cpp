@@ -32,6 +32,7 @@ struct igzfstream {
     }
   ~igzfstream() {gzclose_r(fileobj);}
   operator bool() const {return !gzeof(fileobj);}
+  char peek();
 
   size_t chunk_size;
   std::vector<char> buf;
