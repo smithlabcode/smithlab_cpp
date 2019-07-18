@@ -63,28 +63,28 @@ SimpleGenomicRegion::retrieve_chrom(chrom_id_type i) {
 SimpleGenomicRegion::SimpleGenomicRegion(const GenomicRegion &r) :
   chrom(assign_chrom(r.get_chrom())), start(r.get_start()), end(r.get_end()) {}
 
-SimpleGenomicRegion::SimpleGenomicRegion(string string_representation) {
-  vector<string> parts = smithlab::split_whitespace_quoted(string_representation);
+// SimpleGenomicRegion::SimpleGenomicRegion(string string_representation) {
+//   vector<string> parts = smithlab::split_whitespace_quoted(string_representation);
 
-  // make sure there is the minimal required info
-  if (parts.size() < 3)
-    throw GenomicRegionException("Invalid string representation: " +
-                                 string_representation);
-  // set the chromosome name
-  chrom = assign_chrom(parts[0]);
+//   // make sure there is the minimal required info
+//   if (parts.size() < 3)
+//     throw runtime_error("Invalid string representation: " +
+//                                  string_representation);
+//   // set the chromosome name
+//   chrom = assign_chrom(parts[0]);
 
-  // set the start position
-  const int checkChromStart = atoi(parts[1].c_str());
-  if (checkChromStart < 0)
-    throw GenomicRegionException("Invalid start: " + parts[1]);
-  else start = static_cast<size_t>(checkChromStart);
+//   // set the start position
+//   const int checkChromStart = atoi(parts[1].c_str());
+//   if (checkChromStart < 0)
+//     throw runtime_error("Invalid start: " + parts[1]);
+//   else start = static_cast<size_t>(checkChromStart);
 
-  // set the end position
-  const int checkChromEnd = atoi(parts[2].c_str());
-  if (checkChromEnd < 0)
-    throw GenomicRegionException("Invalid end: " + parts[2]);
-  else end = static_cast<size_t>(checkChromEnd);
-}
+//   // set the end position
+//   const int checkChromEnd = atoi(parts[2].c_str());
+//   if (checkChromEnd < 0)
+//     throw runtime_error("Invalid end: " + parts[2]);
+//   else end = static_cast<size_t>(checkChromEnd);
+// }
 
 SimpleGenomicRegion::SimpleGenomicRegion(const char *s, const size_t len) {
   size_t i = 0;
@@ -113,33 +113,6 @@ SimpleGenomicRegion::tostring() const {
   std::ostringstream s;
   s << retrieve_chrom(chrom) << "\t" << start << "\t" << end;
   return s.str();
-}
-
-
-std::ostream&
-operator<<(std::ostream& s, const SimpleGenomicRegion& region) {
-  return s << region.tostring();
-}
-
-std::istream&
-operator>>(std::istream& s, SimpleGenomicRegion& region) {
-  string chrom;
-  size_t start = 0ul, end = 0ul;
-  if (s >> chrom >> start >> end) {
-    region = SimpleGenomicRegion(chrom, start, end);
-    // else region = SimpleGenomicRegion();
-  }
-  else s.setstate(std::ios::badbit);
-
-  char c;
-  while ((c = s.get()) != '\n' && s);
-  if (c != '\n')
-    s.setstate(std::ios::badbit);
-
-  if (s.eof())
-    s.setstate(std::ios::badbit);
-
-  return s;
 }
 
 
@@ -229,38 +202,37 @@ GenomicRegion::retrieve_chrom(chrom_id_type i) {
 }
 
 
-GenomicRegion::GenomicRegion(string string_representation) : strand('+') {
-  vector<string> parts(smithlab::split_whitespace_quoted(string_representation));
+// GenomicRegion::GenomicRegion(string string_representation) : strand('+') {
+//   vector<string> parts(smithlab::split_whitespace_quoted(string_representation));
 
-  // make sure there is the minimal required info
-  if (parts.size() < 3)
-    throw GenomicRegionException("Invalid string representation: " +
-                                 string_representation);
-  // set the chromosome name
-  chrom = assign_chrom(parts[0]);
+//   // make sure there is the minimal required info
+//   if (parts.size() < 3)
+//     throw runtime_error("Invalid string representation: " +
+//                                  string_representation);
+//   // set the chromosome name
+//   chrom = assign_chrom(parts[0]);
 
-  // set the start position
-  const int checkChromStart = atoi(parts[1].c_str());
-  if (checkChromStart < 0)
-    throw GenomicRegionException("Invalid start: " + parts[1]);
-  else start = static_cast<size_t>(checkChromStart);
+//   // set the start position
+//   const int checkChromStart = atoi(parts[1].c_str());
+//   if (checkChromStart < 0)
+//     throw runtime_error("Invalid start: " + parts[1]);
+//   else start = static_cast<size_t>(checkChromStart);
 
-  // set the end position
-  const int checkChromEnd = atoi(parts[2].c_str());
-  if (checkChromEnd < 0)
-    throw GenomicRegionException("Invalid end: " + parts[2]);
-  else end = static_cast<size_t>(checkChromEnd);
+//   // set the end position
+//   const int checkChromEnd = atoi(parts[2].c_str());
+//   if (checkChromEnd < 0)
+//     throw runtime_error("Invalid end: " + parts[2]);
+//   else end = static_cast<size_t>(checkChromEnd);
 
-  if (parts.size() > 3)
-    name = parts[3];
+//   if (parts.size() > 3)
+//     name = parts[3];
 
-  if (parts.size() > 4)
-    score = atof(parts[4].c_str());
+//   if (parts.size() > 4)
+//     score = atof(parts[4].c_str());
 
-  if (parts.size() > 5)
-    strand = parts[5][0];
-}
-
+//   if (parts.size() > 5)
+//     strand = parts[5][0];
+// }
 
 GenomicRegion::GenomicRegion(const char *s, const size_t len) {
   size_t i = 0;
@@ -316,33 +288,33 @@ GenomicRegion::tostring() const {
   return s.str();
 }
 
-std::ostream&
-operator<<(std::ostream& s, const GenomicRegion& region) {
-  return s << region.tostring();
-}
+// std::ostream&
+// operator<<(std::ostream& s, const GenomicRegion& region) {
+//   return s << region.tostring();
+// }
 
-std::istream&
-operator>>(std::istream& s, GenomicRegion& region) {
-  string chrom, name;
-  size_t start = 0ul, end = 0ul;
-  double score = 0.0;
-  char strand = '\0';
+// std::istream&
+// operator>>(std::istream& s, GenomicRegion& region) {
+//   string chrom, name;
+//   size_t start = 0ul, end = 0ul;
+//   double score = 0.0;
+//   char strand = '\0';
 
-  if (s >> chrom >> start >> end >> name >> score >> strand)
-    region = GenomicRegion(chrom, start, end, name, score, strand);
-  else region = GenomicRegion();
+//   if (s >> chrom >> start >> end >> name >> score >> strand)
+//     region = GenomicRegion(chrom, start, end, name, score, strand);
+//   else region = GenomicRegion();
 
-  char c;
-  while ((c = s.get()) != '\n' && s);
+//   char c;
+//   while ((c = s.get()) != '\n' && s);
 
-  if (c != '\n')
-    s.setstate(std::ios::badbit);
+//   if (c != '\n')
+//     s.setstate(std::ios::badbit);
 
-  if (s.eof())
-    s.setstate(std::ios::badbit);
+//   if (s.eof())
+//     s.setstate(std::ios::badbit);
 
-  return s;
-}
+//   return s;
+// }
 
 bool
 GenomicRegion::contains(const GenomicRegion& other) const {
@@ -468,7 +440,7 @@ is_header_line(const string& line) {
 
 
 static bool
-is_track_line(const char *line) {
+is_track_line(const string &line) {
   static const char *track_label = "track";
   static const size_t track_label_len = 5;
   for (size_t i = 0; i < track_label_len; ++i)
@@ -479,57 +451,30 @@ is_track_line(const char *line) {
 
 
 void
-ReadBEDFile(string filename, vector<GenomicRegion> &the_regions) {
-  static const size_t buffer_size = 10000; // Magic
+ReadBEDFile(const string &filename, vector<GenomicRegion> &the_regions) {
 
-  // open and check the file
-  std::ifstream in(filename.c_str());
+  std::ifstream in(filename);
   if (!in)
-    throw BEDFileException("cannot open input file " + filename);
-  while (!in.eof()) {
-    char buffer[buffer_size];
-    in.getline(buffer, buffer_size);
-    if (in.gcount() == buffer_size - 1)
-      throw BEDFileException("Line too long in file: " + filename);
-    if (!is_header_line(buffer) && !is_track_line(buffer)) {
-      // const string line(buffer);
-      the_regions.push_back(GenomicRegion(buffer));
-    }
-    in.peek();
-  }
-  in.close();
+    throw runtime_error("cannot open input file " + filename);
+
+  string line;
+  while (getline(in, line))
+    if (!is_header_line(line) && !is_track_line(line))
+      the_regions.push_back(GenomicRegion(line));
 }
 
 
 void
-ReadBEDFile(string filename, vector<SimpleGenomicRegion> &the_regions) {
-  std::ifstream in(filename.c_str());
-  if (!in.good())
-    throw BEDFileException("cannot open input file " + filename);
-  size_t begin_pos = in.tellg();
-  in.seekg(0, std::ios_base::end);
-  size_t end_pos = in.tellg();
-  in.seekg(0, std::ios_base::beg);
+ReadBEDFile(const string &filename, vector<SimpleGenomicRegion> &the_regions) {
 
-  size_t filesize = end_pos - begin_pos;
-  char *buffer = new char[filesize + 1];
+  std::ifstream in(filename);
+  if (!in)
+    throw runtime_error("cannot open input file " + filename);
 
-  in.read(buffer, filesize);
-  in.close();
-
-  the_regions.reserve(std::count(buffer, buffer + filesize, '\n'));
-
-  char *buffer_end = buffer + filesize;
-  char *c = buffer;
-  while (c != buffer_end) {
-    char *next = std::find(c, buffer_end, '\n');
-    if (next == c)
-      return;
-    if (*c != 't')
-      the_regions.push_back(SimpleGenomicRegion(c, next - c));
-    c = next + 1;
-  }
-  delete[] buffer;
+  string line;
+  while (getline(in, line))
+    if (!is_header_line(line) && !is_track_line(line))
+      the_regions.push_back(SimpleGenomicRegion(line));
 }
 
 
@@ -597,7 +542,7 @@ extract_regions_chrom_fasta(const string &chrom_name,
   if (!in)
     throw runtime_error("cannot read file: " + filename);
 
-  for (auto i = regions.begin(); i != regions.end(); ++i) {
+  for (auto i = begin(regions); i != end(regions); ++i) {
 
     const size_t orig_start_pos = i->get_start();
     const size_t orig_end_pos = i->get_end();

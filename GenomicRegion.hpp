@@ -46,20 +46,22 @@ public:
     std::swap(start, rhs.start);
     std::swap(end, rhs.end);
   }
-  SimpleGenomicRegion &operator=(const SimpleGenomicRegion &rhs) {
-    SimpleGenomicRegion tmp(rhs);
-    swap(tmp);
-    return *this;
-  }
-  SimpleGenomicRegion(const SimpleGenomicRegion &rhs) :
-    chrom(rhs.chrom), start(rhs.start), end(rhs.end) {}
+  // SimpleGenomicRegion &operator=(const SimpleGenomicRegion &rhs) {
+  //   SimpleGenomicRegion tmp(rhs);
+  //   swap(tmp);
+  //   return *this;
+  // }
+  // SimpleGenomicRegion(const SimpleGenomicRegion &rhs) :
+  //   chrom(rhs.chrom), start(rhs.start), end(rhs.end) {}
 
   // Other constructors
   SimpleGenomicRegion(std::string c, size_t sta, size_t e) :
     chrom(assign_chrom(c)), start(sta), end(e) {}
   SimpleGenomicRegion(const GenomicRegion &rhs);
-  explicit SimpleGenomicRegion(std::string string_representation);
   SimpleGenomicRegion(const char *string_representation, const size_t len);
+  explicit SimpleGenomicRegion(const std::string &line) :
+    SimpleGenomicRegion(line.c_str(), line.length()) {}
+
   std::string tostring() const;
 
   // accessors
@@ -107,11 +109,20 @@ private:
   size_t end;
 };
 
-std::ostream&
-operator<<(std::ostream &the_stream, const SimpleGenomicRegion &region);
+template <class T> T&
+operator>>(T &the_stream, SimpleGenomicRegion &r) {
+  std::string buffer;
+  if (getline(the_stream, buffer)) {
+    r = SimpleGenomicRegion(buffer);
+  }
+  return the_stream;
+}
 
-std::istream&
-operator>>(std::istream &the_stream, SimpleGenomicRegion &region);
+template <class T> T&
+operator<<(T &the_stream, const SimpleGenomicRegion &r) {
+  the_stream << r.tostring();
+  return the_stream;
+}
 
 class GenomicRegion {
 public:
@@ -125,14 +136,14 @@ public:
     std::swap(score, rhs.score);
     std::swap(strand, rhs.strand);
   }
-  GenomicRegion(const GenomicRegion &other) :
-    chrom(other.chrom), name(other.name), start(other.start), end(other.end),
-    score(other.score), strand(other.strand) {}
-  GenomicRegion &operator=(const GenomicRegion &rhs) {
-    GenomicRegion tmp(rhs);
-    swap(tmp);
-    return *this;
-  }
+  // GenomicRegion(const GenomicRegion &other) :
+  //   chrom(other.chrom), name(other.name), start(other.start), end(other.end),
+  //   score(other.score), strand(other.strand) {}
+  // GenomicRegion &operator=(const GenomicRegion &rhs) {
+  //   GenomicRegion tmp(rhs);
+  //   swap(tmp);
+  //   return *this;
+  // }
 
   // Other constructors
   GenomicRegion(std::string c, size_t sta, size_t e,
@@ -141,8 +152,9 @@ public:
   GenomicRegion(std::string c, size_t sta, size_t e) :
     chrom(assign_chrom(c)), name(std::string("X")),
     start(sta), end(e), score(0.0), strand('+') {}
-  explicit GenomicRegion(std::string string_representation);
   GenomicRegion(const char *s, const size_t len);
+  explicit GenomicRegion(const std::string &line) :
+    GenomicRegion(line.c_str(), line.length()) {}
   GenomicRegion(const SimpleGenomicRegion &other) :
     chrom(assign_chrom(other.get_chrom())), name("(NULL)"),
     start(other.get_start()), end(other.get_end()), score(0), strand('+') {}
@@ -216,17 +228,20 @@ score_greater(const T &a, const T &b) {
 }
 
 
-class GenomicRegionException : public SMITHLABException {
-public:
-  GenomicRegionException(std::string s = std::string()) :
-    SMITHLABException(s) {}
-};
+template <class T> T&
+operator>>(T &the_stream, GenomicRegion &r) {
+  std::string buffer;
+  if (getline(the_stream, buffer)) {
+    r = GenomicRegion(buffer);
+  }
+  return the_stream;
+}
 
-std::ostream&
-operator<<(std::ostream &the_stream, const GenomicRegion &region);
-
-std::istream&
-operator>>(std::istream &the_stream, GenomicRegion &region);
+template <class T> T&
+operator<<(T &the_stream, const GenomicRegion &r) {
+  the_stream << r.tostring();
+  return the_stream;
+}
 
 
 template <class T, class U>
@@ -373,9 +388,12 @@ genomic_region_intersection_by_base(const std::vector<T> &regions_a,
 }
 
 void
-ReadBEDFile(std::string filename, std::vector<GenomicRegion> &regions);
+ReadBEDFile(const std::string &filename,
+            std::vector<GenomicRegion> &regions);
+
 void
-ReadBEDFile(std::string filename, std::vector<SimpleGenomicRegion> &regions);
+ReadBEDFile(const std::string filename,
+            std::vector<SimpleGenomicRegion> &regions);
 
 template <class T> void
 WriteBEDFile(const std::string filename,
@@ -401,11 +419,6 @@ WriteBEDFile(const std::string filename,
   out.close();
 }
 
-class BEDFileException : public SMITHLABException {
-public:
-  BEDFileException(std::string s = std::string())
-    throw() : SMITHLABException(s) {}
-};
 
 void
 parse_region_name(std::string region_name,
