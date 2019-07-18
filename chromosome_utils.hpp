@@ -38,60 +38,46 @@
 
 void
 parse_region_name(std::string region_name,
-		  std::string &chrom, size_t &start, size_t &end);
-
-
-// template <class T> std::string
-// assemble_region_name(const T &region) {
-//   return (region.get_chrom() + ":" + smithlab::toa(region.get_start()) + "-" +
-//           smithlab::toa(region.get_end()));
-// }
-
-
-// template <class T> std::string
-// assemble_region_name(const T &region, const std::string sep) {
-//   return (region.get_chrom() + sep + smithlab::toa(region.get_start()) + sep +
-// 	  smithlab::toa(region.get_end()));
-// }
+                  std::string &chrom, size_t &start, size_t &end);
 
 
 void
-extract_regions_chrom_fasta(const std::string &chrom_name, 
-			    const std::string &filename,
-			    const std::vector<GenomicRegion> &regions, 
-			    std::vector<std::string> &sequences);
+extract_regions_chrom_fasta(const std::string &chrom_name,
+                            const std::string &filename,
+                            const std::vector<GenomicRegion> &regions,
+                            std::vector<std::string> &sequences);
 
 
 void
-extract_regions_chrom_fasta(const std::string &chrom_name, 
-			    const std::string &filename,
-			    const std::vector<SimpleGenomicRegion> &regions, 
-			    std::vector<std::string> &sequences);
+extract_regions_chrom_fasta(const std::string &chrom_name,
+                            const std::string &filename,
+                            const std::vector<SimpleGenomicRegion> &regions,
+                            std::vector<std::string> &sequences);
 
 
 void
-extract_regions_fasta(const std::string &dirname, 
-		      const std::vector<SimpleGenomicRegion> &regions_in, 
-		      std::vector<std::string> &sequences);
+extract_regions_fasta(const std::string &dirname,
+                      const std::vector<SimpleGenomicRegion> &regions_in,
+                      std::vector<std::string> &sequences);
 
 
 void
-extract_regions_fasta(const std::string &dirname, 
-		      const std::vector<GenomicRegion> &regions_in, 
-		      std::vector<std::string> &sequences);
+extract_regions_fasta(const std::string &dirname,
+                      const std::vector<GenomicRegion> &regions_in,
+                      std::vector<std::string> &sequences);
 
 
 void
 identify_chromosomes(const std::string chrom_file,
-		     const std::string fasta_suffix,
-		     std::unordered_map<std::string, 
-					     std::string> &chrom_files);
+                     const std::string fasta_suffix,
+                     std::unordered_map<std::string,
+                                             std::string> &chrom_files);
 
 
 void
 identify_and_read_chromosomes(const std::string chrom_file,
-			      const std::string fasta_suffix,
-			      std::unordered_map<std::string,
-						      std::string> &chrom_files);
+                              const std::string fasta_suffix,
+                              std::unordered_map<std::string,
+                                                      std::string> &chrom_files);
 
 #endif

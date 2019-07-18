@@ -25,6 +25,7 @@
 using std::vector;
 using std::string;
 using std::unordered_map;
+using std::runtime_error;
 
 static const char *digits = "0987654321";
 static const char *whitespace = " \t";
@@ -33,11 +34,11 @@ static const char *whitespace = " \t";
 // thing chrom?
 
 void
-parse_region_name(string region_name, 
-		  string& chrom, size_t &start, size_t &end) {
-  
+parse_region_name(string region_name,
+                  string& chrom, size_t &start, size_t &end) {
+
   const size_t colon_offset = region_name.find(":");
-  
+
   // get the chromosome
   size_t chr_offset = region_name.find_last_of(whitespace, colon_offset);
   if (chr_offset == string::npos)
@@ -45,62 +46,62 @@ parse_region_name(string region_name,
   else
     chr_offset += 1;
   chrom = region_name.substr(chr_offset, colon_offset - chr_offset);
-  
+
   // get the start
   const size_t start_end = region_name.find("-", colon_offset + 1);
   const string start_string = region_name.substr(colon_offset + 1,
-						 start_end - colon_offset + 1);
+                                                 start_end - colon_offset + 1);
   start = static_cast<size_t>(atoi(start_string.c_str()));
-  
+
   // get the end
   const size_t end_end =
     region_name.find_first_not_of(digits, start_end + 1);
   const string end_string = region_name.substr(start_end + 1,
-					       end_end - start_end - 1);
+                                               end_end - start_end - 1);
   end = static_cast<size_t>(atoi(end_string.c_str()));
 }
 
 
-static size_t 
+static size_t
 adjust_start_pos(const size_t orig_start, const string &chrom_name) {
   static const double LINE_WIDTH = 50.0;
   const size_t name_offset = chrom_name.length() + 2; // For the '>' and '\n';
-  const size_t preceding_newlines = 
+  const size_t preceding_newlines =
     static_cast<size_t>(std::floor(orig_start / LINE_WIDTH));
   return orig_start + preceding_newlines + name_offset;
 }
 
 
-static size_t 
+static size_t
 adjust_region_size(const size_t orig_start,
-		   const string &chrom_name, 
-		   const size_t orig_size) {
+                   const string &chrom_name,
+                   const size_t orig_size) {
   static const double LINE_WIDTH = 50.0;
-  const size_t preceding_newlines_start = 
+  const size_t preceding_newlines_start =
     static_cast<size_t>(std::floor(orig_start / LINE_WIDTH));
-  const size_t preceding_newlines_end = 
+  const size_t preceding_newlines_end =
     static_cast<size_t>(std::floor((orig_start + orig_size) / LINE_WIDTH));
   return (orig_size + (preceding_newlines_end - preceding_newlines_start));
 }
 
 
-void 
+void
 extract_regions_chrom_fasta(const string &chrom_name,
-			    const string &filename, 
-			    const vector<SimpleGenomicRegion> &regions,
-			    vector<string> &sequences) {
-  
+                            const string &filename,
+                            const vector<SimpleGenomicRegion> &regions,
+                            vector<string> &sequences) {
+
   std::ifstream in(filename.c_str());
   for (vector<SimpleGenomicRegion>::const_iterator i(regions.begin());
        i != regions.end(); ++i) {
-    
+
     const size_t orig_start_pos = i->get_start();
     const size_t orig_end_pos = i->get_end();
     const size_t orig_region_size = orig_end_pos - orig_start_pos;
 
     const size_t start_pos = adjust_start_pos(orig_start_pos, chrom_name);
     const size_t region_size = adjust_region_size(
-						  orig_start_pos, chrom_name, orig_region_size);
+                                                  orig_start_pos, chrom_name, orig_region_size);
     assert(start_pos >= 0);
 
     in.seekg(start_pos);
@@ -109,12 +110,12 @@ extract_regions_chrom_fasta(const string &chrom_name,
     in.read(buffer, region_size);
 
     std::remove_if(buffer, buffer + region_size,
-		   std::bind2nd(std::equal_to<char>(), '\n'));
+                   std::bind2nd(std::equal_to<char>(), '\n'));
     buffer[orig_region_size] = '\0';
-    
+
     sequences.push_back(buffer);
     std::transform(sequences.back().begin(), sequences.back().end(),
-		   sequences.back().begin(), std::ptr_fun(&toupper));
+                   sequences.back().begin(), std::ptr_fun(&toupper));
     assert(i->get_width() == sequences.back().length());
   }
   in.close();
@@ -123,21 +124,21 @@ extract_regions_chrom_fasta(const string &chrom_name,
 
 void
 extract_regions_chrom_fasta(const string &chrom_name,
-			    const string &filename, 
-			    const vector<GenomicRegion> &regions,
-			    vector<string> &sequences) {
-  
+                            const string &filename,
+                            const vector<GenomicRegion> &regions,
+                            vector<string> &sequences) {
+
   std::ifstream in(filename.c_str());
   for (vector<GenomicRegion>::const_iterator i(regions.begin());
        i != regions.end(); ++i) {
-    
+
     const size_t orig_start_pos = i->get_start();
     const size_t orig_end_pos = i->get_end();
     const size_t orig_region_size = orig_end_pos - orig_start_pos;
 
     const size_t start_pos = adjust_start_pos(orig_start_pos, chrom_name);
     const size_t region_size = adjust_region_size(
-						  orig_start_pos, chrom_name, orig_region_size);
+                                                  orig_start_pos, chrom_name, orig_region_size);
     assert(start_pos >= 0);
 
     in.seekg(start_pos);
@@ -146,14 +147,14 @@ extract_regions_chrom_fasta(const string &chrom_name,
     in.read(buffer, region_size);
 
     std::remove_if(
-		   buffer, buffer + region_size,
-		   std::bind2nd(std::equal_to<char>(), '\n'));
+                   buffer, buffer + region_size,
+                   std::bind2nd(std::equal_to<char>(), '\n'));
     buffer[orig_region_size] = '\0';
 
     sequences.push_back(buffer);
     std::transform(
-		   sequences.back().begin(), sequences.back().end(),
-		   sequences.back().begin(), std::ptr_fun(&toupper));
+                   sequences.back().begin(), sequences.back().end(),
+                   sequences.back().begin(), std::ptr_fun(&toupper));
     if (i->neg_strand())
       revcomp_inplace(sequences.back());
     assert(i->get_width() == sequences.back().length());
@@ -164,12 +165,12 @@ extract_regions_chrom_fasta(const string &chrom_name,
 
 void
 extract_regions_fasta(const string &dirname,
-		      const vector<GenomicRegion> &regions_in, 
-		      vector<string> &sequences) {
-  
+                      const vector<GenomicRegion> &regions_in,
+                      vector<string> &sequences) {
+
   static const string FASTA_SUFFIX(".fa");
   assert(check_sorted(regions_in));
-  
+
   vector<string> filenames;
   read_dir(dirname, filenames);
 
@@ -187,15 +188,15 @@ extract_regions_fasta(const string &dirname,
     std::unordered_map<string, size_t>::const_iterator f_idx =
       chrom_regions_map.find(chrom_file);
     if (f_idx == chrom_regions_map.end())
-      throw SMITHLABException("chrom not found:\t" + chrom_file);
+      throw runtime_error("chrom not found:\t" + chrom_file);
     extract_regions_chrom_fasta(
-				chrom_name, filenames[f_idx->second], regions[i], sequences);
+                                chrom_name, filenames[f_idx->second], regions[i], sequences);
   }
 }
 
 
 void extract_regions_fasta(const string &dirname,
-			   const vector<SimpleGenomicRegion> &regions_in, vector<string> &sequences) {
+                           const vector<SimpleGenomicRegion> &regions_in, vector<string> &sequences) {
 
   static const string FASTA_SUFFIX(".fa");
   assert(check_sorted(regions_in));
@@ -217,16 +218,16 @@ void extract_regions_fasta(const string &dirname,
     std::unordered_map<string, size_t>::const_iterator f_idx =
       chrom_regions_map.find(chrom_file);
     if (f_idx == chrom_regions_map.end())
-      throw SMITHLABException("chrom not found:\t" + chrom_file);
+      throw runtime_error("chrom not found:\t" + chrom_file);
     extract_regions_chrom_fasta(
-				chrom_name, filenames[f_idx->second], regions[i], sequences);
+                                chrom_name, filenames[f_idx->second], regions[i], sequences);
   }
 }
 
 
 void
-identify_chromosomes(const string chrom_file, const string fasta_suffix, 
-		     unordered_map<string, string> &chrom_files) {
+identify_chromosomes(const string chrom_file, const string fasta_suffix,
+                     unordered_map<string, string> &chrom_files) {
   vector<string> the_files;
   if (isdir(chrom_file.c_str())) {
     read_dir(chrom_file, fasta_suffix, the_files);
@@ -238,9 +239,9 @@ identify_chromosomes(const string chrom_file, const string fasta_suffix,
 
 
 void
-identify_and_read_chromosomes(const string chrom_file, 
-			      const string fasta_suffix, 
-			      unordered_map<string, string> &chrom_files) {
+identify_and_read_chromosomes(const string chrom_file,
+                              const string fasta_suffix,
+                              unordered_map<string, string> &chrom_files) {
   vector<string> the_files;
   if (isdir(chrom_file.c_str())) {
     read_dir(chrom_file, fasta_suffix, the_files);
