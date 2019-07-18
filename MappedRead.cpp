@@ -61,7 +61,8 @@ MappedRead::MappedRead(const string &line) {
 string
 MappedRead::tostring() const {
   std::ostringstream oss;
-  oss << r << '\t' << seq;
+  oss << r; // no chaining for the << of GenomicRegion
+  oss << '\t' << seq;
   if (!scr.empty())
     oss << '\t' << scr;
   return oss.str();
