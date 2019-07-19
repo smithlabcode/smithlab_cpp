@@ -43,9 +43,8 @@ all: $(OBJECTS)
 %.o: %.cpp %.hpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(INCLUDEARGS)
 
-static: $(OBJECTS) $(HEADERS)
-	ar cru $(STATIC_LIB) $^
-
+static: $(OBJECTS)
+	ar cr $(STATIC_LIB) $^
 
 clean:
 	@-rm -f *.o *.a *~
