@@ -264,16 +264,14 @@ GenomicRegion::GenomicRegion(const char *s, const size_t len) {
   // score of the region (floating point)
   while (isspace(s[i]) && i < len) ++i;
   j = i;
-  end = atoi(s + j);
-  while (!isspace(s[i]) && i < len) ++i;
   score = atof(s + j);
+  while (!isspace(s[i]) && i < len) ++i;
 
   // strand
   while (isspace(s[i]) && i < len) ++i;
   j = i;
-  end = atoi(s + j);
-  while (!isspace(s[i]) && i < len) ++i;
   strand = *(s + j);
+  while (!isspace(s[i]) && i < len) ++i;
 
   // ADS: This is a hack!!!
   if (strand != '-') strand = '+';
