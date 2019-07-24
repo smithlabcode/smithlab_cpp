@@ -16,8 +16,8 @@
 # General Public License for more details.
 #
 
-SOURCES = $(filter-out SAM.cpp,$(wildcard *.cpp))
-OBJECTS = $(patsubst %.cpp,%.o,$(SOURCES))
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(patsubst %.cpp, %.o, $(SOURCES))
 HEADERS = $(wildcard *.hpp)
 
 STATIC_LIB = libsmithlab_cpp.a
@@ -36,9 +36,6 @@ CXXFLAGS += $(OPTFLAGS)
 endif
 
 all: $(OBJECTS)
-
-%.o: %.cpp %.hpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $< $(INCLUDEARGS)
 
 %.o: %.cpp %.hpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(INCLUDEARGS)
