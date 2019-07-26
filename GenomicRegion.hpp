@@ -419,11 +419,6 @@ WriteBEDFile(const std::string filename,
   out.close();
 }
 
-
-void
-parse_region_name(std::string region_name,
-                  std::string &chrom, size_t &start, size_t &end);
-
 template <class T>
 std::string
 assemble_region_name(const T &region) {
@@ -437,29 +432,6 @@ assemble_region_name(const T &region, const std::string sep) {
   return (region.get_chrom() + sep + smithlab::toa(region.get_start()) + sep +
           smithlab::toa(region.get_end()));
 }
-
-void
-extract_regions_chrom_fasta(const std::string &chrom_name,
-                            const std::string &filename,
-                            const std::vector<GenomicRegion> &regions,
-                            std::vector<std::string> &sequences);
-
-
-void
-extract_regions_chrom_fasta(const std::string &chrom_name,
-                            const std::string &filename,
-                            const std::vector<SimpleGenomicRegion> &regions,
-                            std::vector<std::string> &sequences);
-
-void
-extract_regions_fasta(const std::string &dirname,
-                      const std::vector<SimpleGenomicRegion> &regions_in,
-                      std::vector<std::string> &sequences);
-
-void
-extract_regions_fasta(const std::string &dirname,
-                      const std::vector<GenomicRegion> &regions_in,
-                      std::vector<std::string> &sequences);
 
 
 #endif
