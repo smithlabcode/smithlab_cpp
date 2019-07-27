@@ -237,11 +237,16 @@ Option::parse(vector<string> &command_line) {
           format_option(command_line[i + 1]);
         }
         else {
+          // this will only work if it's a bool, because the
+          // format_option function will ignore the argument
           format_option(dummy);
         }
 
         specified = true;
+        // remove this option from the set of options
         command_line.erase(command_line.begin() + i);
+        // if there was an argument (i.e. non bool) then remove that
+        // argument also
         if (arg_type != SMITHLAB_ARG_BOOL) {
           command_line.erase(command_line.begin() + i);
         }
