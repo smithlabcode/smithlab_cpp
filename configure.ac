@@ -41,17 +41,8 @@ installed locally.
 ])])
 AM_CONDITIONAL([HAS_HTSLIB], [test "x$ax_cv_htslib" = "xyes"])
 
-dnl check for gsl
-AX_CHECK_ZLIB(, [AC_MSG_ERROR([zlib not found.
-
-zlib is required for using libsmithlab_cpp. Please use --with-zlib=DIR
-to specify zlib installation if you have it installed locally.
-])])
-
-dnl check for gsl
-AC_CHECK_HEADERS([gsl/gsl_blas.h], [],
-        [AC_MSG_ERROR([failed to find gsl headers])])
-AC_CHECK_LIB([m],[main])
+dnl check for required libraries
+AC_CHECK_LIB([z],[zlibVersion])
 AC_CHECK_LIB([gslcblas],[main])
 AC_CHECK_LIB([gsl],[main])
 
