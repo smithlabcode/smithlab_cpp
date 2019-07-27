@@ -57,5 +57,4 @@ g++ -Wall -std=c++11 -c -o OptionParser.o OptionParser.cpp
 ```
 Now that we are using both the Zlib and HTSLib libraries, it is more
 important that we have a build system that can check for these. So
-this repo no longer contains a `Makefile` but instead you must
-generate one. If you want
+this repo no longer contains a `Makefile`.
