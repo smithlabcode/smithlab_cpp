@@ -29,6 +29,8 @@
 #include <htslib/sam.h>
 #include <htslib/hts.h>
 
+extern "C" {char check_htslib_wrapper();}
+
 struct SAMRecord {
   MappedRead mr;
   bool is_Trich;

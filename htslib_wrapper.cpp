@@ -34,6 +34,8 @@ using std::cerr;
 using std::endl;
 using std::runtime_error;
 
+char check_htslib_wrapper() {return 1;}
+
 SAMReader::SAMReader(const string &fn, const string &mpr) :
   filename(fn), mapper(mpr), good(true) {
 
