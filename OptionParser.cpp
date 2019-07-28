@@ -230,8 +230,8 @@ Option::parse(vector<string> &command_line) {
   if (!command_line.empty()) {
     for (size_t i = 0; i < command_line.size();)
       if (option_match(command_line[i])) {
-        if (specified && arg_type != SMITHLAB_ARG_BOOL)
-          throw runtime_error("duplicate assignment to option: " + long_name);
+        if (specified)
+          throw runtime_error("duplicate use of option: " + long_name);
 
         if (i < command_line.size() - 1) {
           format_option(command_line[i + 1]);
@@ -445,8 +445,8 @@ OptionParser::parse(const int argc, const char **argv,
 }
 
 void
-OptionParser::parse(const int argc, const char **argv, vector<string> &arguments,
-                    string config_filename) {
+OptionParser::parse(const int argc, const char **argv,
+                    vector<string> &arguments, string config_filename) {
   // The "2" below corresponds to the "about" and "help" options
   assert(options.size() >=  2);
 
