@@ -16,10 +16,17 @@ dnl General Public License for more details.
 
 AC_INIT([libsmithlab_cpp], [1.0], [andrewds@usc.edu],
         [], [https://github.com/smithlabcode])
+dnl the config.h is not currently #included in the source, and only
+dnl used to keep command lines short.
+AC_CONFIG_HEADERS([config.h])
 AC_PREREQ([2.63])  dnl 4-argument AC_CHECK_HEADER
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([foreign])
 
-AC_CONFIG_SRCDIR([smithlab_os.cpp])
+dnl Less output to the terminal. Use "--disable-silent-rules" when
+dnl running ./configure to reverse this.
+AM_SILENT_RULES([yes])
+
+AC_CONFIG_SRCDIR([smithlab_utils.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 
 dnl check for c++11
@@ -30,21 +37,25 @@ AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
 AM_PROG_AR
 LT_INIT
 
-dnl check for HTSLib
-AX_WITH_HTSLIB
-AS_IF([test "x$ax_cv_htslib" != "xyes"],
-      [AC_MSG_WARN([HTSlib not found.
+dnl the line breaks in thie message are intended
+hts_fail_msg="
 
-HTSLib is optional for using libsmithlab_cpp. Please use
---with-htslib=DIR to specify htslib installation if you have it
-installed locally.
-])])
-AM_CONDITIONAL([HAS_HTSLIB], [test "x$ax_cv_htslib" = "xyes"])
+Failed to locate HTSLib on your system. Please use the LDFLAGS and
+CPPFLAGS variables to specify the directories where the HTSLib library
+and headers can be found.
+"
+
+AC_ARG_ENABLE([hts],
+  [AS_HELP_STRING([--enable-hts], [Enable HTSLib @<:@yes@:>@])],
+  [enable_hts=yes], [enable_hts=no])
+AS_IF([test "x$enable_hts" = "xyes"],
+  [AC_CHECK_LIB([hts], [hts_version], [], [AC_MSG_FAILURE([$hts_fail_msg])])])
+AM_CONDITIONAL([ENABLE_HTS], [test "x$enable_hts" = "xyes"])
 
 dnl check for required libraries
 AC_CHECK_LIB([z],[zlibVersion])
-AC_CHECK_LIB([gslcblas],[main])
-AC_CHECK_LIB([gsl],[main])
+AC_CHECK_LIB([gslcblas],[cblas_dgemm])
+AC_CHECK_LIB([gsl],[gsl_blas_dgemm])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
