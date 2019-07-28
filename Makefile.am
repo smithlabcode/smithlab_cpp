@@ -23,7 +23,7 @@ OptionParser.cpp QualityScore.cpp RNG.cpp bisulfite_utils.cpp		\
 chromosome_utils.cpp sim_utils.cpp smithlab_os.cpp smithlab_utils.cpp	\
 zlib_wrapper.cpp
 
-if HAS_HTSLIB
+if ENABLE_HTS
 libsmithlab_cpp_la_SOURCES += htslib_wrapper.cpp
 endif
 
