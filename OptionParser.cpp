@@ -82,8 +82,8 @@ using std::to_string;
 template<class T> string
 format_int_like(T &val) {
   return "[" +
-    (val == numeric_limits<T>::max()) ? "infty" :
-    ((val == -numeric_limits<T>::max()) ? "-infty" : to_string(val)) + "]";
+    ((val == numeric_limits<T>::max()) ? "infty" :
+     ((val == -numeric_limits<T>::max()) ? "-infty" : to_string(val))) + "]";
 }
 
 template<class T> string
