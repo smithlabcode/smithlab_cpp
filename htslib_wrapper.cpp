@@ -25,9 +25,6 @@
 #include "smithlab_utils.hpp"
 #include "MappedRead.hpp"
 
-#include <htslib/sam.h>
-#include <htslib/hts.h>
-
 using std::string;
 using std::vector;
 using std::cerr;

@@ -26,8 +26,10 @@
 #include <vector>
 #include <fstream>
 
+extern "C" {
 #include <htslib/sam.h>
 #include <htslib/hts.h>
+}
 
 extern "C" {char check_htslib_wrapper();}
 
