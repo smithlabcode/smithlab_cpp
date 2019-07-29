@@ -35,7 +35,8 @@ AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
 
 AM_PROG_AR
-LT_INIT
+dnl Turn off shared libraries by default
+LT_INIT([disable-shared])
 
 dnl the line breaks in thie message are intended
 hts_fail_msg="
