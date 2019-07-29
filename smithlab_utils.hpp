@@ -37,6 +37,7 @@
 #include <numeric>
 #include <iomanip>
 
+extern "C" {char have_smithlab_cpp();}
 
 namespace smithlab {
   template <class In, class Out, class Pred> Out
