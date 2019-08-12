@@ -39,20 +39,24 @@ struct igzfstream {
   gzFile fileobj;
 };
 
-struct ogzfstream {
-  ogzfstream(const std::string filename) :
-    fileobj(gzopen(filename.c_str(), "w")) {}
-  ~ogzfstream() {gzclose_w(fileobj);}
-  /* eof is not a good error indicator for write */
-  // operator bool() const {return !gzeof(fileobj);}
-  gzFile fileobj;
-};
-
 igzfstream&
 getline(igzfstream &in, std::string &line);
 
 igzfstream&
 operator>>(igzfstream &in, std::string &line);
+
+
+struct ogzfstream {
+  ogzfstream(const std::string filename) :
+    fileobj(gzopen(filename.c_str(), "w")) {}
+  ~ogzfstream() {gzclose_w(fileobj);}
+
+  /* Below: eof is not a good error indicator for output streams and
+   * we often use this only when checking after opening a file. This
+   * function needs improving */
+  operator bool() const {return fileobj != NULL;}
+  gzFile fileobj;
+};
 
 ogzfstream&
 operator<<(ogzfstream &out, const std::string &line);
