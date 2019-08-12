@@ -197,7 +197,7 @@ Option::format_option_description(const size_t offset,
     vector<string> parts;
     smithlab::split_whitespace(description, parts);
     if (required)
-      parts.push_back("[requird]");
+      parts.push_back("[required]");
     if (!required && show_default)
       parts.push_back(format_default_value());
 
