@@ -31,7 +31,9 @@ igzfstream&
 getline(igzfstream &in, string &line) {
   if (gzgets(in.fileobj, &in.buf[0], in.chunk_size)) {
     auto eol = std::find(begin(in.buf), end(in.buf), '\n');
-    line = string(begin(in.buf), eol);
+    line.clear();
+    // in case line already has a reserve
+    copy(begin(in.buf), eol, std::back_inserter(line));
   }
   return in;
 }
