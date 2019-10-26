@@ -392,7 +392,7 @@ ReadBEDFile(const std::string &filename,
             std::vector<GenomicRegion> &regions);
 
 void
-ReadBEDFile(const std::string filename,
+ReadBEDFile(const std::string &filename,
             std::vector<SimpleGenomicRegion> &regions);
 
 template <class T> void
