@@ -417,7 +417,7 @@ SAMReader::get_SAMRecord_general(const string &str, SAMRecord &samr) {
   samr.seg_len = seg_len;
   samr.mr.r.set_name(name);
 
-  if (samr.is_primary && samr.is_mapped) {
+  if (samr.is_mapped) {
     samr.mr.r.set_chrom(chrom);
     samr.mr.r.set_start(start - 1);
     samr.mr.r.set_score(0);
