@@ -394,7 +394,7 @@ read_fasta_file_short_names(const string &filename,
   while (getline(in, line)) {
     if (line[0] == '>') {
       names.push_back(string(begin(line) + 1,
-                             begin(line) + line.find_first_of(1, " \t")));
+                             begin(line) + line.find_first_of(" \t", 1)));
       sequences.push_back(string());
     }
     else sequences.back() += line;
