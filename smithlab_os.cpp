@@ -379,6 +379,29 @@ void read_fastq_file(const char *filename, vector<string> &names,
 }
 
 void
+read_fasta_file_short_names(const string &filename,
+                            vector<string> &names,
+                            vector<string> &sequences) {
+
+  std::ifstream in(filename);
+  if (!in)
+    throw runtime_error("cannot open input file " + filename);
+
+  names.clear();
+  sequences.clear();
+
+  string line;
+  while (getline(in, line)) {
+    if (line[0] == '>') {
+      names.push_back(string(begin(line) + 1,
+                             begin(line) + line.find_first_of(1, " \t")));
+      sequences.push_back(string());
+    }
+    else sequences.back() += line;
+  }
+}
+
+void
 read_fasta_file(const string &filename,
                 vector<string> &names,
                 vector<string> &sequences) {

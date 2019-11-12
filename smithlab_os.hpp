@@ -58,6 +58,11 @@ read_fasta_file(const std::string &filename,
                 std::vector<std::string> &names,
                 std::vector<std::string> &sequences);
 
+void
+read_fasta_file_short_names(const std::string &filename,
+                            std::vector<std::string> &names,
+                            std::vector<std::string> &sequences);
+
 // This verstion looks for the sequence matching a particular name
 void
 read_fasta_file(const std::string &filename,
