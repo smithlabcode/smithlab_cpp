@@ -32,9 +32,9 @@ our code, you can modify the 3rd step above to:
 ```
 $ ./configure --prefix=/some/unimportant/directory
 ```
-It is also a very good idea to run the `configure` script as follows:
+It is also a very good idea to run `make` as follows:
 ```
-$ ./configure CXXFLAGS='-O3 -Wall'
+$ make CXXFLAGS='-O3 -Wall'
 ```
 This will make the resulting library code faster and much smaller, as
 the defaults compile with `-g` for debugging.
