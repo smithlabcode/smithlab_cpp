@@ -58,3 +58,30 @@ g++ -Wall -std=c++11 -c -o OptionParser.o OptionParser.cpp
 Now that we are using both the Zlib and HTSLib libraries, it is more
 important that we have a build system that can check for these. So
 this repo no longer contains a `Makefile`.
+
+## TODO
+
+This code needs lots of changes. I'm listing them here for the present
+and hope to take care of each with separate issues on GitHub. The
+result should be less total code overall in smithlab_cpp.
+
+- `bisulfite_utils.*pp` code should disappear. It has nothing useful,
+  and any functionality it does contain likely belongs in methpipe.
+- The `RNG.*pp` code should also disappear. It should be replaced with
+  the stl random code (since c++11) in applications.
+- The `sim_utils.*pp` code has not been used in any of our tools for a
+  very long time, and should be removed.
+- `QualityScore.*pp` likely should be removed, as we only use
+  sequencing quality scores in specific places, and in those places
+  have chosen to re-implement anything that would be here.
+- `smithlab_os.*pp`: anything related to a `prb` file should be
+  removed. Any use of character arrays should be replaced with strings
+  for filenames. Implementation of many functions in the cpp file is
+  sloppy.
+- `smithlab_utils.*pp`: lots to replace here. Many functions seem
+  redundant with functions elsewhere. Not sure of we need the smithlab
+  namespace. Likely the `copy_if` function should be removed. We
+  should test of the alphabet conversion functions are all needed.
+- There might be redundancy between several functions that span
+  `GenomicRegion.*pp`, `chromosome_utils.*pp` and `smithlab_os.*pp`,
+  especially in relation to reading files that contain genomes.
