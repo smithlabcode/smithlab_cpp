@@ -18,6 +18,8 @@ EXTRA_DIST = README.md
 
 ACLOCAL_AMFLAGS = -I m4
 
+CXXFLAGS = -O3
+
 lib_LTLIBRARIES = libsmithlab_cpp.la
 
 libsmithlab_cpp_la_SOURCES = GenomicRegion.cpp MappedRead.cpp		\
