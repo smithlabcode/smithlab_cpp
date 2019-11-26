@@ -18,19 +18,23 @@
 SOURCES = $(wildcard *.cpp)
 OBJECTS = $(patsubst %.cpp, %.o, $(SOURCES))
 HEADERS = $(wildcard *.hpp)
+REQUIRES_HTSLIB = htslib_wrapper.o
+
+ifndef HAVE_HTSLIB
+NO_HTSLIB := $(filter-out $(REQUIRES_HTSLIB), $(OBJECTS))
+OBJECTS = $(NO_HTSLIB)
+endif
 
 STATIC_LIB = libsmithlab_cpp.a
 
 CXX = g++
 CXXFLAGS = -Wall -std=c++11
-OPTFLAGS = -O2
+OPTFLAGS = -O3
 DEBUGFLAGS = -g
 
 ifdef DEBUG
 CXXFLAGS += $(DEBUGFLAGS)
-endif
-
-ifdef OPT
+else
 CXXFLAGS += $(OPTFLAGS)
 endif
 
