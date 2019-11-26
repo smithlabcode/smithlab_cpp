@@ -40,6 +40,7 @@ using std::vector;
 using std::ios_base;
 using std::unordered_map;
 using std::runtime_error;
+using std::begin;
 
 string
 strip_path(string full_path) {
