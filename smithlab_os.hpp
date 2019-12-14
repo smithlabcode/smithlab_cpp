@@ -40,13 +40,13 @@ void
 identify_chromosomes(const std::string &chrom_file,
                      const std::string fasta_suffix, // could be const char*
                      std::unordered_map<std::string,
-                                        std::string> &chrom_files);
+                     std::string> &chrom_files);
 
 void
 identify_and_read_chromosomes(const std::string &chrom_file,
                               const std::string fasta_suffix,
                               std::unordered_map<std::string,
-                                                 std::string> &chrom_files);
+                              std::string> &chrom_files);
 
 void
 read_dir(const std::string &dirname,
@@ -57,7 +57,6 @@ void
 read_fasta_file(const std::string &filename,
                 std::vector<std::string> &names,
                 std::vector<std::string> &sequences);
-
 void
 read_fasta_file_short_names(const std::string &filename,
                             std::vector<std::string> &names,
@@ -80,10 +79,6 @@ read_fastq_file(const char *filename,
                 std::vector<std::string> &names,
                 std::vector<std::string> &sequences,
                 std::vector<std::string> &scores);
-
-void
-read_prb_file(std::string filename,
-              std::vector<std::vector<std::vector<double> > > &scores);
 
 void
 read_filename_file(const char *filename,

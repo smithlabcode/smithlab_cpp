@@ -74,10 +74,9 @@ result should be less total code overall in smithlab_cpp.
 - `QualityScore.*pp` likely should be removed, as we only use
   sequencing quality scores in specific places, and in those places
   have chosen to re-implement anything that would be here.
-- `smithlab_os.*pp`: anything related to a `prb` file should be
-  removed. Any use of character arrays should be replaced with strings
-  for filenames. Implementation of many functions in the cpp file is
-  sloppy.
+- `smithlab_os.* Any use of character arrays should be replaced with
+  strings for filenames. Implementation of many functions in the cpp
+  file is sloppy.
 - `smithlab_utils.*pp`: lots to replace here. Many functions seem
   redundant with functions elsewhere. Not sure of we need the smithlab
   namespace. Likely the `copy_if` function should be removed. We

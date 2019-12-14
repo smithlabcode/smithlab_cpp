@@ -446,8 +446,7 @@ read_fasta_file(const string &filename,
     char buffer[INPUT_BUFFER_SIZE + 1];
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw runtime_error(
-                          "Line in " + name + "\nexceeds max length: "
+      throw runtime_error("Line in " + name + "\nexceeds max length: "
                           + toa(INPUT_BUFFER_SIZE));
     // correct for dos carriage returns before newlines
     if (buffer[strlen(buffer) - 1] == '\r')
@@ -538,43 +537,6 @@ read_dir(const string& dirname, vector<string> &filenames) {
   if (filenames.empty())
     throw "no valid files found in: " + dirname;
   closedir(dir);
-}
-
-
-void
-read_prb_file(string filename, vector<vector<vector<double> > > &scores) {
-  static const size_t INPUT_BUFFER_SIZE = 1000000;
-  scores.clear();
-  std::ifstream in(filename.c_str());
-  if (!in)
-    throw runtime_error("cannot open input file " + filename);
-  string s;
-  size_t line_number = 0;
-  while (!in.eof()) {
-    ++line_number;
-    char buffer[INPUT_BUFFER_SIZE + 1];
-    in.getline(buffer, INPUT_BUFFER_SIZE);
-    if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw runtime_error(
-                          "Line in " + filename + "\nexceeds max length: "
-                          + toa(INPUT_BUFFER_SIZE));
-    if (buffer[strlen(buffer) - 1] == '\r')
-      buffer[strlen(buffer) - 1] = '\0';
-
-    vector<string> parts;
-    smithlab::split_whitespace(buffer, parts);
-    if (parts.size() % smithlab::alphabet_size != 0)
-      throw runtime_error("Incorrect number of values on line "
-                          + toa(line_number) + " in file "
-                          + filename);
-    scores.push_back(vector<vector<double> >());
-    for (size_t i = 0; i < parts.size(); i += smithlab::alphabet_size) {
-      scores.back().push_back(vector<double>());
-      for (size_t j = 0; j < smithlab::alphabet_size; ++j)
-        scores.back().back().push_back(atof(parts[i + j].c_str()));
-    }
-    in.peek();
-  }
 }
 
 bool
