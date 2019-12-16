@@ -32,12 +32,10 @@ our code, you can modify the 3rd step above to:
 ```
 $ ./configure --prefix=/some/unimportant/directory
 ```
-It is also a very good idea to run `make` as follows:
-```
-$ make CXXFLAGS='-O3 -Wall'
-```
-This will make the resulting library code faster and much smaller, as
-the defaults compile with `-g` for debugging.
+If you want to build this code to use our htslib wrapper, you will need
+to have HTSlib installed in some standard place on your system. If you have
+it installed in some other place, then you will need to set  variables
+(CPPFLAGS and LDFLAGS) when running the configure script.
 
 ## Using the source directly from the repo
 
@@ -49,15 +47,16 @@ help if you have problems using the source repo directly.
 This README.md file is written just as we are turning `smithlab_cpp`
 into a library and not a collection of source files. If you want to
 use it the way it has been used from 2010-2019, then you can use the
-`original_makefile.mk` which should still be in this repo. Just like
-this:
+`Makefile` in this repo without running the `./configure` script:
 ```
-$ make -f original_makefile.mk OptionParser.o
+$ make OptionParser.o
 g++ -Wall -std=c++11 -c -o OptionParser.o OptionParser.cpp
 ```
-Now that we are using both the Zlib and HTSLib libraries, it is more
-important that we have a build system that can check for these. So
-this repo no longer contains a `Makefile`.
+Note: if you run the `./configure` script it will overwrite the
+`Makefile` indicated above. If that happens, just get a new one.  The
+`./configure` script must be obtained using autotools if you cloned
+this repo; if you downloaded this code as a "release" then the
+configure script should be present already.
 
 ## TODO
 
