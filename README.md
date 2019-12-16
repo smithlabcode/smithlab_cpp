@@ -33,9 +33,14 @@ our code, you can modify the 3rd step above to:
 $ ./configure --prefix=/some/unimportant/directory
 ```
 If you want to build this code to use our htslib wrapper, you will need
-to have HTSlib installed in some standard place on your system. If you have
-it installed in some other place, then you will need to set  variables
-(CPPFLAGS and LDFLAGS) when running the configure script.
+to run like this:
+```
+$ ./configure --enable-hts
+```
+You must also have HTSlib installed in some standard place on your
+system. If you have it installed in some other place, then you will
+need to set variables (CPPFLAGS and LDFLAGS) when running the
+configure script.
 
 ## Using the source directly from the repo
 
