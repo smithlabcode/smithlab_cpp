@@ -47,7 +47,7 @@ and headers can be found.
 "
 
 AC_ARG_ENABLE([hts],
-  [AS_HELP_STRING([--enable-hts], [Enable HTSLib @<:@yes@:>@])],
+  [AS_HELP_STRING([--enable-hts], [Enable HTSLib @<:@no@:>@])],
   [enable_hts=yes], [enable_hts=no])
 AS_IF([test "x$enable_hts" = "xyes"],
   [AC_CHECK_LIB([hts], [hts_version], [], [AC_MSG_FAILURE([$hts_fail_msg])])])
