@@ -31,7 +31,7 @@ struct igzfstream {
       buf.resize(chunk_size, ' ');
     }
   ~igzfstream() {gzclose_r(fileobj);}
-  operator bool() const {return !gzeof(fileobj);}
+  operator bool() const {return (fileobj != NULL) && !gzeof(fileobj);}
   char peek();
 
   size_t chunk_size;
