@@ -430,4 +430,6 @@ private:
   static const size_t max_bar_width = 72;
 };
 
+extern char to_valid_five_letter[256];
+
 #endif
