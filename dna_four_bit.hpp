@@ -133,6 +133,17 @@ struct genome_four_bit_itr {
     itr_odd ^= 1ul;
     return tmp;
   }
+  genome_four_bit_itr& operator--() {
+    itr -= !itr_odd;
+    itr_odd ^= 1ul;
+    return *this;
+  }
+  genome_four_bit_itr operator--(int) {
+    genome_four_bit_itr tmp(*this);
+    itr -= !itr_odd;
+    itr_odd ^= 1ul;
+    return tmp;
+  }
   genome_four_bit_itr operator+(const size_t offset) const {
     const size_t offset_odd = offset & 1ul;
     return genome_four_bit_itr(itr + offset/2 + (itr_odd & offset_odd),
