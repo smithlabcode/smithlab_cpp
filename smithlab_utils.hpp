@@ -79,6 +79,29 @@ namespace smithlab {
     return s.str();
   }
   double log_sum_log_vec(const std::vector<double> &vals, size_t lim);
+
+  template <class FwrdItr> double
+  log_sum_log(FwrdItr first, FwrdItr last) {
+    const auto max_itr = std::max_element(first, last);
+    const double max_val = *max_itr;
+    double sum = 1.0;
+    for (auto itr = first; itr != last; ++itr)
+      sum += (itr == max_itr ? 0.0 : std::exp(*itr - max_val));
+    return max_val + std::log(sum);
+  }
+  double
+  log_sum_log(const double p, const double q) {
+    if (p == 0) {return q;}
+    else if (q == 0) {return p;}
+    const double larger = (p > q) ? p : q;
+    const double smaller = (p > q) ? q : p;
+    return larger + log(1.0 + exp(smaller - larger));
+  }
+
+  double
+  log_sum_log(const double p, const double q, const double r) {
+    return log_sum_log(log_sum_log(p, q), r);
+  }
 }
 
 namespace smithlab_bits {
