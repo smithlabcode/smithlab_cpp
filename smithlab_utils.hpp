@@ -89,16 +89,15 @@ namespace smithlab {
       sum += (itr == max_itr ? 0.0 : std::exp(*itr - max_val));
     return max_val + std::log(sum);
   }
-  double
+  inline double
   log_sum_log(const double p, const double q) {
     if (p == 0) {return q;}
     else if (q == 0) {return p;}
     const double larger = (p > q) ? p : q;
-    const double smaller = (p > q) ? q : p;
-    return larger + log(1.0 + exp(smaller - larger));
+    return larger + log(1.0 + exp((p > q ? q : p) - larger));
   }
 
-  double
+  inline double
   log_sum_log(const double p, const double q, const double r) {
     return log_sum_log(log_sum_log(p, q), r);
   }
