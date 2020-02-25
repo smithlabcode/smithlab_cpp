@@ -23,29 +23,28 @@
 
 #include "bisulfite_utils.hpp"
 #include <cstdlib>
+#include <iostream>
+#include <random>
 
 using std::string;
 
 void
-bisulfite_treatment(const Runif &rng, string &seq, double bs_rate, double meth_rate) {
+bisulfite_treatment(std::mt19937 &generator, string &seq, double bs_rate, double meth_rate) {
+  std::uniform_real_distribution<double> dist(0.0,1.0);
+  
   const size_t seq_len = seq.length() - 1;
   for (size_t i = 0; i < seq_len; ++i)
     if (toupper(seq[i]) == 'C') {
       // CpG
       if (toupper(seq[i + 1]) == 'G' &&
-	  (rng.runif(0.0, 1.0) > meth_rate || rng.runif(0.0, 1.0) < bs_rate)) {
+	  (dist(generator) > meth_rate || dist(generator)< bs_rate)) {
 	seq[i] = 'T';
       }
       // Regular C
-      else if (rng.runif(0.0, 1.0) < bs_rate)
+      else if (dist(generator) < bs_rate)
 	seq[i] = 'T';
     }
-  if (toupper(seq[seq_len]) == 'C' && rng.runif(0.0, 1.0) < bs_rate)
+  if (toupper(seq[seq_len]) == 'C' && dist(generator) < bs_rate)
     seq[seq_len] = 'T';
 }
 
-void
-bisulfite_treatment(string &seq, double bs_rate, double meth_rate) {
-  const Runif rng;
-  bisulfite_treatment(rng, seq, bs_rate, meth_rate);
-}

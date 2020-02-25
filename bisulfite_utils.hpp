@@ -26,14 +26,10 @@
 #define BISULFITE_UTILS_HPP
 
 #include <string>
-#include "RNG.hpp"
+#include <random>
 
 void
-bisulfite_treatment(const Runif &rng, std::string &seq, 
-		    double bs_rate = 1.0, double meth_rate = 0.0);
-
-void
-bisulfite_treatment(std::string &seq, 
+bisulfite_treatment(std::mt19937 &generator, std::string &seq, 
 		    double bs_rate = 1.0, double meth_rate = 0.0);
 
 #endif

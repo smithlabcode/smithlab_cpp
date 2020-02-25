@@ -29,6 +29,7 @@
 #include <set>
 #include <cmath>
 #include <unordered_map>
+#include <random>
 
 using std::string;
 using std::vector;
@@ -38,7 +39,7 @@ using std::log;
 
 using std::cerr;
 using std::endl;
-
+using std::mt19937;
 
 void
 sequence_to_consensus_matrix(const string &sequence, 
@@ -58,19 +59,22 @@ sequence_to_consensus_matrix(const string &sequence,
 typedef std::unordered_map<size_t, double> err_map;
 
 static void
-get_error_set(const Runif &rng, const size_t seq_len,
+get_error_set(mt19937 &generator, const size_t seq_len,
 	      const double n_errors, err_map &error) {
   static const double tolerance = 0.1;
-  
+
   double total_error = 0.5*n_errors;
   while (total_error > 0) {
-    const double curr_err = 
-      (total_error < tolerance) ? total_error :
-      rng.runif(0.0, std::min(total_error, 1.0));
-    
-    size_t pos = rng.runif(0ul, seq_len);
+    double curr_err;
+    if (total_error < tolerance) curr_err = total_error;
+    else{
+        std::uniform_real_distribution<double> dist(0.0,std::min(total_error,1.0));
+        curr_err = dist(generator);
+    }
+    std::uniform_int_distribution<size_t> distsizet(0,seq_len);
+    size_t pos = distsizet(generator);
     while (!error.empty() && error.find(pos) != error.end())
-      pos = rng.runif(0ul, seq_len);
+      pos = distsizet(generator);
     
     error[pos] = curr_err;
     total_error -= curr_err;
@@ -79,7 +83,7 @@ get_error_set(const Runif &rng, const size_t seq_len,
 
 
 static void
-add_error(const Runif &rng, double err, vector<double> &matrix) {
+add_error(mt19937 &generator, double err, vector<double> &matrix) {
   static const double tolerance = 0.1;
 
   // find the consensus base
@@ -91,10 +95,16 @@ add_error(const Runif &rng, double err, vector<double> &matrix) {
 
   // add that prob to other bases
   while (err > 0) {
-    const double curr_err = ((err < tolerance) ? err : rng.runif(0.0, err));
-    size_t pos = rng.runif(0ul, smithlab::alphabet_size);
+    double curr_err;
+    if (err < tolerance) curr_err = err;
+    else{
+            std::uniform_real_distribution<double> dist(0.0,err);
+        curr_err = dist(generator);
+    }
+    std::uniform_int_distribution<size_t> distsizet(0,smithlab::alphabet_size);
+    size_t pos = distsizet(generator);
     while (pos == consensus)
-      pos = rng.runif(0ul, smithlab::alphabet_size);
+      pos = distsizet(generator);
     matrix[pos] += curr_err;
     err -= curr_err;
   }
@@ -102,23 +112,24 @@ add_error(const Runif &rng, double err, vector<double> &matrix) {
 
 
 void
-add_sequencing_errors(const Runif &rng, const double n_errors,
+add_sequencing_errors(mt19937 &generator, const double n_errors,
 		      vector<vector<double> > &matrix) {
   // determine where the error will be (and how much);
   const size_t seq_len = matrix.size();
   err_map error;
-  get_error_set(rng, seq_len, n_errors, error);
+  get_error_set(generator, seq_len, n_errors, error);
   // include the errors in the matrix
   for (err_map::const_iterator i = error.begin(); i != error.end(); ++i)
-    add_error(rng, i->second, matrix[i->first]);
+    add_error(generator, i->second, matrix[i->first]);
 }
 
 
 void
 add_sequencing_errors(const double n_errors,
 		      vector<vector<double> > &matrix) {
-  Runif rng;
-  add_sequencing_errors(rng, n_errors, matrix);
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  add_sequencing_errors(generator, n_errors, matrix);
 }
 
 
@@ -138,20 +149,22 @@ call_bases_solexa(const vector<vector<double> > &matrix,
 
 
 void
-add_sequencing_errors(const Runif &rng, const double max_errors,
+add_sequencing_errors(mt19937 &generator, const double max_errors,
 		      string &seq, string &error_log) {
   error_log = string(seq.length(), '0');
   std::set<size_t> errors;
+  std::uniform_int_distribution<size_t> distsizet(0,seq.length());
   for (size_t i = 0; i < max_errors; ++i) {
-    size_t error_pos = rng.runif(0ul, seq.length());
+    size_t error_pos = distsizet(generator);
     while (errors.find(error_pos) != errors.end())
-      error_pos = rng.runif(0ul, seq.length());
+      error_pos = distsizet(generator);
     errors.insert(error_pos);
     error_log[error_pos] = '1';
 
-    size_t c = rng.runif(0ul, smithlab::alphabet_size);
+    std::uniform_int_distribution<size_t> distsizet1(0,smithlab::alphabet_size);
+    size_t c = distsizet1(generator);
     while (c == base2int(seq[error_pos]))
-      c = rng.runif(0ul, smithlab::alphabet_size);
+      c = distsizet1(generator);
     
     seq[error_pos] = int2base(c);
   }
@@ -160,19 +173,23 @@ add_sequencing_errors(const Runif &rng, const double max_errors,
 
 
 void
-generate_sequencing_errors(const Runif &rng, 
+generate_sequencing_errors(mt19937 &generator, 
 			   const size_t read_width,const double total_error, 
 			   vector<vector<double> > &errors) {
   
   errors.resize(read_width, vector<double>(smithlab::alphabet_size, 0));
+  
+  std::uniform_int_distribution<size_t> distsizet(0,read_width);
+  std::uniform_int_distribution<size_t> distsizet1(0,smithlab::alphabet_size);
+  std::uniform_real_distribution<double> dist(0.0,1.0);
+  
   double remaining_error = total_error;
   while (remaining_error > 0) {
-    const size_t error_pos = rng.runif(0ul, read_width);
-    size_t error_base = rng.runif(0ul, smithlab::alphabet_size);
+    const size_t error_pos = distsizet(generator);
+    size_t error_base = distsizet1(generator);
     
     const double error_amount = min(min(1.0 - errors[error_pos][error_base], remaining_error),
-				    rng.runif(0.0, 1.0));
-    
+				    dist(generator)); 
     remaining_error -= error_amount;
     errors[error_pos][error_base] += error_amount;
   }
@@ -220,7 +237,7 @@ prob_to_quality_scores_solexa(const vector<vector<double> > &prb,
 }
 
 void
-add_sequencing_errors(const Runif &rng, const double max_errors,
+add_sequencing_errors(mt19937 &generator, const double max_errors,
 		      string &seq, vector<vector<double> > &quality_scores) {
   
   // first make the pwm:
@@ -228,18 +245,21 @@ add_sequencing_errors(const Runif &rng, const double max_errors,
   for (size_t i = 0; i < seq.length(); ++i)
     quality_scores[i][base2int(seq[i])] = 1.0;
   
+  std::uniform_int_distribution<size_t> distsizet(0,seq.length());
+  std::uniform_int_distribution<size_t> distsizet1(0,smithlab::alphabet_size);
+  std::uniform_real_distribution<double> dist(0.0,1.0);
   double total_error = max_errors;
   while (total_error > 0) {
     // sample an error position:
-    const size_t error_pos = rng.runif(0ul, seq.length());
+    const size_t error_pos = distsizet(generator);
     // sample an error amount:
     double remaining_freq = min(quality_scores[error_pos][base2int(seq[error_pos])], 
 				total_error);
-    const double error_amount = min(min(rng.runif(0.0, 1.0), max_errors), 
+    const double error_amount = min(min(dist(generator), max_errors), 
 				    remaining_freq);
     size_t error_base = base2int(seq[error_pos]);
     while (error_base == base2int(seq[error_pos]))
-      error_base = rng.runif(0ul, smithlab::alphabet_size);
+      error_base = distsizet1(generator);
     
     quality_scores[error_pos][base2int(seq[error_pos])] -= error_amount;
     quality_scores[error_pos][error_base] += error_amount;
