@@ -15,6 +15,7 @@
 
 #ifndef CIGAR_UTILS_HPP
 #define CIGAR_UTILS_HPP
+#include <algorithm>
 
 bool
 consumes_query(const char op) {
