@@ -26,14 +26,14 @@
 
 #include <string>
 #include <vector>
-#include "RNG.hpp"
+#include <random>
 
 void
 sequence_to_consensus_matrix(const std::string &sequence, 
 			     std::vector<std::vector<double> > &matrix);
 
 void
-add_sequencing_errors(const Runif &rng, const double n_errors,
+add_sequencing_errors(std::mt19937 &generator, const double n_errors,
 		      std::vector<std::vector<double> > &matrix);
 
 void
