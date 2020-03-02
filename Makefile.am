@@ -23,7 +23,7 @@ CXXFLAGS = -O3
 lib_LTLIBRARIES = libsmithlab_cpp.la
 
 libsmithlab_cpp_la_SOURCES = GenomicRegion.cpp MappedRead.cpp		\
-OptionParser.cpp QualityScore.cpp RNG.cpp bisulfite_utils.cpp		\
+OptionParser.cpp QualityScore.cpp bisulfite_utils.cpp		\
 chromosome_utils.cpp sim_utils.cpp smithlab_os.cpp smithlab_utils.cpp	\
 zlib_wrapper.cpp dna_four_bit.cpp
 
@@ -32,6 +32,6 @@ libsmithlab_cpp_la_SOURCES += htslib_wrapper.cpp
 endif
 
 include_HEADERS = GenomicRegion.hpp MappedRead.hpp OptionParser.hpp	\
-QualityScore.hpp RNG.hpp bisulfite_utils.hpp chromosome_utils.hpp	\
+QualityScore.hpp bisulfite_utils.hpp chromosome_utils.hpp	\
 sim_utils.hpp smithlab_os.hpp smithlab_utils.hpp zlib_wrapper.hpp	\
 htslib_wrapper.hpp dna_four_bit.hpp
