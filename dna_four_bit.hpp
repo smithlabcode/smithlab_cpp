@@ -26,15 +26,23 @@ enum base_in_byte { left, right };
 extern char dna_four_bit_decoding[16];
 
 template <typename uint_type> constexpr
+uint_type
+get_low_nibble(const uint_type x) {return x & 15u;}
+
+template <typename uint_type> constexpr
+uint_type
+get_high_nibble(const uint_type x) {return (x >> 4) & 15u;}
+
+template <typename uint_type> constexpr
 char
 decode_dna_four_bit_low(const uint_type x) {
-  return dna_four_bit_decoding[x & 15u];
+  return dna_four_bit_decoding[get_low_nibble(x)];
 }
 
 template <typename uint_type> constexpr
 char
 decode_dna_four_bit_high(const uint_type x) {
-  return dna_four_bit_decoding[(x >> 4) & 15u];
+  return dna_four_bit_decoding[get_high_nibble(x)];
 }
 
 template <typename uint_type> constexpr
