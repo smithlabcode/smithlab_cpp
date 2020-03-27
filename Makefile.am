@@ -34,4 +34,4 @@ endif
 include_HEADERS = GenomicRegion.hpp MappedRead.hpp OptionParser.hpp	\
 QualityScore.hpp bisulfite_utils.hpp chromosome_utils.hpp	\
 sim_utils.hpp smithlab_os.hpp smithlab_utils.hpp zlib_wrapper.hpp	\
-htslib_wrapper.hpp dna_four_bit.hpp
+htslib_wrapper.hpp dna_four_bit.hpp cigar_utils.hpp
