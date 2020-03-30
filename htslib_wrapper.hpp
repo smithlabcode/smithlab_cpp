@@ -33,6 +33,22 @@ extern "C" {
 
 extern "C" {char check_htslib_wrapper();}
 
+struct SamFlags {
+  static const uint16_t read_paired = 0x1;
+  static const uint16_t read_pair_mapped = 0x2;
+  static const uint16_t read_unmapped = 0x4;
+  static const uint16_t mate_unmapped = 0x8;
+  static const uint16_t read_rc = 0x10;
+  static const uint16_t mate_rc = 0x20;
+  static const uint16_t template_first = 0x40;
+  static const uint16_t template_second = 0x40;
+  static const uint16_t secondary_aln = 0x100;
+  static const uint16_t below_quality = 0x200;
+  static const uint16_t pcr_duplicate = 0x400;
+  static const uint16_t supplementary_aln = 0x800;
+};
+
+
 struct SAMRecord {
   MappedRead mr;
   bool is_Trich;
