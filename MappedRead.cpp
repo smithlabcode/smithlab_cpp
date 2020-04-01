@@ -22,14 +22,36 @@
 
 #include "MappedRead.hpp"
 #include "smithlab_utils.hpp"
+#include "cigar_utils.hpp"
 
 #include <fstream>
 #include <algorithm>
 #include <sstream>
 #include <string>
+#include <iostream>
 
 using std::string;
 using std::runtime_error;
+
+template <typename SeqType, typename CigarType>
+static void
+apply_cigar_to_string (SeqType &sequence, const CigarType &cigar) {
+  auto cig_it = begin(cigar), cig_end = end(cigar);
+  size_t total_ops = cigar_total_ops(begin(cigar), end(cigar));
+  size_t cnt, pos = 0;
+  sequence.resize(total_ops); // GS: upper bound, ideally subtract 2*(D+S)
+  while (cig_it != cig_end) {
+    cnt = extract_op_count(cig_it, cig_end);
+    if (*cig_it == 'M' || *cig_it == 'N') pos += cnt;
+    else if (*cig_it =='I' || *cig_it =='S') sequence.erase(pos, cnt);
+    else if (*cig_it == 'D') {
+      sequence.insert(pos, string(cnt, 'N'));
+      pos += cnt;
+    }
+    ++cig_it; //skip op character
+  }
+}
+
 
 MappedRead::MappedRead(const string &line) {
   std::istringstream is;
@@ -43,12 +65,12 @@ MappedRead::MappedRead(const string &line) {
     if (find_if(tmp.begin(), tmp.end(),
                 [](char c) {return !std::isdigit(c);}) == tmp.end()) {
       end = std::stol(tmp);
-      if (!(is >> name >> score >> strand >> seq))
+      if (!(is >> name >> score >> strand >> seq >> cigar))
         throw runtime_error("bad line in MappedRead file: " + line);
     }
     else {
       name = tmp;
-      if (!(is >> score >> strand >> seq))
+      if (!(is >> score >> strand >> seq >> cigar))
         throw runtime_error("bad line in MappedRead file: " + line);
       end = start + seq.length();
     }
@@ -63,7 +85,13 @@ MappedRead::tostring() const {
   std::ostringstream oss;
   oss << r; // no chaining for the << of GenomicRegion
   oss << '\t' << seq;
+  oss << '\t' << cigar;
   if (!scr.empty())
     oss << '\t' << scr;
   return oss.str();
+}
+
+void
+MappedRead::apply_cigar() {
+  apply_cigar_to_string(seq, cigar);
 }
