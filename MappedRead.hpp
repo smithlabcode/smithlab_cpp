@@ -31,9 +31,7 @@ struct MappedRead {
   GenomicRegion r;
   std::string seq;
   std::string scr;
-  std::string cigar;
   std::string tostring() const;
-  void apply_cigar();
 };
 
 template <class T> T&
