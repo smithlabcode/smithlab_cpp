@@ -33,9 +33,6 @@
 using std::string;
 using std::runtime_error;
 
-template <typename SeqType, typename CigarType>
-static void
-
 MappedRead::MappedRead(const string &line) {
   std::istringstream is;
   is.rdbuf()->pubsetbuf(const_cast<char*>(line.c_str()), line.size());
@@ -48,12 +45,12 @@ MappedRead::MappedRead(const string &line) {
     if (find_if(tmp.begin(), tmp.end(),
                 [](char c) {return !std::isdigit(c);}) == tmp.end()) {
       end = std::stol(tmp);
-      if (!(is >> name >> score >> strand >> seq >> cigar))
+      if (!(is >> name >> score >> strand >> seq >> scr))
         throw runtime_error("bad line in MappedRead file: " + line);
     }
     else {
       name = tmp;
-      if (!(is >> score >> strand >> seq >> cigar))
+      if (!(is >> score >> strand >> seq >> scr))
         throw runtime_error("bad line in MappedRead file: " + line);
       end = start + seq.length();
     }
@@ -68,7 +65,7 @@ MappedRead::tostring() const {
   std::ostringstream oss;
   oss << r; // no chaining for the << of GenomicRegion
   oss << '\t' << seq;
-  oss << '\t' << cigar;
+  oss << '\t' << scr;
   if (!scr.empty())
     oss << '\t' << scr;
   return oss.str();
