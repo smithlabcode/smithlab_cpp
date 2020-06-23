@@ -22,13 +22,11 @@
 
 #include "MappedRead.hpp"
 #include "smithlab_utils.hpp"
-#include "cigar_utils.hpp"
 
 #include <fstream>
 #include <algorithm>
 #include <sstream>
 #include <string>
-#include <iostream>
 
 using std::string;
 using std::runtime_error;
@@ -45,12 +43,12 @@ MappedRead::MappedRead(const string &line) {
     if (find_if(tmp.begin(), tmp.end(),
                 [](char c) {return !std::isdigit(c);}) == tmp.end()) {
       end = std::stol(tmp);
-      if (!(is >> name >> score >> strand >> seq >> scr))
+      if (!(is >> name >> score >> strand >> seq))
         throw runtime_error("bad line in MappedRead file: " + line);
     }
     else {
       name = tmp;
-      if (!(is >> score >> strand >> seq >> scr))
+      if (!(is >> score >> strand >> seq))
         throw runtime_error("bad line in MappedRead file: " + line);
       end = start + seq.length();
     }
@@ -65,9 +63,7 @@ MappedRead::tostring() const {
   std::ostringstream oss;
   oss << r; // no chaining for the << of GenomicRegion
   oss << '\t' << seq;
-  oss << '\t' << scr;
   if (!scr.empty())
     oss << '\t' << scr;
   return oss.str();
 }
-
