@@ -55,8 +55,6 @@ AM_CONDITIONAL([ENABLE_HTS], [test "x$enable_hts" = "xyes"])
 
 dnl check for required libraries
 AC_CHECK_LIB([z],[zlibVersion])
-AC_CHECK_LIB([gslcblas],[cblas_dgemm])
-AC_CHECK_LIB([gsl],[gsl_blas_dgemm])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
