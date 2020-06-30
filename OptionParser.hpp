@@ -141,8 +141,6 @@ private:
   std::string noflag_message;
   std::vector<Option> options;
 
-  bool config_specified;
-  size_t config_filename;
   bool help_request;
   bool about_request;
   bool show_defaults;
