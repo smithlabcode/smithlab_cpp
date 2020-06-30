@@ -32,7 +32,7 @@ char have_smithlab_cpp() {return 1;}
 
 /* Performs Hochberg step-up p-value adjustment.
  */
-void smithlab::correct_pvals(const size_t n_tests, vector<double> &pvals ) {
+void smithlab::correct_pvals(const size_t n_tests, vector<double> &pvals) {
   assert(!pvals.empty());
 
   vector<std::pair<double, vector<size_t> > > idx;
