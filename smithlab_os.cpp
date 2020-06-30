@@ -286,18 +286,14 @@ read_fastq_file(const char *filename,
     scrs.push_back(scr);
   }
 
-  using std::ptr_fun;
-  using std::not1;
   bool phred_scores = true, solexa_scores = true;
   for (size_t i = 0; i < scrs.size() && phred_scores && solexa_scores; ++i) {
-    phred_scores = (phred_scores
-                    && (find_if(scrs[i].begin(), scrs[i].end(),
-                                not1(ptr_fun(&valid_phred_score)))
-                        == scrs[i].end()));
-    solexa_scores = (solexa_scores
-                     && (find_if(scrs[i].begin(), scrs[i].end(),
-                                 not1(ptr_fun(&valid_solexa_score)))
-                         == scrs[i].end()));
+    phred_scores = phred_scores &&
+      (find_if(begin(scrs[i]), end(scrs[i]),
+               [](char c) {return !valid_phred_score(c);}) == end(scrs[i]));
+    solexa_scores = solexa_scores &&
+      (find_if(begin(scrs[i]), end(scrs[i]),
+               [](char c) {return !valid_solexa_score(c);}) == end(scrs[i]));
   }
 
   if (!phred_scores && !solexa_scores)
