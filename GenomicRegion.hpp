@@ -303,12 +303,11 @@ check_sorted(const std::vector<T> &regions) {
 
 template <class T>
 typename std::vector<T>::const_iterator
-find_closest(const std::vector<T> &regions, const T &region) {
-  typename std::vector<T>::const_iterator closest =
-    lower_bound(regions.begin(), regions.end(), region);
-  if (closest == regions.begin()) return closest;
-  if (closest == regions.end()) return (closest - 1);
-  return (region.distance(*closest) < region.distance(*(closest - 1))) ?
+find_closest(const std::vector<T> &targets, const T &query) {
+  const auto closest = std::lower_bound(begin(targets), end(targets), query);
+  if (closest == begin(targets)) return closest;
+  if (closest == end(targets)) return (closest - 1);
+  return (query.distance(*closest) < query.distance(*(closest - 1))) ?
     closest : (closest - 1);
 }
 
