@@ -35,8 +35,7 @@ AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
 
 AM_PROG_AR
-dnl Turn off shared libraries by default
-LT_INIT([disable-shared])
+AC_PROG_RANLIB
 
 dnl the line breaks in thie message are intended
 hts_fail_msg="
@@ -54,7 +53,7 @@ AS_IF([test "x$enable_hts" = "xyes"],
 AM_CONDITIONAL([ENABLE_HTS], [test "x$enable_hts" = "xyes"])
 
 dnl check for required libraries
-AC_CHECK_LIB([z],[zlibVersion])
+AC_SEARCH_LIBS([z],[zlibVersion])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
