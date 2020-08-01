@@ -15,9 +15,12 @@
 
 #ifndef CIGAR_UTILS_HPP
 #define CIGAR_UTILS_HPP
-#include <algorithm>
 
-bool
+#include <algorithm>
+#include <cctype> // isdigit
+#include <string>
+
+inline bool
 consumes_query(const char op) {
   return ((op == 'M') ||
           (op == 'I') ||
@@ -26,7 +29,7 @@ consumes_query(const char op) {
           (op == 'X'));
 }
 
-bool
+inline bool
 consumes_reference(const char op) {
   return ((op == 'M') ||
           (op == 'D') ||
@@ -329,5 +332,9 @@ uncompress_cigar(T1 c_itr, const T1 c_end, T2 &cigar) {
     fill_n(std::back_inserter(cigar), op_count, *c_itr++);
   }
 }
+
+void
+apply_cigar(const std::string &cigar, std::string &to_inflate,
+            const char inflation_symbol = 'N');
 
 #endif
