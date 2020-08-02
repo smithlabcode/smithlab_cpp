@@ -24,6 +24,7 @@
 #include "htslib_wrapper.hpp"
 #include "smithlab_utils.hpp"
 #include "MappedRead.hpp"
+#include "cigar_utils.hpp"
 
 using std::string;
 using std::vector;
@@ -108,62 +109,6 @@ operator>>(SAMReader &reader, SAMRecord &aln) {
   return reader;
 }
 
-/////////////////////////////////////////////
-//// general facility for SAM format
-/////////////////////////////////////////////
-
-static void
-apply_CIGAR(const string &seq, const string &qual,
-            const string &CIGAR, string &new_seq, string &new_qual) {
-  assert(seq.size() == qual.size());
-  assert(new_seq.size() == 0 && new_qual.size() == 0);
-  size_t n;
-  char op;
-  size_t i = 0;
-
-  std::istringstream iss(CIGAR);
-  while (iss >> n >> op) {
-    switch (op)
-      {
-      case 'M':
-        new_seq += seq.substr(i, n);
-        new_qual += qual.substr(i, n);
-        i += n;
-        break;
-      case 'I':
-        i += n;
-        break;
-      case 'D':
-        new_seq += string(n, 'N');
-        new_qual += string(n, 'B');
-        break;
-      case 'S':
-        i += n;
-        break;
-      case 'H':
-        ;
-        break;
-      case 'P':
-        ;
-        break;
-      case '=':
-        new_seq += seq.substr(i, n);
-        new_qual += qual.substr(i, n);
-        i += n;
-        break;
-      case 'X':
-        new_seq += seq.substr(i, n);
-        new_qual += qual.substr(i, n);
-        i += n;
-        break;
-      }
-  }
-  // Sum of lengths of the M/I/S/=/X operations
-  // shall equal the length of seq.
-
-  assert(i == seq.length());
-  assert(new_seq.size() == new_qual.size());
-}
 
 class FLAG {
 public:
@@ -228,12 +173,11 @@ SAMReader::get_SAMRecord_bsmap(const string &str, SAMRecord &samr) {
   bsmap_get_strand(strand_str, strand, bs_forward);
   samr.mr.r.set_strand(strand[0]);
 
-  string new_seq, new_qual;
-  apply_CIGAR(seq, qual, CIGAR, new_seq, new_qual);
+  string new_seq(seq);
+  apply_cigar(CIGAR, new_seq);
 
   samr.mr.r.set_end(samr.mr.r.get_start() + new_seq.size());
   samr.mr.seq = new_seq;
-  samr.mr.scr = new_qual;
 
   samr.is_Trich = Flag.is_Trich();
   samr.is_mapping_paired = Flag.is_mapping_paired();
@@ -297,17 +241,14 @@ SAMReader::get_SAMRecord_bismark(const string &str, SAMRecord &samr) {
   samr.mr.r.set_score(get_mismatch_bismark(edit_distance_str, meth_call_str));
   samr.mr.r.set_strand(Flag.is_revcomp() ? '-' : '+');
 
-  string new_seq, new_qual;
-  apply_CIGAR(seq, qual, CIGAR, new_seq, new_qual);
+  string new_seq(seq);
+  apply_cigar(CIGAR, new_seq);
 
-  if (Flag.is_revcomp()) {
+  if (Flag.is_revcomp())
     revcomp_inplace(new_seq);
-    std::reverse(new_qual.begin(), new_qual.end());
-  }
 
   samr.mr.r.set_end(samr.mr.r.get_start() + new_seq.size());
   samr.mr.seq = new_seq;
-  samr.mr.scr = new_qual;
 
   samr.is_Trich = Flag.is_Trich();
   samr.is_mapping_paired = Flag.is_mapping_paired();
@@ -369,17 +310,14 @@ SAMReader::get_SAMRecord_bsseeker(const string &str, SAMRecord &samr) {
   samr.mr.r.set_score(atoi(mismatch_str.substr(5).c_str()));
   samr.mr.r.set_strand(Flag.is_revcomp() ? '-' : '+');
 
-  string new_seq, new_qual;
-  apply_CIGAR(seq, qual, CIGAR, new_seq, new_qual);
+  string new_seq(seq);
+  apply_cigar(CIGAR, new_seq);
 
-  if (Flag.is_revcomp()) {
+  if (Flag.is_revcomp())
     revcomp_inplace(new_seq);
-    std::reverse(new_qual.begin(), new_qual.end());
-  }
 
   samr.mr.r.set_end(samr.mr.r.get_start() + new_seq.size());
   samr.mr.seq = new_seq;
-  samr.mr.scr = new_qual;
 
   samr.is_Trich = Flag.is_Trich();
   samr.is_mapping_paired = Flag.is_mapping_paired();
@@ -423,19 +361,15 @@ SAMReader::get_SAMRecord_general(const string &str, SAMRecord &samr) {
     samr.mr.r.set_score(0);
     samr.mr.r.set_strand(Flag.is_revcomp() ? '-' : '+');
 
-    string new_seq, new_qual;
-    apply_CIGAR(seq, qual, CIGAR, new_seq, new_qual);
+    string new_seq(seq);
+    apply_cigar(CIGAR, new_seq);
 
-
-    if (Flag.is_revcomp()) {
+    if (Flag.is_revcomp())
       revcomp_inplace(new_seq);
-      std::reverse(new_qual.begin(), new_qual.end());
-    }
 
     samr.mr.r.set_end(samr.mr.r.get_start() + new_seq.size());
 
     samr.mr.seq = new_seq;
-    samr.mr.scr = new_qual;
 
   }
   samr.is_Trich = Flag.is_Trich();
