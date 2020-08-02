@@ -53,7 +53,6 @@ MappedRead::MappedRead(const string &line) {
       end = start + seq.length();
     }
     r = GenomicRegion(chrom, start, end, name, score, strand);
-    is >> scr;
   }
   else throw runtime_error("bad line in MappedRead file: " + line);
 }
@@ -63,7 +62,5 @@ MappedRead::tostring() const {
   std::ostringstream oss;
   oss << r; // no chaining for the << of GenomicRegion
   oss << '\t' << seq;
-  if (!scr.empty())
-    oss << '\t' << scr;
   return oss.str();
 }
