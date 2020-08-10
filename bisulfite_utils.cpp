@@ -1,7 +1,7 @@
 /*
  *    Part of SMITHLAB software
  *
- *    Copyright (C) 2008 Cold Spring Harbor Laboratory, 
+ *    Copyright (C) 2008 Cold Spring Harbor Laboratory,
  *                       University of Southern California and
  *                       Andrew D. Smith
  *
@@ -29,22 +29,23 @@
 using std::string;
 
 void
-bisulfite_treatment(std::mt19937 &generator, string &seq, double bs_rate, double meth_rate) {
-  std::uniform_real_distribution<double> dist(0.0,1.0);
-  
+bisulfite_treatment(std::mt19937 &generator, string &seq,
+                    double bs_rate, double meth_rate) {
+
+  std::uniform_real_distribution<double> unif(0.0,1.0);
+
   const size_t seq_len = seq.length() - 1;
   for (size_t i = 0; i < seq_len; ++i)
     if (toupper(seq[i]) == 'C') {
       // CpG
       if (toupper(seq[i + 1]) == 'G' &&
-	  (dist(generator) > meth_rate || dist(generator)< bs_rate)) {
-	seq[i] = 'T';
+          (unif(generator) > meth_rate || unif(generator) < bs_rate)) {
+        seq[i] = 'T';
       }
       // Regular C
-      else if (dist(generator) < bs_rate)
-	seq[i] = 'T';
+      else if (unif(generator) < bs_rate)
+        seq[i] = 'T';
     }
-  if (toupper(seq[seq_len]) == 'C' && dist(generator) < bs_rate)
+  if (toupper(seq[seq_len]) == 'C' && unif(generator) < bs_rate)
     seq[seq_len] = 'T';
 }
-
