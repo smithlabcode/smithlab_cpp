@@ -30,6 +30,7 @@ struct MappedRead {
   explicit MappedRead(const std::string &line);
   GenomicRegion r;
   std::string seq;
+  std::string scr;
   std::string tostring() const;
 };
 
