@@ -1,5 +1,6 @@
 /*
  * Part of SMITHLAB_CPP software
+ * This code will be replaced soon
  *
  * Copyright (C) 2019 Meng Zhou and Andrew Smith
  *
@@ -61,15 +62,15 @@ struct SAMRecord {
   std::string get_chrom() const {return mr.r.get_chrom();}
 };
 
-class SAMReader {
+class SAMReader_deprecated {
 public:
-  SAMReader(const std::string &filename, const std::string &mapper);
-  ~SAMReader();
+  SAMReader_deprecated(const std::string &filename, const std::string &mapper);
+  ~SAMReader_deprecated();
 
   operator bool() const {return good;}
 
-  friend SAMReader &
-  operator>>(SAMReader& sam_stream, SAMRecord &samr);
+  friend SAMReader_deprecated &
+  operator>>(SAMReader_deprecated& sam_stream, SAMRecord &samr);
 
 private:
   // internal methods
@@ -94,7 +95,7 @@ private:
   bam1_t *b;
 };
 
-SAMReader &
-operator>>(SAMReader& sam_stream, SAMRecord &samr);
+SAMReader_deprecated &
+operator>>(SAMReader_deprecated& sam_stream, SAMRecord &samr);
 
 #endif

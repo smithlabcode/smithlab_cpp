@@ -1,4 +1,5 @@
 /* Part of SMITHLAB_CPP software
+ * This code will be replaced soon
  *
  * Copyright (C) 2013-2019 University of Southern California and
  *                         Andrew D. Smith
@@ -34,7 +35,7 @@ using std::runtime_error;
 
 char check_htslib_wrapper() {return 1;}
 
-SAMReader::SAMReader(const string &fn, const string &mpr) :
+SAMReader_deprecated::SAMReader_deprecated(const string &fn, const string &mpr) :
   filename(fn), mapper(mpr), good(true) {
 
   if (!(hts = hts_open(filename.c_str(), "r")))
@@ -56,7 +57,7 @@ SAMReader::SAMReader(const string &fn, const string &mpr) :
     throw runtime_error("mapper not supported: " + mapper);
 }
 
-SAMReader::~SAMReader() {
+SAMReader_deprecated::~SAMReader_deprecated() {
   if (hdr) {
     bam_hdr_destroy(hdr);
     hdr = 0;
@@ -74,7 +75,7 @@ SAMReader::~SAMReader() {
 
 
 bool
-SAMReader::get_SAMRecord(const string &str, SAMRecord &samr) {
+SAMReader_deprecated::get_SAMRecord(const string &str, SAMRecord &samr) {
   if (mapper == "bsmap")
     return get_SAMRecord_bsmap(str, samr);
   else if (mapper == "bismark")
@@ -88,8 +89,8 @@ SAMReader::get_SAMRecord(const string &str, SAMRecord &samr) {
   return false;
 }
 
-SAMReader&
-operator>>(SAMReader &reader, SAMRecord &aln) {
+SAMReader_deprecated&
+operator>>(SAMReader_deprecated &reader, SAMRecord &aln) {
   int rd_ret = 0;
   if ((rd_ret = sam_read1(reader.hts, reader.hdr, reader.b)) >= 0) {
     int fmt_ret = 0;
@@ -145,7 +146,7 @@ bsmap_get_strand(const string &strand_str, string &strand, string &bs_forward) {
 }
 
 bool
-SAMReader::get_SAMRecord_bsmap(const string &str, SAMRecord &samr) {
+SAMReader_deprecated::get_SAMRecord_bsmap(const string &str, SAMRecord &samr) {
 
   cerr << "WARNING: "<< "[BSMAP Converter] test "
        << "version: may contain bugs" << endl;
@@ -217,7 +218,7 @@ get_mismatch_bismark(const string &edit_distance_str,
 }
 
 bool
-SAMReader::get_SAMRecord_bismark(const string &str, SAMRecord &samr) {
+SAMReader_deprecated::get_SAMRecord_bismark(const string &str, SAMRecord &samr) {
   string name, chrom, CIGAR, mate_name, seq, qual, strand_str,
     edit_distance_str, mismatch_str, meth_call_str,
     read_conv_str, genome_conv_str;
@@ -283,7 +284,7 @@ public:
 };
 
 bool
-SAMReader::get_SAMRecord_bsseeker(const string &str, SAMRecord &samr) {
+SAMReader_deprecated::get_SAMRecord_bsseeker(const string &str, SAMRecord &samr) {
 
   string name, chrom, CIGAR, mate_name, seq, qual, orientation_str,
     conversion_str, mismatch_str, mismatch_type_str, seq_genome_str;
@@ -336,7 +337,7 @@ public:
 };
 
 bool
-SAMReader::get_SAMRecord_general(const string &str, SAMRecord &samr) {
+SAMReader_deprecated::get_SAMRecord_general(const string &str, SAMRecord &samr) {
   string name, chrom, CIGAR, mate_name, seq, qual;
   size_t flag, start, mapq_score, mate_start;
   int seg_len;
