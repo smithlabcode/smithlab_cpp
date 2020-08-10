@@ -22,7 +22,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "htslib_wrapper.hpp"
+#include "htslib_wrapper_deprecated.hpp"
 #include "smithlab_utils.hpp"
 #include "MappedRead.hpp"
 #include "cigar_utils.hpp"
