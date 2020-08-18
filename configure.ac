@@ -53,7 +53,7 @@ AS_IF([test "x$enable_hts" = "xyes"],
 AM_CONDITIONAL([ENABLE_HTS], [test "x$enable_hts" = "xyes"])
 
 dnl check for required libraries
-AC_SEARCH_LIBS([z],[zlibVersion])
+AC_CHECK_LIB([z],[zlibVersion])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
