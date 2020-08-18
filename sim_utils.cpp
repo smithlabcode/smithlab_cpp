@@ -224,10 +224,10 @@ prob_to_quality_scores_solexa(const vector<vector<double> > &prb,
   quality = prb;
   for (size_t i = 0; i < prb.size(); ++i) {
     std::transform(prb[i].begin(), prb[i].end(),
-		   quality[i].begin(), std::bind2nd(std::plus<double>(), 1e-3));
+		   quality[i].begin(), [](double x) {return x + 1e-3;});	
     const double column_sum = accumulate(quality[i].begin(), quality[i].end(), 0.0);
     std::transform(quality[i].begin(), quality[i].end(),
-		   quality[i].begin(), std::bind2nd(std::divides<double>(), column_sum));
+		   quality[i].begin(), [&column_sum](double x) {return x / column_sum;});
   }
   for (size_t i = 0; i < quality.size(); ++i)
     for (size_t j = 0; j < smithlab::alphabet_size; ++j) {
@@ -269,11 +269,11 @@ add_sequencing_errors(mt19937 &generator, const double max_errors,
 
   for (size_t i = 0; i < quality_scores.size(); ++i) {
     std::transform(quality_scores[i].begin(), quality_scores[i].end(),
-		   quality_scores[i].begin(), std::bind2nd(std::plus<double>(), 1e-3));
+		   quality_scores[i].begin(), [](double x) {return x + 1e-3;});
     const double column_sum = accumulate(quality_scores[i].begin(),
 					 quality_scores[i].end(), 0.0);
     std::transform(quality_scores[i].begin(), quality_scores[i].end(),
-		   quality_scores[i].begin(), std::bind2nd(std::divides<double>(), column_sum));
+		   quality_scores[i].begin(), [&column_sum](double x) {return x / column_sum;});
   }
   
   for (size_t i = 0; i < quality_scores.size(); ++i)

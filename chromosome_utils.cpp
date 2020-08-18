@@ -110,12 +110,12 @@ extract_regions_chrom_fasta(const string &chrom_name,
     in.read(buffer, region_size);
 
     std::remove_if(buffer, buffer + region_size,
-                   std::bind2nd(std::equal_to<char>(), '\n'));
+                    [](const char x) {return x == '\n';});
     buffer[orig_region_size] = '\0';
 
     sequences.push_back(buffer);
     std::transform(sequences.back().begin(), sequences.back().end(),
-                   sequences.back().begin(), std::ptr_fun(&toupper));
+                   sequences.back().begin(), [](const char x) {return toupper(x);});
     assert(i->get_width() == sequences.back().length());
   }
   in.close();
@@ -146,15 +146,14 @@ extract_regions_chrom_fasta(const string &chrom_name,
     buffer[region_size] = '\0';
     in.read(buffer, region_size);
 
-    std::remove_if(
-                   buffer, buffer + region_size,
-                   std::bind2nd(std::equal_to<char>(), '\n'));
+    std::remove_if(buffer, buffer + region_size,
+                    [](const char x) {return x == '\n';});
     buffer[orig_region_size] = '\0';
 
     sequences.push_back(buffer);
-    std::transform(
-                   sequences.back().begin(), sequences.back().end(),
-                   sequences.back().begin(), std::ptr_fun(&toupper));
+    std::transform(sequences.back().begin(), sequences.back().end(),
+                   sequences.back().begin(), [](const char x) {return toupper(x);});
+
     if (i->neg_strand())
       revcomp_inplace(sequences.back());
     assert(i->get_width() == sequences.back().length());
