@@ -94,8 +94,7 @@ operator<<(std::ostream &the_stream, const sam_rec &r) {
 
 sam_rec::sam_rec(const string &line) {
 
-  string tmp;
-  istringstream iss(line); // ADS: change to set the buffer from "line"
+  istringstream iss; // ADS: change to set the buffer from "line"
   iss.rdbuf()->pubsetbuf(const_cast<char*>(line.c_str()), line.size());
   uint32_t will_become_mapq = 0; // to not read mapq as character
                                  // since it's uint8_t
@@ -107,14 +106,15 @@ sam_rec::sam_rec(const string &line) {
     throw runtime_error("invalid mapq in SAM record: " + line);
   mapq = static_cast<uint8_t>(will_become_mapq);
 
-  if (!valid_cigar(cigar, seq))
-    throw runtime_error("invalid cigar in SAM record: " + line);
+  // if (!valid_cigar(cigar, seq))
+  //   throw runtime_error("invalid cigar in SAM record: " + line);
 
-  if (!valid_seq(seq))
-    throw runtime_error("invalid read in SAM record: " + line);
+  // if (!valid_seq(seq))
+  //   throw runtime_error("invalid read in SAM record: " + line);
 
-  if (!valid_qual(qual))
-    throw runtime_error("invalid qual in SAM record: " + line);
+  // if (!valid_qual(qual))
+  //   throw runtime_error("invalid qual in SAM record: " + line);
+  string tmp;
   while (iss >> tmp)
     tags.push_back(tmp);
 }
