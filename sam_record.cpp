@@ -57,20 +57,20 @@ format_sam_flags(const uint16_t the_flags) {
   return oss.str();
 }
 
-static bool
-valid_cigar(const string &cigar, const string &seq) {
-  return cigar_qseq_ops(cigar) == seq.size();
-}
+// static bool
+// valid_cigar(const string &cigar, const string &seq) {
+//   return cigar_qseq_ops(cigar) == seq.size();
+// }
 
-static bool
-valid_seq(const string &read) {
-  return regex_match(read, regex("\\*|[A-Za-z=.]+"));
-}
+// static bool
+// valid_seq(const string &read) {
+//   return regex_match(read, regex("\\*|[A-Za-z=.]+"));
+// }
 
-static bool
-valid_qual(const string &qual) {
-  return regex_match(qual, regex("[!-~]+"));
-}
+// static bool
+// valid_qual(const string &qual) {
+//   return regex_match(qual, regex("[!-~]+"));
+// }
 
 
 ostream &
@@ -106,65 +106,10 @@ sam_rec::sam_rec(const string &line) {
     throw runtime_error("invalid mapq in SAM record: " + line);
   mapq = static_cast<uint8_t>(will_become_mapq);
 
-  // if (!valid_cigar(cigar, seq))
-  //   throw runtime_error("invalid cigar in SAM record: " + line);
-
-  // if (!valid_seq(seq))
-  //   throw runtime_error("invalid read in SAM record: " + line);
-
-  // if (!valid_qual(qual))
-  //   throw runtime_error("invalid qual in SAM record: " + line);
   string tmp;
   while (iss >> tmp)
     tags.push_back(tmp);
 }
-
-// // constructor for "general" sam
-// sam_rec::sam_rec(const std::string &_qname,
-
-//                  // to make sam flags
-//                  const sam_record_type type,
-//                  const bool is_rc,
-
-//                  const std::string &_rname,
-//                  // zero-based!
-//                  const uint32_t start,
-//                  const uint8_t _mapq,
-//                  const std::string &_cigar,
-//                  const std::string &_seq,
-//                  const std::string &_qual,
-
-//                  // not used in SE
-//                  const uint32_t _pnext,
-//                  const uint32_t end,
-
-//                  // not used in non-WGBS
-//                  const bool is_a_rich) {
-
-//   // direct copies of entries
-//   qname = _qname;
-//   rname = _rname;
-//   pos = start + 1; // sam is one-based
-//   seq = is_rc ? revcomp(seq) : _seq;
-//   qual = _qual;
-//   mapq = _mapq;
-//   cigar = _cigar;
-//   pnext = _pnext + 1; // one-based!
-
-//   // infer from non-sam arguments
-//   flags = (!is_a_rich) *             bsflags::read_is_t_rich |
-//           (type != single) *        (samflags::read_paired |
-//                                      samflags::read_pair_mapped) |
-//           (is_rc) *                  samflags::read_rc |
-//           (!is_rc) *                 samflags::mate_rc |
-//           (type == pe_first_mate)  * samflags::template_first |
-//           (type == pe_second_mate) * samflags::template_last;
-
-//   rnext = (type == single) ? "*" : "=";
-//   tlen = is_rc ? (_pnext - end) : (end - start);
-// }
-
-
 
 void
 inflate_with_cigar(const sam_rec &sr, string &to_inflate,
