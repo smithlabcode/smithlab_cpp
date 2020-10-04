@@ -22,10 +22,6 @@ AC_CONFIG_HEADERS([config.h])
 AC_PREREQ([2.63])  dnl 4-argument AC_CHECK_HEADER
 AM_INIT_AUTOMAKE([foreign])
 
-dnl Less output to the terminal. Use "--disable-silent-rules" when
-dnl running ./configure to reverse this.
-AM_SILENT_RULES([yes])
-
 AC_CONFIG_SRCDIR([smithlab_utils.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 
