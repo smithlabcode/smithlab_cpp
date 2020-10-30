@@ -33,11 +33,12 @@ using std::istream;
 using std::ostream;
 using std::begin;
 using std::end;
+using std::ostringstream;
 
 // ADS: this is for debugging purposes
 string
 format_sam_flags(const uint16_t the_flags) {
-  std::ostringstream oss;
+  ostringstream oss;
   using samflags::check;
   oss << "read_paired: " << check(the_flags, samflags::read_paired) << '\n'
       << "read_pair_mapped: "
@@ -72,6 +73,25 @@ format_sam_flags(const uint16_t the_flags) {
 //   return regex_match(qual, regex("[!-~]+"));
 // }
 
+string
+sam_rec::tostring() const {
+  ostringstream oss;
+  oss << qname << '\t'
+      << flags << '\t'
+      << rname << '\t'
+      << pos << '\t'
+      << static_cast<unsigned>(mapq) << '\t'
+      << cigar << '\t'
+      << rnext << '\t'
+      << pnext << '\t'
+      << tlen << '\t'
+      << seq << '\t'
+      << qual;
+
+  for (auto it(begin(tags)); it != end(tags); ++it)
+    oss << '\t' << *it;
+  return oss.str() + "\n";
+}
 
 ostream &
 operator<<(std::ostream &the_stream, const sam_rec &r) {
@@ -88,7 +108,7 @@ operator<<(std::ostream &the_stream, const sam_rec &r) {
              << r.qual;
 
   for (auto it(begin(r.tags)); it != end(r.tags); ++it)
-      the_stream << '\t' << *it;
+    the_stream << '\t' << *it;
   return the_stream;
 }
 
