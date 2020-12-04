@@ -34,6 +34,7 @@ using std::ostream;
 using std::begin;
 using std::end;
 using std::ostringstream;
+using std::to_string;
 
 // ADS: this is for debugging purposes
 string
@@ -73,42 +74,36 @@ format_sam_flags(const uint16_t the_flags) {
 //   return regex_match(qual, regex("[!-~]+"));
 // }
 
+size_t
+sam_rec::estimate_line_size() const {
+  static const size_t all_field_estimates = 100;
+  return qname.size() + rname.size() + qual.size() + all_field_estimates;
+}
+
 string
 sam_rec::tostring() const {
-  ostringstream oss;
-  oss << qname << '\t'
-      << flags << '\t'
-      << rname << '\t'
-      << pos << '\t'
-      << static_cast<unsigned>(mapq) << '\t'
-      << cigar << '\t'
-      << rnext << '\t'
-      << pnext << '\t'
-      << tlen << '\t'
-      << seq << '\t'
-      << qual;
-
+  string out;
+  out.reserve(estimate_line_size());
+  out.append(qname + "\t" +
+               to_string(flags) + "\t" +
+               rname + "\t" +
+               to_string(pos) + "\t" +
+               to_string(static_cast<unsigned>(mapq)) + "\t" +
+               cigar + "\t" +
+               rnext + "\t" +
+               to_string(pnext) + "\t" +
+               to_string(tlen) + "\t" +
+               seq + "\t" +
+               qual);
   for (auto it(begin(tags)); it != end(tags); ++it)
-    oss << '\t' << *it;
-  return oss.str() + "\n";
+    out.append("\t" + *it);
+
+  return out;
 }
 
 ostream &
 operator<<(std::ostream &the_stream, const sam_rec &r) {
-  the_stream << r.qname << '\t'
-             << r.flags << '\t'
-             << r.rname << '\t'
-             << r.pos << '\t'
-             << static_cast<unsigned>(r.mapq) << '\t'
-             << r.cigar << '\t'
-             << r.rnext << '\t'
-             << r.pnext << '\t'
-             << r.tlen << '\t'
-             << r.seq << '\t'
-             << r.qual;
-
-  for (auto it(begin(r.tags)); it != end(r.tags); ++it)
-    the_stream << '\t' << *it;
+  the_stream << r.tostring();
   return the_stream;
 }
 
