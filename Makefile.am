@@ -25,7 +25,7 @@ lib_LIBRARIES = libsmithlab_cpp.a
 libsmithlab_cpp_a_SOURCES = GenomicRegion.cpp MappedRead.cpp		\
 OptionParser.cpp QualityScore.cpp bisulfite_utils.cpp			\
 chromosome_utils.cpp sim_utils.cpp smithlab_os.cpp smithlab_utils.cpp	\
-zlib_wrapper.cpp dna_four_bit.cpp cigar_utils.cpp
+zlib_wrapper.cpp dna_four_bit.cpp cigar_utils.cpp sam_record.cpp
 
 if ENABLE_HTS
 libsmithlab_cpp_a_SOURCES += htslib_wrapper_deprecated.cpp \
