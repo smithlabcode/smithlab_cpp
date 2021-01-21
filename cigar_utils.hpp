@@ -25,7 +25,6 @@ consumes_query(const char op) {
   return ((op == 'M') ||
           (op == 'I') ||
           (op == 'S') ||
-          (op == 'N') ||
           (op == '=') ||
           (op == 'X'));
 }
