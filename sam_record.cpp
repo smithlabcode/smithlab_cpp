@@ -108,9 +108,10 @@ operator<<(std::ostream &the_stream, const sam_rec &r) {
 }
 
 sam_rec::sam_rec(const string &line) {
-
+  /*
   istringstream iss; // ADS: change to set the buffer from "line"
-  iss.rdbuf()->pubsetbuf(const_cast<char*>(line.c_str()), line.size());
+  iss.rdbuf()->pubsetbuf(const_cast<char*>(line.c_str()), line.size());*/
+  istringstream iss(line);
   uint32_t will_become_mapq = 0; // to not read mapq as character
                                  // since it's uint8_t
   if (!(iss >>
