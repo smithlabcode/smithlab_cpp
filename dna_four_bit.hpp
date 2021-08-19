@@ -127,9 +127,10 @@ struct genome_four_bit_itr {
   }
   genome_four_bit_itr operator+(const size_t step) const {
     // whether the sum of offsets is >= 16 
-    const bool shift_one_pos = (offset + (step & 15ul) >= 16);
+    const bool shift_one_pos =
+      (((offset + (static_cast<int>(step) & 15)) & 16) >> 4);
 
-    const size_t new_offset = (offset + step) & 15ul;
+    const int new_offset = (offset + step) & 15;
     return genome_four_bit_itr(itr + step/16 + shift_one_pos,
                                new_offset);
   }
