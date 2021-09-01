@@ -117,6 +117,7 @@ public:
     seq(_seq),
     qual(_qual) {}
   void add_tag(const std::string &the_tag) {tags.push_back(the_tag);}
+  bool empty() const;
   std::string tostring() const;
 };
 

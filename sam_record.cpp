@@ -131,6 +131,11 @@ sam_rec::sam_rec(const string &line) {
     tags.push_back(tmp);
 }
 
+bool
+sam_rec::empty() const {
+  return pos == 0;
+}
+
 void
 inflate_with_cigar(const sam_rec &sr, string &to_inflate,
                    const char inflation_symbol) {
