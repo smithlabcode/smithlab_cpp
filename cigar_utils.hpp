@@ -64,8 +64,7 @@ cigar_qseq_ops(InputItr itr, const InputItr last) {
   size_t op_count = 0;
   while (itr != last) {
     const size_t curr_val = extract_op_count(itr, last);
-    if (consumes_query(*itr++))
-      op_count += curr_val;
+    op_count += curr_val*consumes_query(*itr++);
   }
   return op_count;
 }
@@ -82,8 +81,7 @@ cigar_rseq_ops(InputItr itr, const InputItr last) {
   size_t op_count = 0;
   while (itr != last) {
     const size_t curr_val = extract_op_count(itr, last);
-    if (consumes_reference(*itr++))
-      op_count += curr_val;
+    op_count += curr_val*consumes_reference(*itr++);
   }
   return op_count;
 }

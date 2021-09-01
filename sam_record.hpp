@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sstream>
+#include <iterator>
 
 // from 30 April 2020 SAM documentation
 // 1    0x1   template having multiple segments in sequencing
@@ -118,6 +120,7 @@ public:
     qual(_qual) {}
   void add_tag(const std::string &the_tag) {tags.push_back(the_tag);}
   bool empty() const;
+  size_t estimate_line_size() const;
   std::string tostring() const;
 };
 
@@ -145,5 +148,37 @@ operator<<(std::ostream &the_stream, const sam_rec &r);
 void
 inflate_with_cigar(const sam_rec &sr, std::string &to_inflate,
                    const char inflation_symbol = 'N');
+
+template<typename T>
+static void
+write_sam_header(const std::vector<std::string> &chrom_names,
+                 const std::vector<T> &chrom_starts,
+                 const std::string program_name,
+                 const std::string program_version,
+                 const int argc, const char **argv,
+                 std::ostream &out) {
+  static const std::string SAM_VERSION = "1.0";
+
+  // sam version
+  out <<"@HD" << '\t' << "VN:" << SAM_VERSION << '\n'; // sam version
+
+  // chromosome sizes
+  const size_t n_chroms = chrom_names.size() - 1;
+  for (size_t i = 1; i < n_chroms; ++i) {
+    out << "@SQ" << '\t'
+        << "SN:" << chrom_names[i] << '\t'
+        << "LN:" << chrom_starts[i+1] - chrom_starts[i] << '\n';
+  }
+
+  // program details
+  out << "@PG" << '\t'
+      << "ID:" << program_name << '\t'
+      << "VN:" << program_version << '\t';
+
+  // how the program was run
+  std::ostringstream the_command;
+  copy(argv, argv + argc, std::ostream_iterator<const char*>(the_command, " "));
+  out << "CL:\"" << the_command.str() << "\"" << std::endl;
+}
 
 #endif

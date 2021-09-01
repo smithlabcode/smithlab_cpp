@@ -27,31 +27,15 @@ extern char dna_four_bit_decoding[16];
 
 template <typename uint_type> constexpr
 uint_type
-get_low_nibble(const uint_type x) {return x & 15u;}
-
-template <typename uint_type> constexpr
-uint_type
-get_high_nibble(const uint_type x) {return (x >> 4) & 15u;}
-
-template <typename uint_type> constexpr
-char
-decode_dna_four_bit_low(const uint_type x) {
-  return dna_four_bit_decoding[get_low_nibble(x)];
-}
-
-template <typename uint_type> constexpr
-char
-decode_dna_four_bit_high(const uint_type x) {
-  return dna_four_bit_decoding[get_high_nibble(x)];
+get_nibble(const uint_type x, const size_t offset) {
+  return (x >> (4*offset)) & 15ul;
 }
 
 template <typename uint_type> constexpr
 char
 decode_dna_four_bit(const uint_type x,
-                    const base_in_byte b = base_in_byte::left) {
-  return b == base_in_byte::left ?
-    decode_dna_four_bit_low(x) :
-    decode_dna_four_bit_high(x);
+                    const size_t offset) {
+  return dna_four_bit_decoding[get_nibble(x, offset)];
 }
 
 template<class InputItr, class OutputIt>
@@ -59,8 +43,8 @@ OutputIt
 decode_dna_four_bit(InputItr first, InputItr last, OutputIt d_first) {
   // ADS: assume destination has enough space
   while (first != last) {
-    *d_first++ = decode_dna_four_bit(*first, base_in_byte::left);
-    *d_first++ = decode_dna_four_bit(*first, base_in_byte::right);
+    for (size_t offset = 0; offset < 16; ++offset)
+      *d_first++ = decode_dna_four_bit(*first, offset);
     ++first;
   }
   // if original sequence length is odd and encoding not padded at the front,
@@ -73,95 +57,88 @@ void
 decode_dna_four_bit(const InCtr &source, OutCtr &dest) {
   // expand out the bytes as pairs (do this backwards in case source == dest)
   const size_t source_size = source.size();
-  dest.resize(2*source_size);
+  dest.resize(16*source_size);
   size_t i = source_size;
   size_t j = dest.size();
   while (i > 0) {
     dest[--j] = source[--i];
     dest[--j] = source[i];
   }
-  for (i = 0; i < dest.size(); i += 2) {
-    dest[i] = decode_dna_four_bit(dest[i], base_in_byte::left);
-    dest[i+1] = decode_dna_four_bit(dest[i+1], base_in_byte::right);
+  for (i = 0; i < dest.size(); i += 16) {
+    for (size_t offset = 0; offset < 16; ++offset)
+      dest[i + offset] = decode_dna_four_bit(dest[i], offset);
   }
 }
 
 extern uint8_t dna_four_bit_encoding[128];
-
 template <typename uint_type> constexpr
-uint8_t
-encode_dna_four_bit_low(const uint_type x) {
-  return dna_four_bit_encoding[static_cast<unsigned>(x)];
-}
-
-template <typename uint_type> constexpr
-uint8_t
-encode_dna_four_bit_high(const uint_type x) {
-  return dna_four_bit_encoding[static_cast<unsigned>(x)] << 4;
-}
-
-template <typename uint_type> constexpr
-uint8_t
+size_t
 encode_dna_four_bit(const uint_type x,
-                    const base_in_byte b = base_in_byte::left) {
-  return b == base_in_byte::left ?
-    encode_dna_four_bit_low(x) :
-    encode_dna_four_bit_high(x);
+                    const size_t offset) {
+  return (static_cast<size_t>(
+           dna_four_bit_encoding[static_cast<unsigned>(x)])
+         ) << (4*offset);
 }
 
 template<class InputItr, class OutputIt>
 OutputIt
 encode_dna_four_bit(InputItr first, InputItr last, OutputIt d_first) {
   while (first != last) {
-    *d_first  = encode_dna_four_bit(*first++, base_in_byte::left);
-    *d_first |= (first == last ? 0 :
-                 encode_dna_four_bit(*first++, base_in_byte::right));
+    *d_first = 0;
+    for (size_t i = 0; i < 16 && first != last; ++i)
+      *d_first |= encode_dna_four_bit(*first++, i);
     ++d_first;
   }
   return d_first;
 }
 
-// ADS: indented to be used as pointer to 4-bit encoding of DNA within a vector
-// of uint8_t values
+// GS: intended to be used as pointer to 4-bit encoding of DNA within a vector
+// of size_t values
 struct genome_four_bit_itr {
-  genome_four_bit_itr(const std::vector<uint8_t>::const_iterator itr_,
-                      const bool odd_ = false) : itr(itr_), itr_odd(odd_) {}
+  genome_four_bit_itr(const std::vector<size_t>::const_iterator itr_,
+                      const int off_ = 0) : itr(itr_), offset(off_) {}
 
-  uint8_t operator*() const {
-    return (!itr_odd ? *itr : (*itr >> 4)) & 15;
+  size_t operator*() const {
+    return (*itr >> (offset << 2)) & 15ul;
   }
   genome_four_bit_itr& operator++() {
-    itr += itr_odd;
-    itr_odd ^= 1ul;
+    offset = (offset + 1) & 15ul;
+    itr += (offset == 0);
     return *this;
   }
   genome_four_bit_itr operator++(int) {
     genome_four_bit_itr tmp(*this);
-    itr += itr_odd;
-    itr_odd ^= 1ul;
+    offset = (offset + 1) & 15ul;
+    itr += (offset == 0);
     return tmp;
   }
   genome_four_bit_itr& operator--() {
-    itr -= !itr_odd;
-    itr_odd ^= 1ul;
+    itr -= (offset == 0);
+
+    // GS: will underflow on 0 but it's ok?
+    offset = (offset - 1) & 15ul;
     return *this;
   }
   genome_four_bit_itr operator--(int) {
     genome_four_bit_itr tmp(*this);
-    itr -= !itr_odd;
-    itr_odd ^= 1ul;
+    itr -= (offset == 0);
+    offset = (offset - 1) & 15ul;
     return tmp;
   }
-  genome_four_bit_itr operator+(const size_t offset) const {
-    const size_t offset_odd = offset & 1ul;
-    return genome_four_bit_itr(itr + offset/2 + (itr_odd & offset_odd),
-                               itr_odd != offset_odd);
+  genome_four_bit_itr operator+(const size_t step) const {
+    // whether the sum of offsets is >= 16 
+    const bool shift_one_pos =
+      (((offset + (static_cast<int>(step) & 15)) & 16) >> 4);
+
+    const int new_offset = (offset + step) & 15;
+    return genome_four_bit_itr(itr + step/16 + shift_one_pos,
+                               new_offset);
   }
   bool operator!=(const genome_four_bit_itr &rhs) const {
-    return itr != rhs.itr || itr_odd != rhs.itr_odd;
+    return itr != rhs.itr || offset != rhs.offset;
   }
-  std::vector<uint8_t>::const_iterator itr;
-  size_t itr_odd;
+  std::vector<size_t>::const_iterator itr;
+  int offset;
 };
 
 #endif
