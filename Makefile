@@ -33,6 +33,7 @@ CXX = g++
 CXXFLAGS = -Wall -std=c++11
 OPTFLAGS = -O3
 DEBUGFLAGS = -g
+override CPPFLAGS += $(INCLUDEARGS)
 
 ifdef DEBUG
 CXXFLAGS += $(DEBUGFLAGS)
@@ -43,7 +44,7 @@ endif
 all: $(OBJECTS) static
 
 %.o: %.cpp %.hpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $< $(INCLUDEARGS)
+	$(CXX) $(CXXFLAGS) -c -o $@ $< $(CPPFLAGS) $(LDLIBS) $(LDFLAGS)
 
 static: $(OBJECTS)
 	ar cr $(STATIC_LIB) $^
