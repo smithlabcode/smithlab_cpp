@@ -86,7 +86,7 @@ encode_dna_four_bit(InputItr first, InputItr last, OutputIt d_first) {
   while (first != last) {
     *d_first = 0;
     for (size_t i = 0; i < 16 && first != last; ++i)
-      *d_first |= encode_dna_four_bit(*first++, i);
+      *d_first |= encode_dna_four_bit(std::move(*first++), i);
     ++d_first;
   }
   return d_first;
