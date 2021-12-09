@@ -28,7 +28,7 @@ chromosome_utils.cpp sim_utils.cpp smithlab_os.cpp smithlab_utils.cpp	\
 zlib_wrapper.cpp dna_four_bit.cpp cigar_utils.cpp sam_record.cpp
 
 if ENABLE_HTS
-libsmithlab_cpp_a_SOURCES += htslib_wrapper_deprecated.cpp htslib_wrapper.cpp
+libsmithlab_cpp_a_SOURCES += htslib_wrapper.cpp
 endif
 
 include_HEADERS = GenomicRegion.hpp MappedRead.hpp OptionParser.hpp	\
@@ -37,5 +37,5 @@ sim_utils.hpp smithlab_os.hpp smithlab_utils.hpp zlib_wrapper.hpp	\
 dna_four_bit.hpp cigar_utils.hpp sam_record.hpp
 
 if ENABLE_HTS
-include_HEADERS += htslib_wrapper.hpp htslib_wrapper_deprecated.hpp
+include_HEADERS += htslib_wrapper.hpp
 endif
