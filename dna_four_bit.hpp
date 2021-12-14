@@ -115,7 +115,6 @@ struct genome_four_bit_itr {
   genome_four_bit_itr& operator--() {
     itr -= (offset == 0);
 
-    // GS: will underflow on 0 but it's ok?
     offset = (offset - 1) & 15ul;
     return *this;
   }
@@ -126,7 +125,7 @@ struct genome_four_bit_itr {
     return tmp;
   }
   genome_four_bit_itr operator+(const size_t step) const {
-    // whether the sum of offsets is >= 16 
+    // whether the sum of offsets is >= 16
     const bool shift_one_pos =
       (((offset + (static_cast<int>(step) & 15)) & 16) >> 4);
 
