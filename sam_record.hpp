@@ -55,7 +55,7 @@ namespace samflags {
   static const uint16_t pcr_duplicate = 0x400;
   static const uint16_t supplementary_aln = 0x800;
 
-  inline bool
+  constexpr bool
   check(const uint16_t to_check, const uint16_t &f) {return to_check & f;}
   inline void
   set(uint16_t &to_set, const uint16_t f) {to_set |= f;}
