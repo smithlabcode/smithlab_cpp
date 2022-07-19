@@ -149,6 +149,30 @@ void
 inflate_with_cigar(const sam_rec &sr, std::string &to_inflate,
                    const char inflation_symbol = 'N');
 
+// assumes program name is at argv[0]
+template<typename T>
+void
+write_pg_line(const int argc, const char **argv,
+              const std::string program_name,
+              const std::string program_version, T &out) {
+  out << "@PG\t";
+
+  // empty program, should never happen
+  if (argc == 0) {
+    out << '\n';
+  }
+  else {
+    if (!program_name.empty())
+      out << "ID:" << program_name << '\t';
+    if (!program_version.empty())
+      out << "VN:" << program_version << '\t';
+
+    std::ostringstream the_command;
+    copy(argv, argv + argc, std::ostream_iterator<const char*>(the_command, " "));
+    out << "CL:\"" << the_command.str() << "\"" << std::endl;
+  }
+}
+
 template<typename T>
 static void
 write_sam_header(const std::vector<std::string> &chrom_names,
