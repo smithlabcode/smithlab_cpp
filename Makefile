@@ -1,6 +1,6 @@
 # Makefile from smithlab_cpp C++ code library
 #
-# Copyright (C) 2010-2019 Andrew D. Smith
+# Copyright (C) 2010-2022 Andrew D. Smith
 #
 # Authors: Andrew D. Smith
 #
@@ -41,13 +41,13 @@ else
 CXXFLAGS += $(OPTFLAGS)
 endif
 
-all: $(OBJECTS) static
+all: $(STATIC_LIB)
 
 %.o: %.cpp %.hpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(CPPFLAGS) $(LDLIBS) $(LDFLAGS)
 
-static: $(OBJECTS)
-	ar cr $(STATIC_LIB) $^
+$(STATIC_LIB): $(OBJECTS)
+	ar cr $@ $^
 
 clean:
 	@-rm -f *.o *.a *~
