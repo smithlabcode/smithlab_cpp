@@ -119,7 +119,7 @@ Option::format_default_value() const {
   else if (arg_type == SMITHLAB_ARG_DOUBLE)
     return format_float_like(*double_value);
   else if (arg_type == SMITHLAB_ARG_STRING)
-    return *string_value;
+    return (*string_value).empty() ? "" : "[" + *string_value + "]";
   else if (arg_type == SMITHLAB_ARG_CHAR)
     return "[" + string(1, *char_value) + "]";
   else // if (arg_type == SMITHLAB_ARG_BOOL)
