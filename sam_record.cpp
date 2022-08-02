@@ -22,7 +22,6 @@
 #include <sstream>
 
 #include "cigar_utils.hpp"
-#include "bisulfite_utils.hpp"
 #include "smithlab_utils.hpp"
 
 using std::string;
@@ -85,16 +84,16 @@ sam_rec::tostring() const {
   string out;
   out.reserve(estimate_line_size());
   out.append(qname + "\t" +
-               to_string(flags) + "\t" +
-               rname + "\t" +
-               to_string(pos) + "\t" +
-               to_string(static_cast<unsigned>(mapq)) + "\t" +
-               cigar + "\t" +
-               rnext + "\t" +
-               to_string(pnext) + "\t" +
-               to_string(tlen) + "\t" +
-               seq + "\t" +
-               qual);
+             to_string(flags) + "\t" +
+             rname + "\t" +
+             to_string(pos) + "\t" +
+             to_string(static_cast<unsigned>(mapq)) + "\t" +
+             cigar + "\t" +
+             rnext + "\t" +
+             to_string(pnext) + "\t" +
+             to_string(tlen) + "\t" +
+             seq + "\t" +
+             qual);
   for (auto it(begin(tags)); it != end(tags); ++it)
     out.append("\t" + *it);
 
@@ -109,9 +108,9 @@ operator<<(std::ostream &the_stream, const sam_rec &r) {
 
 sam_rec::sam_rec(const string &line) {
   /*
-  istringstream iss; // ADS: change to set the buffer from "line"
-  iss.rdbuf()->pubsetbuf(const_cast<char*>(line.c_str()), line.size());*/
-  istringstream iss(line);
+    istringstream iss; // ADS: change to set the buffer from "line"
+    iss.rdbuf()->pubsetbuf(const_cast<char*>(line.c_str()), line.size());*/
+  istringstream iss(line); // ADS: unfortunate macos stuff?
   uint32_t will_become_mapq = 0; // to not read mapq as character
                                  // since it's uint8_t
   if (!(iss >>
