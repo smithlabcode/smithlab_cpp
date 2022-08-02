@@ -69,12 +69,6 @@ This code needs lots of changes. I'm listing them here for the present
 and hope to take care of each with separate issues on GitHub. The
 result should be less total code overall in smithlab_cpp.
 
-- `bisulfite_utils.*pp` code should disappear. It has nothing useful,
-  and any functionality it does contain likely belongs in methpipe.
-- The `RNG.*pp` code should also disappear. It should be replaced with
-  the stl random code (since c++11) in applications.
-- The `sim_utils.*pp` code has not been used in any of our tools for a
-  very long time, and should be removed.
 - `QualityScore.*pp` likely should be removed, as we only use
   sequencing quality scores in specific places, and in those places
   have chosen to re-implement anything that would be here.
