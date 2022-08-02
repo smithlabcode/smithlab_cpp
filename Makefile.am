@@ -22,19 +22,19 @@ CXXFLAGS = -O3
 
 lib_LIBRARIES = libsmithlab_cpp.a
 
-libsmithlab_cpp_a_SOURCES = GenomicRegion.cpp MappedRead.cpp		\
-OptionParser.cpp QualityScore.cpp bisulfite_utils.cpp			\
-chromosome_utils.cpp sim_utils.cpp smithlab_os.cpp smithlab_utils.cpp	\
-zlib_wrapper.cpp dna_four_bit.cpp cigar_utils.cpp sam_record.cpp
+libsmithlab_cpp_a_SOURCES = GenomicRegion.cpp MappedRead.cpp            \
+OptionParser.cpp QualityScore.cpp chromosome_utils.cpp                  \
+smithlab_os.cpp smithlab_utils.cpp zlib_wrapper.cpp dna_four_bit.cpp    \
+cigar_utils.cpp sam_record.cpp
 
 if ENABLE_HTS
 libsmithlab_cpp_a_SOURCES += htslib_wrapper.cpp
 endif
 
-include_HEADERS = GenomicRegion.hpp MappedRead.hpp OptionParser.hpp	\
-QualityScore.hpp bisulfite_utils.hpp chromosome_utils.hpp		\
-sim_utils.hpp smithlab_os.hpp smithlab_utils.hpp zlib_wrapper.hpp	\
-dna_four_bit.hpp cigar_utils.hpp sam_record.hpp
+include_HEADERS = GenomicRegion.hpp MappedRead.hpp OptionParser.hpp     \
+QualityScore.hpp chromosome_utils.hpp smithlab_os.hpp                   \
+smithlab_utils.hpp zlib_wrapper.hpp dna_four_bit.hpp cigar_utils.hpp    \
+sam_record.hpp
 
 if ENABLE_HTS
 include_HEADERS += htslib_wrapper.hpp
