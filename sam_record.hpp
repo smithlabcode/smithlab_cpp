@@ -153,8 +153,8 @@ inflate_with_cigar(const sam_rec &sr, std::string &to_inflate,
 template<typename T>
 void
 write_pg_line(const int argc, const char **argv,
-              const std::string program_name,
-              const std::string program_version, T &out) {
+              const std::string &program_name,
+              const std::string &program_version, T &out) {
   out << "@PG\t";
 
   // empty program, should never happen
@@ -168,7 +168,8 @@ write_pg_line(const int argc, const char **argv,
       out << "VN:" << program_version << '\t';
 
     std::ostringstream the_command;
-    copy(argv, argv + argc, std::ostream_iterator<const char*>(the_command, " "));
+    copy(argv, argv + argc,
+         std::ostream_iterator<const char*>(the_command, " "));
     out << "CL:\"" << the_command.str() << "\"" << std::endl;
   }
 }
