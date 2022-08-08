@@ -239,12 +239,28 @@ GenomicRegion::GenomicRegion(const char *s, const size_t len) {
 
   // the chrom
   while (isspace(s[i]) && i < len) ++i;
+  if (i == len)
+    throw runtime_error(
+        "malformatted BED file contains only one"
+        "column in the line below "
+        "(a properly formatted BED file must contain at least three):\n"
+        + string(s));
+
   size_t j = i;
   while (!isspace(s[i]) && i < len) ++i;
+  if (i == len)
+    throw runtime_error(
+        "malformatted BED file contains only two "
+        "columns in the line below "
+        "(a properly formatted BED file must contain at least three):\n"
+        + string(s));
+
   chrom = assign_chrom(string(s + j, i - j));
 
   // start of the region (a positive integer)
   while (isspace(s[i]) && i < len) ++i;
+
+
   j = i;
   start = atoi(s + j);
   while (!isspace(s[i]) && i < len) ++i;
