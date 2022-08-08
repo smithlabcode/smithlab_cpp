@@ -293,12 +293,6 @@ mer2i_rc(std::string::const_iterator a, const std::string::const_iterator b) {
   return index;
 }
 
-struct SMITHLABException : public std::runtime_error {
-  SMITHLABException(std::string m) : std::runtime_error(m), message(m) {}
-  std::string message;
-};
-
-
 template <class T> std::string toa(T t) {
   std::ostringstream s;
   s << t;
