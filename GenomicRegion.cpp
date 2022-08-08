@@ -191,8 +191,6 @@ GenomicRegion::assign_chrom(const std::string &c) {
   }
   else return chr_id->second;
 }
-using std::cerr;
-using std::endl;
 
 string
 GenomicRegion::retrieve_chrom(chrom_id_type i) {
@@ -466,9 +464,11 @@ is_track_line(const string &line) {
 
 void
 ReadBEDFile(const string &filename, vector<GenomicRegion> &the_regions) {
-
   std::ifstream in(filename);
-  if (!in)
+  if (isdir(filename.c_str()))
+    throw runtime_error("BED file is a directory: " + filename);
+
+  if (!in.good())
     throw runtime_error("cannot open input file " + filename);
 
   string line;
@@ -480,9 +480,11 @@ ReadBEDFile(const string &filename, vector<GenomicRegion> &the_regions) {
 
 void
 ReadBEDFile(const string &filename, vector<SimpleGenomicRegion> &the_regions) {
-
   std::ifstream in(filename);
-  if (!in)
+  if (isdir(filename.c_str()))
+    throw runtime_error("BED file is a directory: " + filename);
+
+  if (!in.good())
     throw runtime_error("cannot open input file " + filename);
 
   string line;
