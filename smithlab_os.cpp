@@ -157,7 +157,7 @@ identify_and_read_chromosomes(const string &chrom_file,
 
   for (size_t i = 0; i < the_files.size(); ++i) {
     vector<string> names, seqs;
-    read_fasta_file(the_files[i], names, seqs);
+    read_fasta_file_short_names(the_files[i], names, seqs);
     for (size_t j = 0; j < names.size(); ++j)
       chrom_files[names[j]] = the_files[i];
   }
