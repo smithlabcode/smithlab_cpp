@@ -39,8 +39,7 @@ unordered_map<chrom_id_type, string> SimpleGenomicRegion::fw_table_out;
 
 chrom_id_type
 SimpleGenomicRegion::assign_chrom(const std::string &c) {
-  unordered_map<string, chrom_id_type>::const_iterator
-    chr_id(fw_table_in.find(c));
+  auto chr_id(fw_table_in.find(c));
   if (chr_id == fw_table_in.end()) {
     const chrom_id_type r = fw_table_in.size();
     fw_table_in[c] = r;
@@ -54,37 +53,14 @@ SimpleGenomicRegion::assign_chrom(const std::string &c) {
 
 string
 SimpleGenomicRegion::retrieve_chrom(chrom_id_type i) {
-  unordered_map<chrom_id_type, string>::const_iterator chr_name(fw_table_out.find(i));
-  assert(chr_name != fw_table_out.end());
+  auto chr_name(fw_table_out.find(i));
+  // assert(chr_name != fw_table_out.end());
   return chr_name->second;
 }
 
 
 SimpleGenomicRegion::SimpleGenomicRegion(const GenomicRegion &r) :
   chrom(assign_chrom(r.get_chrom())), start(r.get_start()), end(r.get_end()) {}
-
-// SimpleGenomicRegion::SimpleGenomicRegion(string string_representation) {
-//   vector<string> parts = smithlab::split_whitespace_quoted(string_representation);
-
-//   // make sure there is the minimal required info
-//   if (parts.size() < 3)
-//     throw runtime_error("Invalid string representation: " +
-//                                  string_representation);
-//   // set the chromosome name
-//   chrom = assign_chrom(parts[0]);
-
-//   // set the start position
-//   const int checkChromStart = atoi(parts[1].c_str());
-//   if (checkChromStart < 0)
-//     throw runtime_error("Invalid start: " + parts[1]);
-//   else start = static_cast<size_t>(checkChromStart);
-
-//   // set the end position
-//   const int checkChromEnd = atoi(parts[2].c_str());
-//   if (checkChromEnd < 0)
-//     throw runtime_error("Invalid end: " + parts[2]);
-//   else end = static_cast<size_t>(checkChromEnd);
-// }
 
 SimpleGenomicRegion::SimpleGenomicRegion(const char *s, const size_t len) {
   size_t i = 0;
@@ -182,7 +158,7 @@ unordered_map<chrom_id_type, string> GenomicRegion::fw_table_out;
 
 chrom_id_type
 GenomicRegion::assign_chrom(const std::string &c) {
-  unordered_map<string, chrom_id_type>::const_iterator chr_id(fw_table_in.find(c));
+  auto chr_id(fw_table_in.find(c));
   if (chr_id == fw_table_in.end()) {
     const chrom_id_type r = fw_table_in.size();
     fw_table_in[c] = r;
@@ -199,38 +175,6 @@ GenomicRegion::retrieve_chrom(chrom_id_type i) {
   return chr_name->second;
 }
 
-
-// GenomicRegion::GenomicRegion(string string_representation) : strand('+') {
-//   vector<string> parts(smithlab::split_whitespace_quoted(string_representation));
-
-//   // make sure there is the minimal required info
-//   if (parts.size() < 3)
-//     throw runtime_error("Invalid string representation: " +
-//                                  string_representation);
-//   // set the chromosome name
-//   chrom = assign_chrom(parts[0]);
-
-//   // set the start position
-//   const int checkChromStart = atoi(parts[1].c_str());
-//   if (checkChromStart < 0)
-//     throw runtime_error("Invalid start: " + parts[1]);
-//   else start = static_cast<size_t>(checkChromStart);
-
-//   // set the end position
-//   const int checkChromEnd = atoi(parts[2].c_str());
-//   if (checkChromEnd < 0)
-//     throw runtime_error("Invalid end: " + parts[2]);
-//   else end = static_cast<size_t>(checkChromEnd);
-
-//   if (parts.size() > 3)
-//     name = parts[3];
-
-//   if (parts.size() > 4)
-//     score = atof(parts[4].c_str());
-
-//   if (parts.size() > 5)
-//     strand = parts[5][0];
-// }
 
 GenomicRegion::GenomicRegion(const char *s, const size_t len) {
   size_t i = 0;
@@ -300,33 +244,6 @@ GenomicRegion::tostring() const {
   return s.str();
 }
 
-// std::ostream&
-// operator<<(std::ostream& s, const GenomicRegion& region) {
-//   return s << region.tostring();
-// }
-
-// std::istream&
-// operator>>(std::istream& s, GenomicRegion& region) {
-//   string chrom, name;
-//   size_t start = 0ul, end = 0ul;
-//   double score = 0.0;
-//   char strand = '\0';
-
-//   if (s >> chrom >> start >> end >> name >> score >> strand)
-//     region = GenomicRegion(chrom, start, end, name, score, strand);
-//   else region = GenomicRegion();
-
-//   char c;
-//   while ((c = s.get()) != '\n' && s);
-
-//   if (c != '\n')
-//     s.setstate(std::ios::badbit);
-
-//   if (s.eof())
-//     s.setstate(std::ios::badbit);
-
-//   return s;
-// }
 
 bool
 GenomicRegion::contains(const GenomicRegion& other) const {
@@ -436,8 +353,6 @@ separate_chromosomes(const vector<GenomicRegion>& regions,
   for (Separator::iterator i = separator.begin(); i != separator.end(); ++i)
     separated_by_chrom.push_back(i->second);
 }
-
-
 
 
 static bool

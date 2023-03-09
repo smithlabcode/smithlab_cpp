@@ -39,20 +39,12 @@ class GenomicRegion;
 
 class SimpleGenomicRegion {
 public:
-  // Cannonical
   SimpleGenomicRegion() : chrom(assign_chrom("(null)")), start(0), end(0) {}
   void swap(SimpleGenomicRegion &rhs) {
     std::swap(chrom, rhs.chrom);
     std::swap(start, rhs.start);
     std::swap(end, rhs.end);
   }
-  // SimpleGenomicRegion &operator=(const SimpleGenomicRegion &rhs) {
-  //   SimpleGenomicRegion tmp(rhs);
-  //   swap(tmp);
-  //   return *this;
-  // }
-  // SimpleGenomicRegion(const SimpleGenomicRegion &rhs) :
-  //   chrom(rhs.chrom), start(rhs.start), end(rhs.end) {}
 
   // Other constructors
   SimpleGenomicRegion(std::string c, size_t sta, size_t e) :
@@ -136,14 +128,6 @@ public:
     std::swap(score, rhs.score);
     std::swap(strand, rhs.strand);
   }
-  // GenomicRegion(const GenomicRegion &other) :
-  //   chrom(other.chrom), name(other.name), start(other.start), end(other.end),
-  //   score(other.score), strand(other.strand) {}
-  // GenomicRegion &operator=(const GenomicRegion &rhs) {
-  //   GenomicRegion tmp(rhs);
-  //   swap(tmp);
-  //   return *this;
-  // }
 
   // Other constructors
   GenomicRegion(std::string c, size_t sta, size_t e,
@@ -431,6 +415,5 @@ assemble_region_name(const T &region, const std::string sep) {
   return (region.get_chrom() + sep + smithlab::toa(region.get_start()) + sep +
           smithlab::toa(region.get_end()));
 }
-
 
 #endif
