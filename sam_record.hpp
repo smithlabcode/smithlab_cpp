@@ -177,7 +177,7 @@ write_pg_line(const int argc, const char **argv,
 template<typename T>
 static void
 write_sam_header(const std::vector<std::string> &chrom_names,
-                 const std::vector<T> &chrom_starts,
+                 const std::vector<T> &chrom_sizes,
                  const std::string program_name,
                  const std::string program_version,
                  const int argc, const char **argv,
@@ -192,7 +192,7 @@ write_sam_header(const std::vector<std::string> &chrom_names,
   for (size_t i = 0; i < n_chroms; ++i) {
     out << "@SQ" << '\t'
         << "SN:" << chrom_names[i] << '\t'
-        << "LN:" << chrom_starts[i+1] - chrom_starts[i] << '\n';
+        << "LN:" << chrom_sizes[i] << '\n';
   }
 
   // program details
