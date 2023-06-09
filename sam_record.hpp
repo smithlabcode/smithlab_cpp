@@ -188,8 +188,8 @@ write_sam_header(const std::vector<std::string> &chrom_names,
   out <<"@HD" << '\t' << "VN:" << SAM_VERSION << '\n'; // sam version
 
   // chromosome sizes
-  const size_t n_chroms = chrom_names.size() - 1;
-  for (size_t i = 1; i < n_chroms; ++i) {
+  const size_t n_chroms = chrom_names.size();
+  for (size_t i = 0; i < n_chroms; ++i) {
     out << "@SQ" << '\t'
         << "SN:" << chrom_names[i] << '\t'
         << "LN:" << chrom_starts[i+1] - chrom_starts[i] << '\n';
