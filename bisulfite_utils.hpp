@@ -22,6 +22,7 @@
 
 #include <string>
 #include <random>
+#include <cstdint>
 
 #include "sam_record.hpp"
 

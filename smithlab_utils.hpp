@@ -36,6 +36,7 @@
 #include <cmath>
 #include <numeric>
 #include <iomanip>
+#include <cstdint>
 
 extern "C" {char have_smithlab_cpp();}
 
