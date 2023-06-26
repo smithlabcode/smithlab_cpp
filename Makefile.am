@@ -18,7 +18,7 @@ EXTRA_DIST = README.md
 
 ACLOCAL_AMFLAGS = -I m4
 
-CXXFLAGS = -O3
+CXXFLAGS = -Wall -O3
 
 lib_LIBRARIES = libsmithlab_cpp.a
 
