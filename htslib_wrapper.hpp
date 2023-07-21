@@ -42,6 +42,8 @@ public:
 
   bool get_sam_record(sam_rec &sr);
 
+  void add_threads(const size_t n_threads);
+
   std::string get_header() const;
 
 private:
@@ -50,9 +52,10 @@ private:
   std::string filename;
   bool good;
 
-  htsFile* hts;
-  bam_hdr_t *hdr;
-  bam1_t *b;
+  htsFile* hts{};
+  bam_hdr_t *hdr{};
+  bam1_t *b{};
+  // htsThreadPool *tp{};
 };
 
 SAMReader &

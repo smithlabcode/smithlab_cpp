@@ -25,6 +25,10 @@
 #include "smithlab_utils.hpp"
 #include "MappedRead.hpp"
 
+// extern "C" {
+// #include <htslib/thread_pool.h>
+// }
+
 using std::string;
 using std::vector;
 using std::cerr;
@@ -33,8 +37,21 @@ using std::runtime_error;
 
 char check_htslib_wrapper() {return 1;}
 
+/*
+void
+SAMReader::add_threads(const size_t n_threads) {
+  // ADS: should probably check that `hts_tpool` succeeded
+  tp = new htsThreadPool{hts_tpool_init(n_threads), 0};
+  // tp->pool = hts_tpool_init(n_threads);
+  // tp->qsize = 0;
+  const int err_code = hts_set_thread_pool(hts, tp);
+  if (err_code < 0) throw runtime_error("error setting threads");
+}
+*/
+
 SAMReader::SAMReader(const string &fn) :
-  filename(fn), good(true) {
+  filename(fn), good(true), hts(nullptr),
+  hdr(nullptr), b(nullptr) { // , tp(nullptr) {
 
   if (!(hts = hts_open(filename.c_str(), "r")))
     throw runtime_error("cannot open file: " + filename);
@@ -52,16 +69,22 @@ SAMReader::SAMReader(const string &fn) :
 SAMReader::~SAMReader() {
   if (hdr) {
     bam_hdr_destroy(hdr);
-    hdr = 0;
+    hdr = nullptr;
   }
   if (b) {
     bam_destroy1(b);
-    b = 0;
+    b = nullptr;
   }
   if (hts) {
     assert(hts_close(hts) >= 0);
-    hts = 0;
+    hts = nullptr;
   }
+  // if (tp) {
+  //   assert(tp->pool);
+  //   hts_tpool_destroy(tp->pool);
+  //   tp->pool = nullptr;
+  //   tp = nullptr;
+  // }
   good = false;
 }
 
@@ -80,6 +103,10 @@ bool
 SAMReader::get_sam_record(sam_rec &sr) {
   int rd_ret = 0;
   if ((rd_ret = sam_read1(hts, hdr, b)) >= 0) {
+    // ADS: the line below implicitly converts the 0-based leftmost
+    // coordinate in the bam1_core_t struct into a 1-based value,
+    // which corresponds to the conversion of a BAM record to a SAM
+    // record. Remember to convert it back for 0-based coordinates.
     int fmt_ret = 0;
     if ((fmt_ret = sam_format1(hdr, b, &hts->line)) <= 0)
       throw runtime_error("failed reading record from: " + filename);
@@ -90,6 +117,8 @@ SAMReader::get_sam_record(sam_rec &sr) {
     // sam_read1 only get called when "(fp->line.l == 0)". For BAM
     // format, it does not seem to matter.
     hts->line.l = 0;
+    // ADS: possibly this should be:
+    // hts->line.l = ks_clear(hts->line.l);
   }
   else if (rd_ret == -1)
     good = false;
