@@ -429,7 +429,7 @@ public:
     bar = std::string(bar_width, ' ');
   }
   bool time_to_report(const size_t i) const {
-    return (static_cast<size_t>((100.0*i)/total) > prev);
+    return std::round((100.0*std::min(i, total))/total) > prev;
   }
   void
   report(std::ostream &out, const size_t i);
