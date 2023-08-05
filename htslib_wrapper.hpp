@@ -1,7 +1,6 @@
-/*
- * Part of SMITHLAB_CPP software
+/* Part of SMITHLAB_CPP software
  *
- * Copyright (C) 2019 Meng Zhou and Andrew Smith
+ * Copyright (C) 2019-2-23 Meng Zhou and Andrew Smith
  *
  * Authors: Meng Zhou and Andrew Smith
  *
@@ -19,46 +18,45 @@
 #ifndef HTSLIB_WRAPPER_HPP
 #define HTSLIB_WRAPPER_HPP
 
-#include "smithlab_utils.hpp"
-#include "sam_record.hpp"
-
+#include <fstream>
 #include <string>
 #include <vector>
-#include <fstream>
+
+#include "sam_record.hpp"
+#include "smithlab_utils.hpp"
 
 extern "C" {
-#include <htslib/sam.h>
 #include <htslib/hts.h>
+#include <htslib/sam.h>
 }
 
-extern "C" {char check_htslib_wrapper();}
+extern "C" {
+  char check_htslib_wrapper();
+}
 
 class SAMReader {
 public:
   SAMReader(const std::string &filename);
   ~SAMReader();
 
-  operator bool() const {return good;}
+  operator bool() const { return good; }
 
   bool get_sam_record(sam_rec &sr);
 
   void add_threads(const size_t n_threads);
 
   std::string get_header() const;
-
 private:
-
   // data
   std::string filename;
   bool good;
 
-  htsFile* hts{};
+  htsFile *hts{};
   bam_hdr_t *hdr{};
   bam1_t *b{};
-  // htsThreadPool *tp{};
 };
 
 SAMReader &
-operator>>(SAMReader& sam_stream, sam_rec &samr);
+operator>>(SAMReader &sam_stream, sam_rec &samr);
 
 #endif

@@ -1,6 +1,6 @@
 /* Part of SMITHLAB_CPP software
  *
- * Copyright (C) 2013-2019 University of Southern California and
+ * Copyright (C) 2013-2023 University of Southern California and
  *                         Andrew D. Smith
  *
  * Authors: Meng Zhou, Qiang Song, Andrew Smith
@@ -16,43 +16,29 @@
  * General Public License for more details.
  */
 
-#include <string>
-#include <vector>
+#include "htslib_wrapper.hpp"
+
 #include <fstream>
 #include <iostream>
+#include <string>
+#include <vector>
 
-#include "htslib_wrapper.hpp"
-#include "smithlab_utils.hpp"
 #include "MappedRead.hpp"
+#include "smithlab_utils.hpp"
 
-// extern "C" {
-// #include <htslib/thread_pool.h>
-// }
-
-using std::string;
-using std::vector;
 using std::cerr;
 using std::endl;
 using std::runtime_error;
+using std::string;
+using std::vector;
 
-char check_htslib_wrapper() {return 1;}
-
-/*
-void
-SAMReader::add_threads(const size_t n_threads) {
-  // ADS: should probably check that `hts_tpool` succeeded
-  tp = new htsThreadPool{hts_tpool_init(n_threads), 0};
-  // tp->pool = hts_tpool_init(n_threads);
-  // tp->qsize = 0;
-  const int err_code = hts_set_thread_pool(hts, tp);
-  if (err_code < 0) throw runtime_error("error setting threads");
+char
+check_htslib_wrapper() {
+  return 1;
 }
-*/
 
-SAMReader::SAMReader(const string &fn) :
-  filename(fn), good(true), hts(nullptr),
-  hdr(nullptr), b(nullptr) { // , tp(nullptr) {
-
+SAMReader::SAMReader(const string &fn)
+    : filename(fn), good(true), hts(nullptr), hdr(nullptr), b(nullptr) {
   if (!(hts = hts_open(filename.c_str(), "r")))
     throw runtime_error("cannot open file: " + filename);
 
@@ -79,17 +65,10 @@ SAMReader::~SAMReader() {
     assert(hts_close(hts) >= 0);
     hts = nullptr;
   }
-  // if (tp) {
-  //   assert(tp->pool);
-  //   hts_tpool_destroy(tp->pool);
-  //   tp->pool = nullptr;
-  //   tp = nullptr;
-  // }
   good = false;
 }
 
-
-SAMReader&
+SAMReader &
 operator>>(SAMReader &reader, sam_rec &aln) {
   reader.get_sam_record(aln);
   return reader;
@@ -111,7 +90,7 @@ SAMReader::get_sam_record(sam_rec &sr) {
     if ((fmt_ret = sam_format1(hdr, b, &hts->line)) <= 0)
       throw runtime_error("failed reading record from: " + filename);
     sr = sam_rec(hts->line.s);
-    good = true; //reader.get_sam_record(reader.hts->line.s, sr);
+    good = true;  // reader.get_sam_record(reader.hts->line.s, sr);
     // ADS: line below seems to be needed when the file format is SAM
     // because the hts_getline for parsing SAM format files within
     // sam_read1 only get called when "(fp->line.l == 0)". For BAM
@@ -122,12 +101,12 @@ SAMReader::get_sam_record(sam_rec &sr) {
   }
   else if (rd_ret == -1)
     good = false;
-  else // rd_ret < -1
+  else  // rd_ret < -1
     throw runtime_error("failed to read record from file: " + filename);
   return good;
 }
 
 string
 SAMReader::get_header() const {
-  return hdr->text; // includes newline
+  return hdr->text;  // includes newline
 }
