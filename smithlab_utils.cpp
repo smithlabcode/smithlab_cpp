@@ -226,7 +226,7 @@ smithlab::squash(const std::vector<std::string>& v) {
 
 void
 ProgressBar::report(std::ostream &out, const size_t i) {
-  prev = std::round((100.0*i)/total);
+  prev = std::round((100.0*std::min(i, total))/total);
   const size_t x =
     std::min(static_cast<size_t>(bar_width*(prev/100.0)), bar_width);
   fill_n(begin(bar), x, '=');
