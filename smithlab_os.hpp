@@ -114,4 +114,7 @@ read_dir(const std::string& dirname, std::vector<std::string> &filenames);
 bool
 is_valid_output_file(const std::string &filename);
 
+
+bool has_gz_ext(const std::string &filename);
+
 #endif

@@ -64,6 +64,4 @@ operator<<(ogzfstream &out, const std::string &line);
 ogzfstream&
 operator<<(ogzfstream &out, const char c);
 
-bool has_gz_ext(const std::string &filename);
-
 #endif

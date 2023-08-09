@@ -556,3 +556,10 @@ is_valid_output_file(const string &filename) {
     return (access(dir_part.c_str(), F_OK | W_OK) == 0);
   }
 }
+
+bool
+has_gz_ext(const string &filename) {
+  const string ext(".gz");
+  return filename.size() >= ext.size()
+    && filename.compare(filename.size() - ext.size(), ext.size(), ext) == 0;
+}

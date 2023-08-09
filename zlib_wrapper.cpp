@@ -54,10 +54,3 @@ operator<<(ogzfstream &out, const char c) {
   gzputc(out.fileobj, c);
   return out;
 }
-
-bool
-has_gz_ext(const string &filename) {
-  const string ext(".gz");
-  return filename.size() >= ext.size()
-    && filename.compare(filename.size() - ext.size(), ext.size(), ext) == 0;
-}
