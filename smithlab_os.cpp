@@ -231,7 +231,7 @@ read_fastq_file(const char *filename,
   vector<char> scr;
   vector<vector<char> > scrs;
   bool first_line = true;
-  bool is_sequence_line = false, is_score_line = false;
+  bool is_sequence_line = false;
   size_t line_count = 0;
   while (!in.eof()) {
     char buffer[INPUT_BUFFER_SIZE + 1];
@@ -271,12 +271,9 @@ read_fastq_file(const char *filename,
       if (buffer[0] != '+')
         throw runtime_error("invalid FASTQ score name line: " +
                             string(buffer));
-      is_score_line = true;
     }
     if (is_fastq_score_line(line_count)) {
-      assert(is_score_line);
       parse_score_line(buffer, scr);
-      is_score_line = false;
     }
     ++line_count;
   }
@@ -321,7 +318,7 @@ void read_fastq_file(const char *filename, vector<string> &names,
 
   string s, name, scr;
   bool first_line = true;
-  bool is_sequence_line = false, is_score_line = false;
+  bool is_sequence_line = false;
   size_t line_count = 0;
   while (!in.eof()) {
     char buffer[INPUT_BUFFER_SIZE + 1];
@@ -359,12 +356,9 @@ void read_fastq_file(const char *filename, vector<string> &names,
       if (buffer[0] != '+')
         throw runtime_error("invalid FASTQ score name line: " +
                             string(buffer));
-      is_score_line = true;
     }
     if (is_fastq_score_line(line_count)) {
-      assert(is_score_line);
       scr = buffer;
-      is_score_line = false;
     }
     ++line_count;
   }
