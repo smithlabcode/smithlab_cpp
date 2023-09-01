@@ -24,6 +24,7 @@
 #include <iostream>
 #include <sstream>
 #include <iterator>
+#include <cstdint>
 
 // from 30 April 2020 SAM documentation
 // 1    0x1   template having multiple segments in sequencing

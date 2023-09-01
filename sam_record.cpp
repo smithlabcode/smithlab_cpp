@@ -20,6 +20,7 @@
 
 #include <regex>
 #include <sstream>
+#include <cstdint>
 
 #include "cigar_utils.hpp"
 #include "smithlab_utils.hpp"
