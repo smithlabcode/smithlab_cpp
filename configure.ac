@@ -1,6 +1,6 @@
 dnl This file is part of smithlab_cpp
 dnl
-dnl Copyright (C) 2010-2019: Andrew D. Smith and Meng Zhou
+dnl Copyright (C) 2010-2022: Andrew D. Smith and Meng Zhou
 dnl
 dnl Author: Andrew D. Smith and Meng Zhou
 dnl
@@ -25,10 +25,10 @@ AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([smithlab_utils.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 
-dnl check for c++11
+dnl check for c++17
 AC_LANG(C++)
 AC_PROG_CXX
-AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
+AX_CXX_COMPILE_STDCXX_17([noext], [mandatory])
 
 AM_PROG_AR
 AC_PROG_RANLIB
