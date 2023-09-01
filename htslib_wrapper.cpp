@@ -1,6 +1,6 @@
 /* Part of SMITHLAB_CPP software
  *
- * Copyright (C) 2013-2019 University of Southern California and
+ * Copyright (C) 2013-2023 University of Southern California and
  *                         Andrew D. Smith
  *
  * Authors: Meng Zhou, Qiang Song, Andrew Smith
@@ -16,26 +16,29 @@
  * General Public License for more details.
  */
 
-#include <string>
-#include <vector>
+#include "htslib_wrapper.hpp"
+
 #include <fstream>
 #include <iostream>
+#include <string>
+#include <vector>
 
-#include "htslib_wrapper.hpp"
-#include "smithlab_utils.hpp"
 #include "MappedRead.hpp"
+#include "smithlab_utils.hpp"
 
-using std::string;
-using std::vector;
 using std::cerr;
 using std::endl;
 using std::runtime_error;
+using std::string;
+using std::vector;
 
-char check_htslib_wrapper() {return 1;}
+char
+check_htslib_wrapper() {
+  return 1;
+}
 
-SAMReader::SAMReader(const string &fn) :
-  filename(fn), good(true) {
-
+SAMReader::SAMReader(const string &fn)
+    : filename(fn), good(true), hts(nullptr), hdr(nullptr), b(nullptr) {
   if (!(hts = hts_open(filename.c_str(), "r")))
     throw runtime_error("cannot open file: " + filename);
 
@@ -52,21 +55,20 @@ SAMReader::SAMReader(const string &fn) :
 SAMReader::~SAMReader() {
   if (hdr) {
     bam_hdr_destroy(hdr);
-    hdr = 0;
+    hdr = nullptr;
   }
   if (b) {
     bam_destroy1(b);
-    b = 0;
+    b = nullptr;
   }
   if (hts) {
     assert(hts_close(hts) >= 0);
-    hts = 0;
+    hts = nullptr;
   }
   good = false;
 }
 
-
-SAMReader&
+SAMReader &
 operator>>(SAMReader &reader, sam_rec &aln) {
   reader.get_sam_record(aln);
   return reader;
@@ -80,25 +82,31 @@ bool
 SAMReader::get_sam_record(sam_rec &sr) {
   int rd_ret = 0;
   if ((rd_ret = sam_read1(hts, hdr, b)) >= 0) {
+    // ADS: the line below implicitly converts the 0-based leftmost
+    // coordinate in the bam1_core_t struct into a 1-based value,
+    // which corresponds to the conversion of a BAM record to a SAM
+    // record. Remember to convert it back for 0-based coordinates.
     int fmt_ret = 0;
     if ((fmt_ret = sam_format1(hdr, b, &hts->line)) <= 0)
       throw runtime_error("failed reading record from: " + filename);
     sr = sam_rec(hts->line.s);
-    good = true; //reader.get_sam_record(reader.hts->line.s, sr);
+    good = true;  // reader.get_sam_record(reader.hts->line.s, sr);
     // ADS: line below seems to be needed when the file format is SAM
     // because the hts_getline for parsing SAM format files within
     // sam_read1 only get called when "(fp->line.l == 0)". For BAM
     // format, it does not seem to matter.
     hts->line.l = 0;
+    // ADS: possibly this should be:
+    // hts->line.l = ks_clear(hts->line.l);
   }
   else if (rd_ret == -1)
     good = false;
-  else // rd_ret < -1
+  else  // rd_ret < -1
     throw runtime_error("failed to read record from file: " + filename);
   return good;
 }
 
 string
 SAMReader::get_header() const {
-  return hdr->text; // includes newline
+  return hdr->text;  // includes newline
 }

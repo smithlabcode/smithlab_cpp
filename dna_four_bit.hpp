@@ -118,24 +118,35 @@ struct genome_four_bit_itr {
     offset = (offset - 1) & 15ul;
     return *this;
   }
+
   genome_four_bit_itr operator--(int) {
     genome_four_bit_itr tmp(*this);
     itr -= (offset == 0);
     offset = (offset - 1) & 15ul;
     return tmp;
   }
+
   genome_four_bit_itr operator+(const size_t step) const {
     // whether the sum of offsets is >= 16
     const bool shift_one_pos =
-      (((offset + (static_cast<int>(step) & 15)) & 16) >> 4);
+      ((offset + (static_cast<int>(step) & 15)) & 16) >> 4;
 
     const int new_offset = (offset + step) & 15;
-    return genome_four_bit_itr(itr + step/16 + shift_one_pos,
-                               new_offset);
+    return genome_four_bit_itr(itr + step / 16 + shift_one_pos, new_offset);
   }
+
   bool operator!=(const genome_four_bit_itr &rhs) const {
     return itr != rhs.itr || offset != rhs.offset;
   }
+
+  bool operator<(const genome_four_bit_itr &rhs) const {
+    return itr < rhs.itr || (itr == rhs.itr && offset < rhs.offset);
+  }
+
+  bool operator<=(const genome_four_bit_itr &rhs) const {
+    return itr < rhs.itr || (itr == rhs.itr && offset <= rhs.offset);
+  }
+
   std::vector<size_t>::const_iterator itr;
   int offset;
 };

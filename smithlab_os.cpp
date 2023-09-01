@@ -157,7 +157,7 @@ identify_and_read_chromosomes(const string &chrom_file,
 
   for (size_t i = 0; i < the_files.size(); ++i) {
     vector<string> names, seqs;
-    read_fasta_file(the_files[i], names, seqs);
+    read_fasta_file_short_names(the_files[i], names, seqs);
     for (size_t j = 0; j < names.size(); ++j)
       chrom_files[names[j]] = the_files[i];
   }
@@ -231,7 +231,7 @@ read_fastq_file(const char *filename,
   vector<char> scr;
   vector<vector<char> > scrs;
   bool first_line = true;
-  bool is_sequence_line = false, is_score_line = false;
+  bool is_sequence_line = false;
   size_t line_count = 0;
   while (!in.eof()) {
     char buffer[INPUT_BUFFER_SIZE + 1];
@@ -271,12 +271,9 @@ read_fastq_file(const char *filename,
       if (buffer[0] != '+')
         throw runtime_error("invalid FASTQ score name line: " +
                             string(buffer));
-      is_score_line = true;
     }
     if (is_fastq_score_line(line_count)) {
-      assert(is_score_line);
       parse_score_line(buffer, scr);
-      is_score_line = false;
     }
     ++line_count;
   }
@@ -321,7 +318,7 @@ void read_fastq_file(const char *filename, vector<string> &names,
 
   string s, name, scr;
   bool first_line = true;
-  bool is_sequence_line = false, is_score_line = false;
+  bool is_sequence_line = false;
   size_t line_count = 0;
   while (!in.eof()) {
     char buffer[INPUT_BUFFER_SIZE + 1];
@@ -359,12 +356,9 @@ void read_fastq_file(const char *filename, vector<string> &names,
       if (buffer[0] != '+')
         throw runtime_error("invalid FASTQ score name line: " +
                             string(buffer));
-      is_score_line = true;
     }
     if (is_fastq_score_line(line_count)) {
-      assert(is_score_line);
       scr = buffer;
-      is_score_line = false;
     }
     ++line_count;
   }
@@ -555,4 +549,11 @@ is_valid_output_file(const string &filename) {
     // check if directory part exists and is writeable
     return (access(dir_part.c_str(), F_OK | W_OK) == 0);
   }
+}
+
+bool
+has_gz_ext(const string &filename) {
+  const string ext(".gz");
+  return filename.size() >= ext.size()
+    && filename.compare(filename.size() - ext.size(), ext.size(), ext) == 0;
 }
