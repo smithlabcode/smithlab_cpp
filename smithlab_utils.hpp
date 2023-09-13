@@ -300,7 +300,6 @@ template <class T> std::string toa(T t) {
   return s.str();
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Code for dealing with the DNA alphabet
 
@@ -338,8 +337,6 @@ bits2string_masked(size_t mask, size_t bits) {
   return s;
 }
 
-
-
 inline std::string
 bits2string_for_positions(size_t positions, size_t bits) {
   std::string s;
@@ -356,22 +353,14 @@ percent(const size_t a, const size_t b) {
   return static_cast<size_t>((100.0*a)/b);
 }
 
-
-
-
-
-////////////////////Code from Alphabet//////////////////////
-
-
-
-bool
-inline valid_base(char c) {
+inline bool
+valid_base(char c) {
   char i = std::toupper(c);
   return (i == 'A' || i == 'C' || i == 'G' || i == 'T');
 }
 
-size_t
-inline mer2index(const char *s, size_t n) {
+inline size_t
+mer2index(const char *s, size_t n) {
   size_t multiplier = 1, index = 0;
   do {
     --n;
@@ -381,9 +370,9 @@ inline mer2index(const char *s, size_t n) {
   return index;
 }
 
-size_t
-inline kmer_counts(const std::vector<std::string> &seqs,
-                   std::vector<size_t> &counts, size_t k) {
+inline size_t
+kmer_counts(const std::vector<std::string> &seqs,
+            std::vector<size_t> &counts, size_t k) {
   counts.clear();
   size_t nwords =
     static_cast<size_t>(pow(static_cast<float>(smithlab::alphabet_size),
@@ -403,7 +392,6 @@ inline kmer_counts(const std::vector<std::string> &seqs,
   }
   return total;
 }
-
 
 /*
  * How to use the ProgressBar:
