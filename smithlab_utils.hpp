@@ -424,21 +424,21 @@ inline kmer_counts(const std::vector<std::string> &seqs,
 class ProgressBar {
 public:
   ProgressBar(const size_t x, const std::string message = "completion") :
-    total(x/100.0), prev(0), mid_tag(message) {
+    total(x), prev(0), mid_tag(message) {
     bar_width = max_bar_width - message.length() - 3 - 5;
     bar = std::string(bar_width, ' ');
   }
   bool time_to_report(const size_t i) const {
-    return std::round(std::min(i, total)/total) > prev;
+    return std::round((100.0*std::min(i, total))/total) > prev;
   }
   void
   report(std::ostream &out, const size_t i);
 
 private:
 
-  size_t total{};
-  size_t prev{};
-  size_t bar_width{};
+  size_t total;
+  size_t prev;
+  size_t bar_width;
   std::string left_tag = "\r[";
   std::string mid_tag;
   std::string bar;
