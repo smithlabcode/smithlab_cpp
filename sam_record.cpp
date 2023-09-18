@@ -112,13 +112,13 @@ sam_rec::sam_rec(const string &line) {
     istringstream iss; // ADS: change to set the buffer from "line"
     iss.rdbuf()->pubsetbuf(const_cast<char*>(line.c_str()), line.size());*/
   istringstream iss(line); // ADS: unfortunate macos stuff?
-  uint32_t will_become_mapq = 0; // to not read mapq as character
-                                 // since it's uint8_t
+  int32_t will_become_mapq = 0; // to not read mapq as character
+                                // since it's uint8_t
   if (!(iss >>
         qname >> flags >> rname >> pos >> will_become_mapq >>
         cigar >> rnext >> pnext >> tlen >> seq >> qual))
     throw runtime_error("incorrect SAM record:\n" + line);
-  if (mapq > 255)
+  if (will_become_mapq < 0 || will_become_mapq > 255)
     throw runtime_error("invalid mapq in SAM record: " + line);
   mapq = static_cast<uint8_t>(will_become_mapq);
 

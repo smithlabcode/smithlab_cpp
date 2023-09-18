@@ -74,7 +74,7 @@ adjust_start_pos(const size_t orig_start, const string &chrom_name) {
 
 static size_t
 adjust_region_size(const size_t orig_start,
-                   const string &chrom_name,
+                   const string &chrom_name, // ADS: remove this soon
                    const size_t orig_size) {
   static const double LINE_WIDTH = 50.0;
   const size_t preceding_newlines_start =

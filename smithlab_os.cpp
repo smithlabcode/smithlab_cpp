@@ -24,6 +24,7 @@
 #include <cmath>
 #include <unordered_map>
 #include <exception>
+#include <filesystem>
 
 #include "smithlab_os.hpp"
 #include "smithlab_utils.hpp"
@@ -535,9 +536,10 @@ read_dir(const string& dirname, vector<string> &filenames) {
 
 bool
 is_valid_output_file(const string &filename) {
-  const bool file_exists = (access(filename.c_str(), F_OK) == 0);
-  if (file_exists)
-    return (!isdir(filename.c_str()) &&
+  // ADS: seems like there is no way around "access" and apparently
+  // access is not a great solution anyway.
+  if (std::filesystem::exists(filename))
+    return (!std::filesystem::is_directory(filename) &&
             access(filename.c_str(), W_OK) == 0);
   else {
     // ADS: check if dir exists and is writeable
