@@ -64,7 +64,7 @@ parse_region_name(string region_name,
 
 static size_t
 adjust_start_pos(const size_t orig_start, const string &chrom_name) {
-  static const double LINE_WIDTH = 50.0;
+  static const double LINE_WIDTH = 50.0;  // ADS: dangerous; often this is 80
   const size_t name_offset = chrom_name.length() + 2; // For the '>' and '\n';
   const size_t preceding_newlines =
     static_cast<size_t>(std::floor(orig_start / LINE_WIDTH));
@@ -76,7 +76,7 @@ static size_t
 adjust_region_size(const size_t orig_start,
                    const string &chrom_name, // ADS: remove this soon
                    const size_t orig_size) {
-  static const double LINE_WIDTH = 50.0;
+  static const double LINE_WIDTH = 50.0;  // ADS: dangerous; often this is 80
   const size_t preceding_newlines_start =
     static_cast<size_t>(std::floor(orig_start / LINE_WIDTH));
   const size_t preceding_newlines_end =
@@ -84,83 +84,53 @@ adjust_region_size(const size_t orig_start,
   return (orig_size + (preceding_newlines_end - preceding_newlines_start));
 }
 
+template <class T>
+void
+extract_regions_chrom_fasta_impl(const string &chrom_name,
+                                 const string &filename,
+                                 const vector<T> &regions,
+                                 vector<string> &sequences) {
+
+  std::ifstream in(filename);
+  if (!in) throw runtime_error("failed to open file: " + filename);
+
+  for (auto &i : regions) {
+    const auto orig_start_pos = i.get_start();
+    const auto orig_end_pos = i.get_end();
+    const auto orig_region_size = orig_end_pos - orig_start_pos;
+
+    const auto start_pos = adjust_start_pos(orig_start_pos, chrom_name);
+    const auto region_size =
+      adjust_region_size(orig_start_pos, chrom_name, orig_region_size);
+    assert(start_pos >= 0);
+
+    in.seekg(start_pos);
+    string buffer(region_size, '\0');
+    in.read(buffer.data(), region_size);
+
+    buffer.erase(remove(begin(buffer), end(buffer), '\n'));
+    transform(cbegin(buffer), cend(buffer), begin(buffer),
+              [](const char x) {return toupper(x);});
+    sequences.push_back(move(buffer));
+    assert(i.get_width() == sequences.back().size());
+  }
+}
 
 void
 extract_regions_chrom_fasta(const string &chrom_name,
                             const string &filename,
                             const vector<SimpleGenomicRegion> &regions,
                             vector<string> &sequences) {
-
-  std::ifstream in(filename.c_str());
-  for (vector<SimpleGenomicRegion>::const_iterator i(regions.begin());
-       i != regions.end(); ++i) {
-
-    const size_t orig_start_pos = i->get_start();
-    const size_t orig_end_pos = i->get_end();
-    const size_t orig_region_size = orig_end_pos - orig_start_pos;
-
-    const size_t start_pos = adjust_start_pos(orig_start_pos, chrom_name);
-    const size_t region_size = adjust_region_size(
-                                                  orig_start_pos, chrom_name, orig_region_size);
-    assert(start_pos >= 0);
-
-    in.seekg(start_pos);
-    char buffer[region_size + 1];
-    buffer[region_size] = '\0';
-    in.read(buffer, region_size);
-
-    std::remove_if(buffer, buffer + region_size,
-                    [](const char x) {return x == '\n';});
-    buffer[orig_region_size] = '\0';
-
-    sequences.push_back(buffer);
-    std::transform(sequences.back().begin(), sequences.back().end(),
-                   sequences.back().begin(), [](const char x) {return toupper(x);});
-    assert(i->get_width() == sequences.back().length());
-  }
-  in.close();
+  extract_regions_chrom_fasta_impl(chrom_name, filename, regions, sequences);
 }
-
 
 void
 extract_regions_chrom_fasta(const string &chrom_name,
                             const string &filename,
                             const vector<GenomicRegion> &regions,
                             vector<string> &sequences) {
-
-  std::ifstream in(filename.c_str());
-  for (vector<GenomicRegion>::const_iterator i(regions.begin());
-       i != regions.end(); ++i) {
-
-    const size_t orig_start_pos = i->get_start();
-    const size_t orig_end_pos = i->get_end();
-    const size_t orig_region_size = orig_end_pos - orig_start_pos;
-
-    const size_t start_pos = adjust_start_pos(orig_start_pos, chrom_name);
-    const size_t region_size = adjust_region_size(
-                                                  orig_start_pos, chrom_name, orig_region_size);
-    assert(start_pos >= 0);
-
-    in.seekg(start_pos);
-    char buffer[region_size + 1];
-    buffer[region_size] = '\0';
-    in.read(buffer, region_size);
-
-    std::remove_if(buffer, buffer + region_size,
-                    [](const char x) {return x == '\n';});
-    buffer[orig_region_size] = '\0';
-
-    sequences.push_back(buffer);
-    std::transform(sequences.back().begin(), sequences.back().end(),
-                   sequences.back().begin(), [](const char x) {return toupper(x);});
-
-    if (i->neg_strand())
-      revcomp_inplace(sequences.back());
-    assert(i->get_width() == sequences.back().length());
-  }
-  in.close();
+  extract_regions_chrom_fasta_impl(chrom_name, filename, regions, sequences);
 }
-
 
 void
 extract_regions_fasta(const string &dirname,

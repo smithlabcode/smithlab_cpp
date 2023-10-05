@@ -232,7 +232,11 @@ read_fastq_file(const char *filename,
   vector<char> scr;
   vector<vector<char> > scrs;
   bool first_line = true;
+  // ADS: preprocessor stuff below is because is_sequence_line is only
+  // used with asserts; consider removing variable
+#ifndef NDEBUG
   bool is_sequence_line = false;
+#endif
   size_t line_count = 0;
   while (!in.eof()) {
     char buffer[INPUT_BUFFER_SIZE + 1];
@@ -261,12 +265,16 @@ read_fastq_file(const char *filename,
       name = name.substr(name.find_first_not_of("@ "));
       s = "";
       scr.clear();
+#ifndef NDEBUG
       is_sequence_line = true;
+#endif
     }
     if (is_fastq_sequence_line(line_count)) {
       assert(is_sequence_line);
       s += buffer;
+#ifndef NDEBUG
       is_sequence_line = false;
+#endif
     }
     if (is_fastq_score_name_line(line_count)) {
       if (buffer[0] != '+')
@@ -319,7 +327,11 @@ void read_fastq_file(const char *filename, vector<string> &names,
 
   string s, name, scr;
   bool first_line = true;
+  // ADS: preprocessor stuff below is because is_sequence_line is only
+  // used with asserts; consider removing variable
+#ifndef NDEBUG
   bool is_sequence_line = false;
+#endif
   size_t line_count = 0;
   while (!in.eof()) {
     char buffer[INPUT_BUFFER_SIZE + 1];
@@ -346,12 +358,16 @@ void read_fastq_file(const char *filename, vector<string> &names,
         first_line = false;
       name = buffer;
       name = name.substr(name.find_first_not_of("@ "));
+#ifndef NDEBUG
       is_sequence_line = true;
+#endif
     }
     if (is_fastq_sequence_line(line_count)) {
       assert(is_sequence_line);
       s = buffer;
+#ifndef NDEBUG
       is_sequence_line = false;
+#endif
     }
     if (is_fastq_score_name_line(line_count)) {
       if (buffer[0] != '+')

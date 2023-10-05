@@ -380,13 +380,13 @@ kmer_counts(const std::vector<std::string> &seqs,
   counts.resize(nwords, 0);
   size_t total = 0;
   for (size_t i = 0; i < seqs.size(); ++i) {
-    char seq[seqs[i].length() + 1];
-    seq[seqs[i].length()] = '\0';
-    copy(seqs[i].begin(), seqs[i].end(), seq);
+    std::vector<char> seq(seqs[i].length() + 1, '\0');
+    auto seq_data = seq.data();
+    copy(cbegin(seqs[i]), cend(seqs[i]), seq_data);
     for (size_t j = 0; j < seqs[i].length() - k + 1; ++j)
-      if (std::count_if(seq + j, seq + j + k, &valid_base) ==
+      if (std::count_if(seq_data + j, seq_data + j + k, &valid_base) ==
           static_cast<int>(k)) {
-        counts[mer2index(seq + j, k)]++;
+        counts[mer2index(seq_data + j, k)]++;
         ++total;
       }
   }
@@ -412,21 +412,21 @@ kmer_counts(const std::vector<std::string> &seqs,
 class ProgressBar {
 public:
   ProgressBar(const size_t x, const std::string message = "completion") :
-    total(x/100.0), prev(0), mid_tag(message) {
+    total(x), prev(0), mid_tag(message) {
     bar_width = max_bar_width - message.length() - 3 - 5;
     bar = std::string(bar_width, ' ');
   }
   bool time_to_report(const size_t i) const {
-    return std::round(std::min(i, total)/total) > prev;
+    return std::round((100.0*std::min(i, total))/total) > prev;
   }
   void
   report(std::ostream &out, const size_t i);
 
 private:
 
-  size_t total{};
-  size_t prev{};
-  size_t bar_width{};
+  size_t total;
+  size_t prev;
+  size_t bar_width;
   std::string left_tag = "\r[";
   std::string mid_tag;
   std::string bar;
