@@ -407,14 +407,14 @@ read_config_file(const string &config_filename,
   }
 }
 
-void
-OptionParser::parse(const int argc, const char **argv,
-                    vector<string> &arguments) {
+vector<string>
+OptionParser::parse(const int argc, const char **argv) {
   // The "2" below corresponds to the "about" and "help" options
   assert(options.size() >=  2);
 
+  vector<string> arguments;
+
   // The '1' and '+ 1' below is to skip over the program name
-  arguments.clear();
   assert(argc >= 1);
   copy(argv + 1, argv + argc, back_inserter(arguments));
 
@@ -449,6 +449,13 @@ OptionParser::parse(const int argc, const char **argv,
       first_missing_option_name = options[i].format_option_name();
 
   leftover_args = arguments;
+  return arguments;
+}
+
+void
+OptionParser::parse(const int argc, const char **argv,
+                    vector<string> &arguments) {
+  arguments = parse(argc, argv);
 }
 
 void

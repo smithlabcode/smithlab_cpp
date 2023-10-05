@@ -110,6 +110,9 @@ public:
   void parse(const int argc, const char **argv,
              std::vector<std::string> &arguments);
 
+  std::vector<std::string>
+  parse(const int argc, const char **argv);
+
   void parse(const int argc, const char **argv,
              std::vector<std::string> &arguments,
              std::string config_filename);
