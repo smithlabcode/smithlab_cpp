@@ -369,7 +369,6 @@ read_config_file(const string &config_filename,
     throw runtime_error("cannot open config file: " + config_filename);
 
   string line;
-  size_t line_number = 0;
   while (in) {
 
     if (!getline(in, line))
@@ -398,12 +397,9 @@ read_config_file(const string &config_filename,
       if (!all_of(begin(option_value), end(option_value), valid_option_char))
         throw runtime_error("bad option label: " + line);
 
-      // cerr << option_label << '\t' << option_value << endl;
-
       config_file_options.push_back(line);
     }
     in.peek();
-    ++line_number;
   }
 }
 
