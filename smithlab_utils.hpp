@@ -430,7 +430,7 @@ private:
   std::string left_tag = "\r[";
   std::string mid_tag;
   std::string bar;
-  std::string right_tag = "\%]";
+  std::string right_tag = "%%]";
 
   static const size_t max_bar_width = 72;
 };
