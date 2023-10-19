@@ -22,10 +22,19 @@
 
 #include "chromosome_utils.hpp"
 
+#include <utility>
+#include <cctype>
+#include <vector>
+#include <string>
+#include <unordered_map>
+#include <stdexcept>
+
 using std::vector;
 using std::string;
 using std::unordered_map;
 using std::runtime_error;
+using std::size;
+using std::toupper;
 
 static const char *digits = "0987654321";
 static const char *whitespace = " \t";
@@ -61,26 +70,24 @@ parse_region_name(string region_name,
   end = static_cast<size_t>(atoi(end_string.c_str()));
 }
 
-
 static size_t
 adjust_start_pos(const size_t orig_start, const string &chrom_name) {
-  static const double LINE_WIDTH = 50.0;  // ADS: dangerous; often this is 80
+  static constexpr double line_width = 50.0;  // ADS: dangerous; often
+                                              // this is 80
   const size_t name_offset = chrom_name.length() + 2; // For the '>' and '\n';
   const size_t preceding_newlines =
-    static_cast<size_t>(std::floor(orig_start / LINE_WIDTH));
+    static_cast<size_t>(std::floor(orig_start / line_width));
   return orig_start + preceding_newlines + name_offset;
 }
 
-
 static size_t
-adjust_region_size(const size_t orig_start,
-                   const string &chrom_name, // ADS: remove this soon
-                   const size_t orig_size) {
-  static const double LINE_WIDTH = 50.0;  // ADS: dangerous; often this is 80
+adjust_region_size(const size_t orig_start, const size_t orig_size) {
+  static constexpr double line_width = 50.0;  // ADS: dangerous; often
+                                              // this is 80
   const size_t preceding_newlines_start =
-    static_cast<size_t>(std::floor(orig_start / LINE_WIDTH));
+    static_cast<size_t>(std::floor(orig_start / line_width));
   const size_t preceding_newlines_end =
-    static_cast<size_t>(std::floor((orig_start + orig_size) / LINE_WIDTH));
+    static_cast<size_t>(std::floor((orig_start + orig_size) / line_width));
   return (orig_size + (preceding_newlines_end - preceding_newlines_start));
 }
 
@@ -100,8 +107,7 @@ extract_regions_chrom_fasta_impl(const string &chrom_name,
     const auto orig_region_size = orig_end_pos - orig_start_pos;
 
     const auto start_pos = adjust_start_pos(orig_start_pos, chrom_name);
-    const auto region_size =
-      adjust_region_size(orig_start_pos, chrom_name, orig_region_size);
+    const auto region_size = adjust_region_size(orig_start_pos, orig_region_size);
     assert(start_pos >= 0);
 
     in.seekg(start_pos);
@@ -111,8 +117,8 @@ extract_regions_chrom_fasta_impl(const string &chrom_name,
     buffer.erase(remove(begin(buffer), end(buffer), '\n'));
     transform(cbegin(buffer), cend(buffer), begin(buffer),
               [](const char x) {return toupper(x);});
-    sequences.push_back(move(buffer));
-    assert(i.get_width() == sequences.back().size());
+    sequences.push_back(std::move(buffer));
+    assert(i.get_width() == size(sequences.back()));
   }
 }
 
