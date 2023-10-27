@@ -397,11 +397,11 @@ kmer_counts(const std::vector<std::string> &seqs,
  * How to use the ProgressBar:
  *
  * //====================================
- * const size_t lim = v.size();
+ * const uint64_t lim = v.size();
  * ProgressBar progress(lim);
  * if (VERBOSE)
  *   progress.report(cerr, 0);
- * for (size_t i = 0; i < lim; ++i) {
+ * for (uint64_t i = 0; i < lim; ++i) {
  *   if (VERBOSE && progress.time_to_report(i))
  *     progress.report(cerr, i);
  *   v[i] += x;
@@ -413,6 +413,9 @@ class ProgressBar {
 public:
   ProgressBar(const size_t x, const std::string message = "completion") :
     total(x), prev(0), mid_tag(message) {
+    // the 3 below is for the default left_tag and right_tag printed
+    // width and the 5 is for the width of the percent (up to 100)
+    // plus two pipes ('|')
     bar_width = max_bar_width - message.length() - 3 - 5;
     bar = std::string(bar_width, ' ');
   }
@@ -424,13 +427,13 @@ public:
 
 private:
 
-  size_t total;
-  size_t prev;
-  size_t bar_width;
+  size_t total{};
+  size_t prev{};
+  size_t bar_width{};
   std::string left_tag = "\r[";
   std::string mid_tag;
   std::string bar;
-  std::string right_tag = "%%]";
+  std::string right_tag = "%]";
 
   static const size_t max_bar_width = 72;
 };
