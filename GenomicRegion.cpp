@@ -355,22 +355,22 @@ separate_chromosomes(const vector<GenomicRegion>& regions,
 }
 
 
-static bool
-is_header_line(const string& line) {
-  static const char *browser_label = "browser";
-  static const size_t browser_label_len = 7;
-  for (size_t i = 0; i < browser_label_len; ++i)
+static inline auto
+is_header_line(const string& line) -> bool {
+  static constexpr auto browser_label = "browser";
+  static constexpr auto browser_label_len = 7u;
+  for (auto i = 0u; i < browser_label_len; ++i)
     if (line[i] != browser_label[i])
       return false;
   return true;
 }
 
 
-static bool
-is_track_line(const string &line) {
-  static const char *track_label = "track";
-  static const size_t track_label_len = 5;
-  for (size_t i = 0; i < track_label_len; ++i)
+static inline auto
+is_track_line(const string &line) -> bool {
+  static constexpr auto track_label = "track";
+  static constexpr auto track_label_len = 5u;
+  for (auto i = 0u; i < track_label_len; ++i)
     if (line[i] != track_label[i])
       return false;
   return true;
@@ -380,11 +380,8 @@ is_track_line(const string &line) {
 void
 ReadBEDFile(const string &filename, vector<GenomicRegion> &the_regions) {
   std::ifstream in(filename);
-  if (isdir(filename.c_str()))
-    throw runtime_error("BED file is a directory: " + filename);
-
-  if (!in.good())
-    throw runtime_error("cannot open input file " + filename);
+  if (!in)
+    throw runtime_error("failed to open file " + filename);
 
   string line;
   while (getline(in, line))
