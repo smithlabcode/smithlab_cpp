@@ -122,6 +122,7 @@ public:
 
   bool about_requested() const {return about_request;}
   std::string about_message() const;
+  std::string about_message_raw() const;
   std::string invalid_leftover() const;
 
   bool option_missing() const {
