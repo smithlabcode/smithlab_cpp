@@ -562,6 +562,12 @@ OptionParser::about_message() const {
 
 
 string
+OptionParser::about_message_raw() const {
+  return prog_descr;
+}
+
+
+string
 OptionParser::invalid_leftover() const {
   static const string left_tag("invalid leftover args [should be ");
   static const string right_tag("]");
