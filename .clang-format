@@ -1,0 +1,5 @@
+BasedOnStyle: llvm
+BreakBeforeBraces: Custom
+BraceWrapping:
+  BeforeElse: true
+IndentWrappedFunctionNames: false
