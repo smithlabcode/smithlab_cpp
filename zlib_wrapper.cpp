@@ -19,16 +19,14 @@
 
 using std::string;
 
-char
-igzfstream::peek() {
+char igzfstream::peek() {
   const char c = gzgetc(fileobj);
   if (!gzeof(fileobj))
     gzungetc(c, fileobj);
   return c;
 }
 
-igzfstream&
-getline(igzfstream &in, string &line) {
+igzfstream &getline(igzfstream &in, string &line) {
   if (gzgets(in.fileobj, &in.buf[0], in.chunk_size)) {
     auto eol = std::find(begin(in.buf), end(in.buf), '\n');
     line.clear();
@@ -38,19 +36,16 @@ getline(igzfstream &in, string &line) {
   return in;
 }
 
-igzfstream&
-operator>>(igzfstream &in, string &line) {
+igzfstream &operator>>(igzfstream &in, string &line) {
   return getline(in, line);
 }
 
-ogzfstream&
-operator<<(ogzfstream &out, const string &line) {
+ogzfstream &operator<<(ogzfstream &out, const string &line) {
   gzputs(out.fileobj, line.c_str());
   return out;
 }
 
-ogzfstream&
-operator<<(ogzfstream &out, const char c) {
+ogzfstream &operator<<(ogzfstream &out, const char c) {
   gzputc(out.fileobj, c);
   return out;
 }

@@ -31,7 +31,7 @@ extern "C" {
 }
 
 extern "C" {
-  char check_htslib_wrapper();
+char check_htslib_wrapper();
 }
 
 class SAMReader {
@@ -46,6 +46,7 @@ public:
   void add_threads(const size_t n_threads);
 
   std::string get_header() const;
+
 private:
   // data
   std::string filename;
@@ -56,7 +57,6 @@ private:
   bam1_t *b{};
 };
 
-SAMReader &
-operator>>(SAMReader &sam_stream, sam_rec &samr);
+SAMReader &operator>>(SAMReader &sam_stream, sam_rec &samr);
 
 #endif

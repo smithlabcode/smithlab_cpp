@@ -16,6 +16,7 @@
 
 #include "dna_four_bit.hpp"
 
+// clang-format off
 char dna_four_bit_decoding[] = {
   'Z', // = 0000 =  0 = {}        = Zero bases
   'A', // = 0001 =  1 = {A}       = Adenine
@@ -76,3 +77,4 @@ uint8_t dna_four_bit_encoding[] = {
 };
 //      .  A  B  C  D  .  .  G  H  .  .  K  .  M  N  .
 //      .  .  R  S  T  .  V  W  .  Y  Z
+// clang-format on

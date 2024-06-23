@@ -19,30 +19,30 @@
 #ifndef OPTION_PARSER_HPP
 #define OPTION_PARSER_HPP
 
+#include <limits>
 #include <string>
 #include <vector>
-#include <limits>
 
 class Option {
 public:
-  Option(const std::string l_name, const char s_name,
-         const std::string descr,  const bool reqd, int &val);
-  Option(const std::string l_name, const char s_name,
-         const std::string descr,  const bool reqd, unsigned &val);
-  Option(const std::string l_name, const char s_name,
-         const std::string descr,  const bool reqd, long &val);
-  Option(const std::string l_name, const char s_name,
-         const std::string descr,  const bool reqd, unsigned long &val);
-  Option(const std::string l_name, const char s_name,
-         const std::string descr,  const bool reqd, float &val);
-  Option(const std::string l_name, const char s_name,
-         const std::string descr,  const bool reqd, double &val);
-  Option(const std::string l_name, const char s_name,
-         const std::string descr,  const bool reqd, std::string &val);
-  Option(const std::string l_name, const char s_name,
-         const std::string descr,  const bool reqd, bool &val);
-  Option(const std::string l_name, const char s_name,
-         const std::string descr,  const bool reqd, char &val);
+  Option(const std::string l_name, const char s_name, const std::string descr,
+         const bool reqd, int &val);
+  Option(const std::string l_name, const char s_name, const std::string descr,
+         const bool reqd, unsigned &val);
+  Option(const std::string l_name, const char s_name, const std::string descr,
+         const bool reqd, long &val);
+  Option(const std::string l_name, const char s_name, const std::string descr,
+         const bool reqd, unsigned long &val);
+  Option(const std::string l_name, const char s_name, const std::string descr,
+         const bool reqd, float &val);
+  Option(const std::string l_name, const char s_name, const std::string descr,
+         const bool reqd, double &val);
+  Option(const std::string l_name, const char s_name, const std::string descr,
+         const bool reqd, std::string &val);
+  Option(const std::string l_name, const char s_name, const std::string descr,
+         const bool reqd, bool &val);
+  Option(const std::string l_name, const char s_name, const std::string descr,
+         const bool reqd, char &val);
 
   bool parse(std::vector<std::string> &command_line);
 
@@ -54,7 +54,6 @@ public:
   std::string format_default_value() const;
 
 private:
-
   unsigned arg_type;
   std::string long_name;
   char short_name;
@@ -81,57 +80,52 @@ private:
 
 class OptionParser {
 public:
-
   OptionParser(const std::string nm, const std::string descr,
                std::string noflag_msg = "",
                const size_t n_left = std::numeric_limits<size_t>::max());
 
-  void set_show_defaults() {show_defaults = true;}
+  void set_show_defaults() { show_defaults = true; }
 
   void add_opt(const std::string l_name, const char s_name,
-               const std::string descr,  const bool reqd, int &val);
+               const std::string descr, const bool reqd, int &val);
   void add_opt(const std::string l_name, const char s_name,
-               const std::string descr,  const bool reqd, unsigned &val);
+               const std::string descr, const bool reqd, unsigned &val);
   void add_opt(const std::string l_name, const char s_name,
-               const std::string descr,  const bool reqd, long &val);
+               const std::string descr, const bool reqd, long &val);
   void add_opt(const std::string l_name, const char s_name,
-               const std::string descr,  const bool reqd, unsigned long &val);
+               const std::string descr, const bool reqd, unsigned long &val);
   void add_opt(const std::string l_name, const char s_name,
-               const std::string descr,  const bool reqd, float &val);
+               const std::string descr, const bool reqd, float &val);
   void add_opt(const std::string l_name, const char s_name,
-               const std::string descr,  const bool reqd, double &val);
+               const std::string descr, const bool reqd, double &val);
   void add_opt(const std::string l_name, const char s_name,
-               const std::string descr,  const bool reqd, std::string &val);
+               const std::string descr, const bool reqd, std::string &val);
   void add_opt(const std::string l_name, const char s_name,
-               const std::string descr,  const bool reqd, bool &val);
+               const std::string descr, const bool reqd, bool &val);
   void add_opt(const std::string l_name, const char s_name,
-               const std::string descr,  const bool reqd, char &val);
+               const std::string descr, const bool reqd, char &val);
 
   void parse(const int argc, const char **argv,
              std::vector<std::string> &arguments);
 
-  std::vector<std::string>
-  parse(const int argc, const char **argv);
+  std::vector<std::string> parse(const int argc, const char **argv);
 
   void parse(const int argc, const char **argv,
-             std::vector<std::string> &arguments,
-             std::string config_filename);
+             std::vector<std::string> &arguments, std::string config_filename);
 
-  bool help_requested() const {return help_request;}
+  bool help_requested() const { return help_request; }
   std::string help_message() const;
 
-  bool about_requested() const {return about_request;}
+  bool about_requested() const { return about_request; }
   std::string about_message() const;
   std::string about_message_raw() const;
   std::string invalid_leftover() const;
 
-  bool option_missing() const {
-    return !first_missing_option_name.empty();
-  }
+  bool option_missing() const { return !first_missing_option_name.empty(); }
 
   bool wrong_number_leftover() const {
     return n_leftover != std::numeric_limits<size_t>::max() &&
-      leftover_args.size() != n_leftover;
+           leftover_args.size() != n_leftover;
   }
 
   std::string option_missing_message() const;

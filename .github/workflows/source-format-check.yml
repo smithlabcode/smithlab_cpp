@@ -17,4 +17,4 @@ jobs:
       run: sudo apt-get install -y clang-format
     - name: Run clang-format
       run: |
-        git $(ls-files '*.*pp') | xargs clang-format -n -Werror
+        clang-format -n -Werror $(git ls-files '*.*pp')

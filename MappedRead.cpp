@@ -23,17 +23,17 @@
 #include "MappedRead.hpp"
 #include "smithlab_utils.hpp"
 
-#include <fstream>
 #include <algorithm>
+#include <fstream>
 #include <sstream>
 #include <string>
 
-using std::string;
 using std::runtime_error;
+using std::string;
 
 MappedRead::MappedRead(const string &line) {
   std::istringstream is;
-  is.rdbuf()->pubsetbuf(const_cast<char*>(line.c_str()), line.size());
+  is.rdbuf()->pubsetbuf(const_cast<char *>(line.c_str()), line.size());
 
   string chrom, name, tmp;
   size_t start = 0ul, end = 0ul;
@@ -41,7 +41,7 @@ MappedRead::MappedRead(const string &line) {
   double score;
   if (is >> chrom >> start >> tmp) {
     if (find_if(tmp.begin(), tmp.end(),
-                [](char c) {return !std::isdigit(c);}) == tmp.end()) {
+                [](char c) { return !std::isdigit(c); }) == tmp.end()) {
       end = std::stol(tmp);
       if (!(is >> name >> score >> strand >> seq))
         throw runtime_error("bad line in MappedRead file: " + line);
@@ -55,11 +55,11 @@ MappedRead::MappedRead(const string &line) {
     r = GenomicRegion(chrom, start, end, name, score, strand);
     is >> scr;
   }
-  else throw runtime_error("bad line in MappedRead file: " + line);
+  else
+    throw runtime_error("bad line in MappedRead file: " + line);
 }
 
-string
-MappedRead::tostring() const {
+string MappedRead::tostring() const {
   std::ostringstream oss;
   oss << r; // no chaining for the << of GenomicRegion
   oss << '\t' << seq;

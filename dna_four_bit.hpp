@@ -25,22 +25,18 @@ enum base_in_byte { left, right };
 
 extern char dna_four_bit_decoding[16];
 
-template <typename uint_type> constexpr
-uint_type
-get_nibble(const uint_type x, const size_t offset) {
-  return (x >> (4*offset)) & 15ul;
+template <typename uint_type>
+constexpr uint_type get_nibble(const uint_type x, const size_t offset) {
+  return (x >> (4 * offset)) & 15ul;
 }
 
-template <typename uint_type> constexpr
-char
-decode_dna_four_bit(const uint_type x,
-                    const size_t offset) {
+template <typename uint_type>
+constexpr char decode_dna_four_bit(const uint_type x, const size_t offset) {
   return dna_four_bit_decoding[get_nibble(x, offset)];
 }
 
-template<class InputItr, class OutputIt>
-OutputIt
-decode_dna_four_bit(InputItr first, InputItr last, OutputIt d_first) {
+template <class InputItr, class OutputIt>
+OutputIt decode_dna_four_bit(InputItr first, InputItr last, OutputIt d_first) {
   // ADS: assume destination has enough space
   while (first != last) {
     for (size_t offset = 0; offset < 16; ++offset)
@@ -52,12 +48,11 @@ decode_dna_four_bit(InputItr first, InputItr last, OutputIt d_first) {
   return d_first;
 }
 
-template<class InCtr, class OutCtr>
-void
-decode_dna_four_bit(const InCtr &source, OutCtr &dest) {
+template <class InCtr, class OutCtr>
+void decode_dna_four_bit(const InCtr &source, OutCtr &dest) {
   // expand out the bytes as pairs (do this backwards in case source == dest)
   const size_t source_size = source.size();
-  dest.resize(16*source_size);
+  dest.resize(16 * source_size);
   size_t i = source_size;
   size_t j = dest.size();
   while (i > 0) {
@@ -71,18 +66,14 @@ decode_dna_four_bit(const InCtr &source, OutCtr &dest) {
 }
 
 extern uint8_t dna_four_bit_encoding[128];
-template <typename uint_type> constexpr
-size_t
-encode_dna_four_bit(const uint_type x,
-                    const size_t offset) {
-  return (static_cast<size_t>(
-           dna_four_bit_encoding[static_cast<unsigned>(x)])
-         ) << (4*offset);
+template <typename uint_type>
+constexpr size_t encode_dna_four_bit(const uint_type x, const size_t offset) {
+  return (static_cast<size_t>(dna_four_bit_encoding[static_cast<unsigned>(x)]))
+         << (4 * offset);
 }
 
-template<class InputItr, class OutputIt>
-OutputIt
-encode_dna_four_bit(InputItr first, InputItr last, OutputIt d_first) {
+template <class InputItr, class OutputIt>
+OutputIt encode_dna_four_bit(InputItr first, InputItr last, OutputIt d_first) {
   while (first != last) {
     *d_first = 0;
     for (size_t i = 0; i < 16 && first != last; ++i)
@@ -96,12 +87,11 @@ encode_dna_four_bit(InputItr first, InputItr last, OutputIt d_first) {
 // of size_t values
 struct genome_four_bit_itr {
   genome_four_bit_itr(const std::vector<size_t>::const_iterator itr_,
-                      const int off_ = 0) : itr(itr_), offset(off_) {}
+                      const int off_ = 0)
+      : itr(itr_), offset(off_) {}
 
-  size_t operator*() const {
-    return (*itr >> (offset << 2)) & 15ul;
-  }
-  genome_four_bit_itr& operator++() {
+  size_t operator*() const { return (*itr >> (offset << 2)) & 15ul; }
+  genome_four_bit_itr &operator++() {
     offset = (offset + 1) & 15ul;
     itr += (offset == 0);
     return *this;
@@ -112,7 +102,7 @@ struct genome_four_bit_itr {
     itr += (offset == 0);
     return tmp;
   }
-  genome_four_bit_itr& operator--() {
+  genome_four_bit_itr &operator--() {
     itr -= (offset == 0);
 
     offset = (offset - 1) & 15ul;
@@ -129,7 +119,7 @@ struct genome_four_bit_itr {
   genome_four_bit_itr operator+(const size_t step) const {
     // whether the sum of offsets is >= 16
     const bool shift_one_pos =
-      ((offset + (static_cast<int>(step) & 15)) & 16) >> 4;
+        ((offset + (static_cast<int>(step) & 15)) & 16) >> 4;
 
     const int new_offset = (offset + step) & 15;
     return genome_four_bit_itr(itr + step / 16 + shift_one_pos, new_offset);

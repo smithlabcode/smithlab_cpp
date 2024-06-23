@@ -23,36 +23,41 @@
 
 #include "OptionParser.hpp"
 
-#include <sstream>
-#include <cstdlib>
-#include <fstream>
 #include <cassert>
-#include <iomanip>
-#include <exception>
-#include <cstring>
 #include <cctype>
+#include <cstdlib>
+#include <cstring>
+#include <exception>
+#include <fstream>
 #include <functional>
+#include <iomanip>
 #include <iterator>
+#include <sstream>
 
 #include "smithlab_utils.hpp"
 
-using std::vector;
-using std::string;
-using std::endl;
-using std::runtime_error;
 using std::begin;
 using std::end;
+using std::endl;
+using std::runtime_error;
+using std::string;
+using std::vector;
 
 static const size_t MAX_LINE_LENGTH = 72;
 
 enum {
-  SMITHLAB_ARG_INT,    SMITHLAB_ARG_UINT,  SMITHLAB_ARG_LONG,
-  SMITHLAB_ARG_ULONG,  SMITHLAB_ARG_FLOAT, SMITHLAB_ARG_DOUBLE,
-  SMITHLAB_ARG_STRING, SMITHLAB_ARG_BOOL,  SMITHLAB_ARG_CHAR
+  SMITHLAB_ARG_INT,
+  SMITHLAB_ARG_UINT,
+  SMITHLAB_ARG_LONG,
+  SMITHLAB_ARG_ULONG,
+  SMITHLAB_ARG_FLOAT,
+  SMITHLAB_ARG_DOUBLE,
+  SMITHLAB_ARG_STRING,
+  SMITHLAB_ARG_BOOL,
+  SMITHLAB_ARG_CHAR
 };
 
-void
-Option::format_option(const string &argument) {
+void Option::format_option(const string &argument) {
   std::istringstream ss(argument);
   if ((arg_type == SMITHLAB_ARG_INT && !(ss >> *int_value)) ||
       (arg_type == SMITHLAB_ARG_UINT && !(ss >> *uint_value)) ||
@@ -61,8 +66,8 @@ Option::format_option(const string &argument) {
       (arg_type == SMITHLAB_ARG_FLOAT && !(ss >> *float_value)) ||
       (arg_type == SMITHLAB_ARG_DOUBLE && !(ss >> *double_value)) ||
       (arg_type == SMITHLAB_ARG_CHAR && !(ss >> *char_value)))
-    throw runtime_error("Invalid argument [" + argument +
-                        "] to option [" + format_option_name() + "]");
+    throw runtime_error("Invalid argument [" + argument + "] to option [" +
+                        format_option_name() + "]");
   else if (arg_type == SMITHLAB_ARG_STRING)
     *string_value = argument;
   else if (arg_type == SMITHLAB_ARG_BOOL) {
@@ -77,32 +82,37 @@ Option::format_option(const string &argument) {
 using std::numeric_limits;
 using std::to_string;
 
-template<class T> string
-format_int_like(T &val) {
+template <class T> string format_int_like(T &val) {
   return "[" +
-    ((val == numeric_limits<T>::max()) ? "infty" :
-     ((val == -numeric_limits<T>::max()) ? "-infty" : to_string(val))) + "]";
+         ((val == numeric_limits<T>::max())
+              ? "infty"
+              : ((val == -numeric_limits<T>::max()) ? "-infty"
+                                                    : to_string(val))) +
+         "]";
 }
 
-template<class T> string
-format_unsigned_like(T &val) {
-  return "[" +
-    ((val == numeric_limits<T>::max()) ? "infty" : to_string(val)) + "]";
+template <class T> string format_unsigned_like(T &val) {
+  return "[" + ((val == numeric_limits<T>::max()) ? "infty" : to_string(val)) +
+         "]";
 }
 
-template<class T> string
-format_float_like(T &val) {
+template <class T> string format_float_like(T &val) {
   return "[" +
-    ((val == numeric_limits<T>::max()) ? "infty" :
-     ((val == -numeric_limits<T>::max()) ? "-infty" :
-      ((val == numeric_limits<T>::min()) ? "eps" :
-       ((val == -numeric_limits<T>::min()) ? "-eps" :
-        ((std::abs(val) < numeric_limits<T>::min()) ? "0.0" :
-         to_string(val)))))) + "]";
+         ((val == numeric_limits<T>::max())
+              ? "infty"
+              : ((val == -numeric_limits<T>::max())
+                     ? "-infty"
+                     : ((val == numeric_limits<T>::min())
+                            ? "eps"
+                            : ((val == -numeric_limits<T>::min())
+                                   ? "-eps"
+                                   : ((std::abs(val) < numeric_limits<T>::min())
+                                          ? "0.0"
+                                          : to_string(val)))))) +
+         "]";
 }
 
-string
-Option::format_default_value() const {
+string Option::format_default_value() const {
   std::istringstream ss;
   if (arg_type == SMITHLAB_ARG_INT)
     return format_int_like(*int_value);
@@ -120,76 +130,76 @@ Option::format_default_value() const {
     return (*string_value).empty() ? "" : "[" + *string_value + "]";
   else if (arg_type == SMITHLAB_ARG_CHAR)
     return "[" + string(1, *char_value) + "]";
-  else // if (arg_type == SMITHLAB_ARG_BOOL)
+  else         // if (arg_type == SMITHLAB_ARG_BOOL)
     return ""; //*bool_value ? "true" : "false";
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 
 Option::Option(const string l_name, const char s_name, const string descr,
-               const bool reqd, int &val) :
-  arg_type(SMITHLAB_ARG_INT), long_name(l_name), short_name(s_name),
-  description(descr), required(reqd), specified(false), int_value(&val)  {}
+               const bool reqd, int &val)
+    : arg_type(SMITHLAB_ARG_INT), long_name(l_name), short_name(s_name),
+      description(descr), required(reqd), specified(false), int_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
-               const bool reqd, unsigned int &val) :
-  arg_type(SMITHLAB_ARG_UINT), long_name(l_name), short_name(s_name),
-  description(descr), required(reqd), specified(false), uint_value(&val)  {}
+               const bool reqd, unsigned int &val)
+    : arg_type(SMITHLAB_ARG_UINT), long_name(l_name), short_name(s_name),
+      description(descr), required(reqd), specified(false), uint_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
-               const bool reqd, long &val) :
-  arg_type(SMITHLAB_ARG_LONG), long_name(l_name), short_name(s_name),
-  description(descr), required(reqd), specified(false), long_value(&val) {}
+               const bool reqd, long &val)
+    : arg_type(SMITHLAB_ARG_LONG), long_name(l_name), short_name(s_name),
+      description(descr), required(reqd), specified(false), long_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
-               const bool reqd, unsigned long &val) :
-  arg_type(SMITHLAB_ARG_ULONG), long_name(l_name), short_name(s_name),
-  description(descr), required(reqd), specified(false), ulong_value(&val) {}
+               const bool reqd, unsigned long &val)
+    : arg_type(SMITHLAB_ARG_ULONG), long_name(l_name), short_name(s_name),
+      description(descr), required(reqd), specified(false), ulong_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
-               const bool reqd, float &val) :
-  arg_type(SMITHLAB_ARG_FLOAT), long_name(l_name), short_name(s_name),
-  description(descr), required(reqd), specified(false), float_value(&val) {}
+               const bool reqd, float &val)
+    : arg_type(SMITHLAB_ARG_FLOAT), long_name(l_name), short_name(s_name),
+      description(descr), required(reqd), specified(false), float_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
-               const bool reqd, double &val) :
-  arg_type(SMITHLAB_ARG_DOUBLE), long_name(l_name), short_name(s_name),
-  description(descr), required(reqd), specified(false), double_value(&val) {}
+               const bool reqd, double &val)
+    : arg_type(SMITHLAB_ARG_DOUBLE), long_name(l_name), short_name(s_name),
+      description(descr), required(reqd), specified(false), double_value(&val) {
+}
 
 Option::Option(const string l_name, const char s_name, const string descr,
-               const bool reqd, string &val) :
-  arg_type(SMITHLAB_ARG_STRING), long_name(l_name), short_name(s_name),
-  description(descr), required(reqd), specified(false), string_value(&val) {}
+               const bool reqd, string &val)
+    : arg_type(SMITHLAB_ARG_STRING), long_name(l_name), short_name(s_name),
+      description(descr), required(reqd), specified(false), string_value(&val) {
+}
 
 Option::Option(const string l_name, const char s_name, const string descr,
-               const bool reqd, bool &val) :
-  arg_type(SMITHLAB_ARG_BOOL), long_name(l_name), short_name(s_name),
-  description(descr), required(reqd), specified(false), bool_value(&val) {}
+               const bool reqd, bool &val)
+    : arg_type(SMITHLAB_ARG_BOOL), long_name(l_name), short_name(s_name),
+      description(descr), required(reqd), specified(false), bool_value(&val) {}
 
 Option::Option(const string l_name, const char s_name, const string descr,
-               const bool reqd, char &val) :
-  arg_type(SMITHLAB_ARG_CHAR), long_name(l_name), short_name(s_name),
-  description(descr), required(reqd), specified(false), char_value(&val) {}
+               const bool reqd, char &val)
+    : arg_type(SMITHLAB_ARG_CHAR), long_name(l_name), short_name(s_name),
+      description(descr), required(reqd), specified(false), char_value(&val) {}
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 
-string
-Option::format_option_name() const {
+string Option::format_option_name() const {
   std::ostringstream ss;
   if (short_name != '\0')
     ss << '-' << short_name << ", -" << long_name;
-  else ss << "    -" << long_name;
+  else
+    ss << "    -" << long_name;
   return ss.str();
 }
 
-string
-Option::format_option_description(const size_t offset,
-                                  const bool show_default) const {
+string Option::format_option_description(const size_t offset,
+                                         const bool show_default) const {
   std::ostringstream ss;
   if (!description.empty()) {
     vector<string> parts;
@@ -208,22 +218,20 @@ Option::format_option_description(const size_t offset,
       if (i > 0 && line_len == 0)
         ss << string(offset, ' ');
       ss << parts[i] << " ";
-      line_len += parts[i].size()+1; //+1 for the added space
+      line_len += parts[i].size() + 1; //+1 for the added space
     }
   }
   return ss.str();
 }
 
-bool
-Option::option_match(const string &other) {
+bool Option::option_match(const string &other) {
   return (long_name == other ||
           (other.length() > 1 && other[0] == '-' &&
            (other.substr(1) == long_name ||
             (other[1] == short_name && other.length() == 2))));
 }
 
-bool
-Option::parse(vector<string> &command_line) {
+bool Option::parse(vector<string> &command_line) {
   static const string dummy;
   if (!command_line.empty()) {
     for (size_t i = 0; i < command_line.size();)
@@ -256,8 +264,7 @@ Option::parse(vector<string> &command_line) {
   return (specified || !required);
 }
 
-void
-Option::parse_config_file(vector<string> &options) {
+void Option::parse_config_file(vector<string> &options) {
   size_t i = 0;
   size_t op_num = options.size();
   while (i < op_num) {
@@ -281,57 +288,49 @@ Option::parse_config_file(vector<string> &options) {
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 
-void
-OptionParser::add_opt(const string l_name, const char s_name, const string descr,
-                      const bool reqd, int &val) {
+void OptionParser::add_opt(const string l_name, const char s_name,
+                           const string descr, const bool reqd, int &val) {
   options.push_back(Option(l_name, s_name, descr, reqd, val));
 }
 
-void
-OptionParser::add_opt(const string l_name, const char s_name, const string descr,
-                      const bool reqd, unsigned &val) {
+void OptionParser::add_opt(const string l_name, const char s_name,
+                           const string descr, const bool reqd, unsigned &val) {
   options.push_back(Option(l_name, s_name, descr, reqd, val));
 }
 
-void
-OptionParser::add_opt(const string l_name, const char s_name, const string descr,
-                      const bool reqd, long &val)  {
+void OptionParser::add_opt(const string l_name, const char s_name,
+                           const string descr, const bool reqd, long &val) {
   options.push_back(Option(l_name, s_name, descr, reqd, val));
 }
 
-void
-OptionParser::add_opt(const string l_name, const char s_name, const string descr,
-                      const bool reqd, unsigned long &val) {
+void OptionParser::add_opt(const string l_name, const char s_name,
+                           const string descr, const bool reqd,
+                           unsigned long &val) {
   options.push_back(Option(l_name, s_name, descr, reqd, val));
 }
 
-void
-OptionParser::add_opt(const string l_name, const char s_name, const string descr,
-                      const bool reqd, float &val) {
+void OptionParser::add_opt(const string l_name, const char s_name,
+                           const string descr, const bool reqd, float &val) {
   options.push_back(Option(l_name, s_name, descr, reqd, val));
 }
 
-void
-OptionParser::add_opt(const string l_name, const char s_name, const string descr,
-                      const bool reqd, double &val) {
+void OptionParser::add_opt(const string l_name, const char s_name,
+                           const string descr, const bool reqd, double &val) {
   options.push_back(Option(l_name, s_name, descr, reqd, val));
 }
 
-void
-OptionParser::add_opt(const string l_name, const char s_name, const string descr,
-                      const bool reqd, string &val) {
+void OptionParser::add_opt(const string l_name, const char s_name,
+                           const string descr, const bool reqd, string &val) {
   options.push_back(Option(l_name, s_name, descr, reqd, val));
 }
 
-void
-OptionParser::add_opt(const string l_name, const char s_name, const string descr,
-                      const bool reqd, bool &val) {
+void OptionParser::add_opt(const string l_name, const char s_name,
+                           const string descr, const bool reqd, bool &val) {
   options.push_back(Option(l_name, s_name, descr, reqd, val));
 }
 
-void
-OptionParser::add_opt(const string l_name, const char s_name, const string descr,
-                      const bool reqd, char &val) {
+void OptionParser::add_opt(const string l_name, const char s_name,
+                           const string descr, const bool reqd, char &val) {
   options.push_back(Option(l_name, s_name, descr, reqd, val));
 }
 
@@ -340,12 +339,9 @@ OptionParser::add_opt(const string l_name, const char s_name, const string descr
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 
-bool valid_option_char(char ch) {
-  return std::isalnum(ch) || ch == '_';
-}
+bool valid_option_char(char ch) { return std::isalnum(ch) || ch == '_'; }
 
-static void
-fix_whitespace(string &s) {
+static void fix_whitespace(string &s) {
   std::istringstream iss(s);
   string token;
   s.clear();
@@ -356,9 +352,8 @@ fix_whitespace(string &s) {
   }
 }
 
-static void
-read_config_file(const string &config_filename,
-                 vector<string> &config_file_options) {
+static void read_config_file(const string &config_filename,
+                             vector<string> &config_file_options) {
   static const char comment_character = '#';
   static const char separator_character = ':';
 
@@ -381,7 +376,7 @@ read_config_file(const string &config_filename,
 
       const size_t sep_pos = line.find_first_of(separator_character);
 
-      if (sep_pos == 0 || // catches ": "
+      if (sep_pos == 0 ||               // catches ": "
           sep_pos >= line.length() - 1) // catches no sep or final char sep
         throw runtime_error("bad config file line: " + line);
 
@@ -403,10 +398,9 @@ read_config_file(const string &config_filename,
   }
 }
 
-vector<string>
-OptionParser::parse(const int argc, const char **argv) {
+vector<string> OptionParser::parse(const int argc, const char **argv) {
   // The "2" below corresponds to the "about" and "help" options
-  assert(options.size() >=  2);
+  assert(options.size() >= 2);
 
   vector<string> arguments;
 
@@ -422,7 +416,7 @@ OptionParser::parse(const int argc, const char **argv) {
       vector<string> config_file_options;
       string config_filename;
       if (i + 1 < argc - 1)
-        config_filename =  arguments[i+1];
+        config_filename = arguments[i + 1];
       else
         // ads: need to check that this is really a filename
         throw runtime_error("--config requires config filename");
@@ -448,17 +442,15 @@ OptionParser::parse(const int argc, const char **argv) {
   return arguments;
 }
 
-void
-OptionParser::parse(const int argc, const char **argv,
-                    vector<string> &arguments) {
+void OptionParser::parse(const int argc, const char **argv,
+                         vector<string> &arguments) {
   arguments = parse(argc, argv);
 }
 
-void
-OptionParser::parse(const int argc, const char **argv,
-                    vector<string> &arguments, string config_filename) {
+void OptionParser::parse(const int argc, const char **argv,
+                         vector<string> &arguments, string config_filename) {
   // The "2" below corresponds to the "about" and "help" options
-  assert(options.size() >=  2);
+  assert(options.size() >= 2);
 
   if (!config_filename.empty()) {
     vector<string> config_file_options;
@@ -480,10 +472,10 @@ OptionParser::parse(const int argc, const char **argv,
 }
 
 OptionParser::OptionParser(const string nm, const string descr,
-                           string noflag_msg, const size_t n_left) :
-  prog_name(nm), prog_descr(descr), noflag_message(noflag_msg),
-  help_request(false), about_request(false),
-  show_defaults(false), n_leftover(n_left) {
+                           string noflag_msg, const size_t n_left)
+    : prog_name(nm), prog_descr(descr), noflag_message(noflag_msg),
+      help_request(false), about_request(false), show_defaults(false),
+      n_leftover(n_left) {
   add_opt("help", '?', "print this help message", false, help_request);
   add_opt("about", '\0', "print about message", false, about_request);
 }
@@ -495,8 +487,7 @@ OptionParser::OptionParser(const string nm, const string descr,
 ////// FOR PRINTING MESSAGES
 //////
 
-string
-OptionParser::help_message() const {
+string OptionParser::help_message() const {
   // corresponds to the two spaces before and
   static const string SPACE_BEFORE_SHORT = "  ";
   static const string SPACE_BTWN_SHRT_LNG = "  ";
@@ -504,7 +495,7 @@ OptionParser::help_message() const {
 
   vector<string> option_names;
   size_t max_name_len = 0;
-  for(size_t i = 0; i < options.size(); ++i) {
+  for (size_t i = 0; i < options.size(); ++i) {
     option_names.push_back(options[i].format_option_name());
     max_name_len = std::max(max_name_len, option_names.back().length());
   }
@@ -522,23 +513,22 @@ OptionParser::help_message() const {
     for (size_t i = 2; i < options.size(); ++i)
       ss << SPACE_BEFORE_SHORT << std::left << std::setw(max_name_len)
          << option_names[i] << SPACE_BTWN_SHRT_LNG
-         << options[i].format_option_description(max_name_len +
-                                                 TOTAL_ADDED_SPACE,
-                                                 show_defaults) << endl;
+         << options[i].format_option_description(
+                max_name_len + TOTAL_ADDED_SPACE, show_defaults)
+         << endl;
   }
 
   ss << endl << "Help options:" << endl;
   for (size_t i = 0; i < std::min(2ul, options.size()); ++i)
     ss << SPACE_BEFORE_SHORT << std::left << std::setw(max_name_len)
        << option_names[i] << SPACE_BTWN_SHRT_LNG
-       << options[i].format_option_description(max_name_len +
-                                               TOTAL_ADDED_SPACE,
-                                               show_defaults) << endl;
+       << options[i].format_option_description(max_name_len + TOTAL_ADDED_SPACE,
+                                               show_defaults)
+       << endl;
   return ss.str();
 }
 
-string
-OptionParser::about_message() const {
+string OptionParser::about_message() const {
   static const char *PROGRAM_NAME_TAG = "PROGRAM: ";
 
   vector<string> parts;
@@ -553,22 +543,17 @@ OptionParser::about_message() const {
       line_len = 0;
       ss << endl;
     }
-    else ss << ' ';
+    else
+      ss << ' ';
     ss << parts[i];
     line_len += parts[i].length() + 1; // the "+1" is for the space
   }
   return ss.str();
 }
 
+string OptionParser::about_message_raw() const { return prog_descr; }
 
-string
-OptionParser::about_message_raw() const {
-  return prog_descr;
-}
-
-
-string
-OptionParser::invalid_leftover() const {
+string OptionParser::invalid_leftover() const {
   static const string left_tag("invalid leftover args [should be ");
   static const string right_tag("]");
 
@@ -577,15 +562,12 @@ OptionParser::invalid_leftover() const {
     ss << left_tag << n_leftover << right_tag << endl;
   }
   for (size_t i = 0; i < leftover_args.size(); ++i) {
-    ss << "leftover arg #" << (i + 1) << "=\""
-       << leftover_args[i] << "\"";
+    ss << "leftover arg #" << (i + 1) << "=\"" << leftover_args[i] << "\"";
   }
   return ss.str();
 }
 
-
-string
-OptionParser::option_missing_message() const {
+string OptionParser::option_missing_message() const {
   std::ostringstream ss;
   ss << "required argument missing: [" << first_missing_option_name << "]";
   return ss.str();
