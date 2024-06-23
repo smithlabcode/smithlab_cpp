@@ -50,6 +50,7 @@ AM_CONDITIONAL([ENABLE_HTS], [test "x$enable_hts" = "xyes"])
 
 dnl check for required libraries
 AC_CHECK_LIB([z],[zlibVersion])
+AC_CHECK_HEADERS([zlib.h], , [echo "Did not find zlib.h header"; exit -1])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

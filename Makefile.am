@@ -18,8 +18,11 @@ EXTRA_DIST = README.md
 
 ACLOCAL_AMFLAGS = -I m4
 
-CXXFLAGS = -Wall -Wextra -Wpedantic
-CXXFLAGS += -O3 -DNDEBUG
+# For thing we don't want users to override
+AM_CXXFLAGS = -Wall -Wextra -Wpedantic
+
+# Users can override this; by default it would get -O2 -g
+CXXFLAGS = -O3 -DNDEBUG
 
 lib_LIBRARIES = libsmithlab_cpp.a
 
