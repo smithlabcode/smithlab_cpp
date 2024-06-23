@@ -16,35 +16,33 @@
  * General Public License for more details.
  */
 
-#include <fstream>
-#include <iostream>
 #include <algorithm>
-#include <map>
-#include <cstring>
 #include <cmath>
-#include <unordered_map>
+#include <cstring>
 #include <exception>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <unordered_map>
 
+#include "QualityScore.hpp"
 #include "smithlab_os.hpp"
 #include "smithlab_utils.hpp"
-#include "QualityScore.hpp"
 
-#include <errno.h>
 #include <dirent.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <errno.h>
 
-using std::string;
-using std::vector;
-using std::ios_base;
-using std::unordered_map;
-using std::runtime_error;
 using std::begin;
+using std::ios_base;
+using std::runtime_error;
+using std::string;
+using std::unordered_map;
+using std::vector;
 
-string
-strip_path(string full_path) {
+string strip_path(string full_path) {
   size_t start = full_path.find_last_of('/');
   if (start == string::npos)
     start = 0;
@@ -53,8 +51,7 @@ strip_path(string full_path) {
   return full_path.substr(start);
 }
 
-string
-strip_path_and_suffix(string full_path) {
+string strip_path_and_suffix(string full_path) {
   size_t start = full_path.find_last_of('/');
   if (start == string::npos)
     start = 0;
@@ -66,28 +63,27 @@ strip_path_and_suffix(string full_path) {
   return full_path.substr(start, end - start);
 }
 
-void
-parse_dir_basename_suffix(const string &full_path,
-                          string &dirname,
-                          string &base_name, string &suffix) {
+void parse_dir_basename_suffix(const string &full_path, string &dirname,
+                               string &base_name, string &suffix) {
   const size_t base_index = full_path.find_last_of("/\\");
   if (base_index != string::npos)
     dirname = full_path.substr(0, base_index);
-  else dirname = "";
+  else
+    dirname = "";
 
   const size_t suffix_index = full_path.find_last_of(".");
   if (suffix_index != string::npos &&
       (base_index == string::npos || suffix_index > base_index))
     suffix = string(begin(full_path) + suffix_index + 1, end(full_path));
-  else suffix = "";
+  else
+    suffix = "";
 
   base_name = string(begin(full_path) + base_index + 1,
                      begin(full_path) + suffix_index);
 }
 
-void
-format_dir_basename_suffix(const string &dn, const string &bn,
-                           const string &sf, string &full_path) {
+void format_dir_basename_suffix(const string &dn, const string &bn,
+                                const string &sf, string &full_path) {
   full_path = dn;
   if (!dn.empty() && bn.back() != '/')
     full_path += '/';
@@ -98,15 +94,13 @@ format_dir_basename_suffix(const string &dn, const string &bn,
     full_path += (sf[0] == '.' || full_path.back() == '.') ? sf : "." + sf;
 }
 
-bool
-isdir(const char *filename) {
+bool isdir(const char *filename) {
   struct stat buffer;
   stat(filename, &buffer);
   return S_ISDIR(buffer.st_mode);
 }
 
-bool
-is_fastq(const string &filename) {
+bool is_fastq(const string &filename) {
   std::ifstream f(filename.c_str());
   char c = '\0';
   f >> c;
@@ -117,14 +111,12 @@ is_fastq(const string &filename) {
 ////////////////////////////////////////////////////////////////////////
 // Stuff dealing with FASTA format sequence files
 
-bool
-is_valid_filename(const string &name, const string &filename_suffix) {
+bool is_valid_filename(const string &name, const string &filename_suffix) {
   const string suffix(name.substr(name.find_last_of(".") + 1));
   return (suffix == filename_suffix);
 }
 
-string
-path_join(const string &a, const string &b) {
+string path_join(const string &a, const string &b) {
   if (b.empty() || b[0] == '/')
     throw runtime_error("cannot prepend dir to file \"" + b + "\"");
   if (!a.empty() && a[a.length() - 1] == '/')
@@ -133,22 +125,21 @@ path_join(const string &a, const string &b) {
     return a + "/" + b;
 }
 
-void
-identify_chromosomes(const string &chrom_file, const string fasta_suffix,
-                     unordered_map<string, string> &chrom_files) {
+void identify_chromosomes(const string &chrom_file, const string fasta_suffix,
+                          unordered_map<string, string> &chrom_files) {
   vector<string> the_files;
   if (isdir(chrom_file.c_str())) {
     read_dir(chrom_file, fasta_suffix, the_files);
     for (size_t i = 0; i < the_files.size(); ++i)
       chrom_files[strip_path_and_suffix(the_files[i])] = the_files[i];
   }
-  else chrom_files[strip_path_and_suffix(chrom_file)] = chrom_file;
+  else
+    chrom_files[strip_path_and_suffix(chrom_file)] = chrom_file;
 }
 
-void
-identify_and_read_chromosomes(const string &chrom_file,
-                              const string fasta_suffix,
-                              unordered_map<string, string> &chrom_files) {
+void identify_and_read_chromosomes(const string &chrom_file,
+                                   const string fasta_suffix,
+                                   unordered_map<string, string> &chrom_files) {
   vector<string> the_files;
   if (isdir(chrom_file.c_str())) {
     read_dir(chrom_file, fasta_suffix, the_files);
@@ -164,9 +155,8 @@ identify_and_read_chromosomes(const string &chrom_file,
   }
 }
 
-void
-read_dir(const string& dirname, string filename_suffix,
-         vector<string> &filenames) {
+void read_dir(const string &dirname, string filename_suffix,
+              vector<string> &filenames) {
   DIR *dir;
   if (!(dir = opendir(dirname.c_str())))
     throw runtime_error("could not open directory: " + dirname);
@@ -186,41 +176,32 @@ read_dir(const string& dirname, string filename_suffix,
   closedir(dir);
 }
 
-bool
-is_sequence_line(const char *buffer) {
-  return isvalid(buffer[0]);
-}
+bool is_sequence_line(const char *buffer) { return isvalid(buffer[0]); }
 
-void
-parse_score_line(const char *buffer, vector<char> &scr) {
+void parse_score_line(const char *buffer, vector<char> &scr) {
   for (const char *i = buffer; *i != '\0'; ++i)
     scr.push_back(*i);
 }
 
-inline bool
-is_fastq_name_line(size_t line_count) {
+inline bool is_fastq_name_line(size_t line_count) {
   return ((line_count & 3ul) == 0ul);
 }
 
-inline bool
-is_fastq_sequence_line(size_t line_count) {
+inline bool is_fastq_sequence_line(size_t line_count) {
   return ((line_count & 3ul) == 1ul);
 }
 
-inline bool
-is_fastq_score_name_line(size_t line_count) {
+inline bool is_fastq_score_name_line(size_t line_count) {
   return ((line_count & 3ul) == 2ul);
 }
 
-inline bool
-is_fastq_score_line(size_t line_count) {
+inline bool is_fastq_score_line(size_t line_count) {
   return ((line_count & 3ul) == 3ul);
 }
 
-void
-read_fastq_file(const char *filename,
-                vector<string> &names,
-                vector<string> &sequences, vector<vector<double> > &scores) {
+void read_fastq_file(const char *filename, vector<string> &names,
+                     vector<string> &sequences,
+                     vector<vector<double>> &scores) {
 
   static const size_t INPUT_BUFFER_SIZE = 1000000;
 
@@ -230,7 +211,7 @@ read_fastq_file(const char *filename,
 
   string s, name;
   vector<char> scr;
-  vector<vector<char> > scrs;
+  vector<vector<char>> scrs;
   bool first_line = true;
   // ADS: preprocessor stuff below is because is_sequence_line is only
   // used with asserts; consider removing variable
@@ -242,9 +223,8 @@ read_fastq_file(const char *filename,
     char buffer[INPUT_BUFFER_SIZE + 1];
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw runtime_error(
-                          "Line in " + name + "\nexceeds max length: "
-                          + toa(INPUT_BUFFER_SIZE));
+      throw runtime_error("Line in " + name +
+                          "\nexceeds max length: " + toa(INPUT_BUFFER_SIZE));
     if (in.gcount() == 0)
       break;
 
@@ -259,7 +239,8 @@ read_fastq_file(const char *filename,
         names.push_back(name);
         sequences.push_back(s);
         scrs.push_back(scr);
-      } else
+      }
+      else
         first_line = false;
       name = buffer;
       name = name.substr(name.find_first_not_of("@ "));
@@ -278,8 +259,7 @@ read_fastq_file(const char *filename,
     }
     if (is_fastq_score_name_line(line_count)) {
       if (buffer[0] != '+')
-        throw runtime_error("invalid FASTQ score name line: " +
-                            string(buffer));
+        throw runtime_error("invalid FASTQ score name line: " + string(buffer));
     }
     if (is_fastq_score_line(line_count)) {
       parse_score_line(buffer, scr);
@@ -294,12 +274,14 @@ read_fastq_file(const char *filename,
 
   bool phred_scores = true, solexa_scores = true;
   for (size_t i = 0; i < scrs.size() && phred_scores && solexa_scores; ++i) {
-    phred_scores = phred_scores &&
-      (find_if(begin(scrs[i]), end(scrs[i]),
-               [](char c) {return !valid_phred_score(c);}) == end(scrs[i]));
-    solexa_scores = solexa_scores &&
-      (find_if(begin(scrs[i]), end(scrs[i]),
-               [](char c) {return !valid_solexa_score(c);}) == end(scrs[i]));
+    phred_scores =
+        phred_scores && (find_if(begin(scrs[i]), end(scrs[i]), [](char c) {
+                           return !valid_phred_score(c);
+                         }) == end(scrs[i]));
+    solexa_scores =
+        solexa_scores && (find_if(begin(scrs[i]), end(scrs[i]), [](char c) {
+                            return !valid_solexa_score(c);
+                          }) == end(scrs[i]));
   }
 
   if (!phred_scores && !solexa_scores)
@@ -308,10 +290,9 @@ read_fastq_file(const char *filename,
   for (size_t i = 0; i < scrs.size(); ++i) {
     scores.push_back(vector<double>(scrs[i].size()));
     for (size_t j = 0; j < scrs[i].size(); ++j)
-      scores[i][j] =
-        (solexa_scores) ?
-        quality_character_to_solexa(scrs[i][j] - 5) :
-        quality_character_to_phred(scrs[i][j]);
+      scores[i][j] = (solexa_scores)
+                         ? quality_character_to_solexa(scrs[i][j] - 5)
+                         : quality_character_to_phred(scrs[i][j]);
     scrs[i].clear();
   }
 }
@@ -337,9 +318,8 @@ void read_fastq_file(const char *filename, vector<string> &names,
     char buffer[INPUT_BUFFER_SIZE + 1];
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw runtime_error(
-                          "Line in " + name + "\nexceeds max length: "
-                          + toa(INPUT_BUFFER_SIZE));
+      throw runtime_error("Line in " + name +
+                          "\nexceeds max length: " + toa(INPUT_BUFFER_SIZE));
     if (in.gcount() == 0)
       break;
 
@@ -354,7 +334,8 @@ void read_fastq_file(const char *filename, vector<string> &names,
         names.push_back(name);
         sequences.push_back(s);
         scores.push_back(scr);
-      } else
+      }
+      else
         first_line = false;
       name = buffer;
       name = name.substr(name.find_first_not_of("@ "));
@@ -371,8 +352,7 @@ void read_fastq_file(const char *filename, vector<string> &names,
     }
     if (is_fastq_score_name_line(line_count)) {
       if (buffer[0] != '+')
-        throw runtime_error("invalid FASTQ score name line: " +
-                            string(buffer));
+        throw runtime_error("invalid FASTQ score name line: " + string(buffer));
     }
     if (is_fastq_score_line(line_count)) {
       scr = buffer;
@@ -386,10 +366,8 @@ void read_fastq_file(const char *filename, vector<string> &names,
   }
 }
 
-void
-read_fasta_file_short_names(const string &filename,
-                            vector<string> &names,
-                            vector<string> &sequences) {
+void read_fasta_file_short_names(const string &filename, vector<string> &names,
+                                 vector<string> &sequences) {
 
   std::ifstream in(filename);
   if (!in)
@@ -406,17 +384,16 @@ read_fasta_file_short_names(const string &filename,
         names.push_back(line.substr(1));
       else
         names.push_back(string(begin(line) + 1,
-                             begin(line) + line.find_first_of(" \t", 1)));
+                               begin(line) + line.find_first_of(" \t", 1)));
       sequences.push_back(string());
     }
-    else sequences.back() += line;
+    else
+      sequences.back() += line;
   }
 }
 
-void
-read_fasta_file(const string &filename,
-                vector<string> &names,
-                vector<string> &sequences) {
+void read_fasta_file(const string &filename, vector<string> &names,
+                     vector<string> &sequences) {
 
   std::ifstream in(filename.c_str());
   if (!in)
@@ -432,14 +409,13 @@ read_fasta_file(const string &filename,
       names.push_back(line.substr(1));
       sequences.push_back(string());
     }
-    else sequences.back() += line;
+    else
+      sequences.back() += line;
   }
 }
 
-void
-read_fasta_file(const string &filename,
-                const string &target,
-                string &sequence) {
+void read_fasta_file(const string &filename, const string &target,
+                     string &sequence) {
 
   // read the sequence with the given name from a fasta file
 
@@ -457,8 +433,8 @@ read_fasta_file(const string &filename,
     char buffer[INPUT_BUFFER_SIZE + 1];
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
-      throw runtime_error("Line in " + name + "\nexceeds max length: "
-                          + toa(INPUT_BUFFER_SIZE));
+      throw runtime_error("Line in " + name +
+                          "\nexceeds max length: " + toa(INPUT_BUFFER_SIZE));
     // correct for dos carriage returns before newlines
     if (buffer[strlen(buffer) - 1] == '\r')
       buffer[strlen(buffer) - 1] = '\0';
@@ -468,7 +444,8 @@ read_fasta_file(const string &filename,
         in.close();
         return;
       }
-      else first_line = false;
+      else
+        first_line = false;
       name = buffer;
       name = name.substr(name.find_first_not_of("> "));
       const size_t first_whitespace = name.find_first_of(" \t");
@@ -479,14 +456,13 @@ read_fasta_file(const string &filename,
     else if (name == target)
       s += buffer;
     in.peek();
-  } //while
+  } // while
 
   if (!first_line && s.length() > 0 && name == target)
     std::swap(sequence, s);
 }
 
-void
-read_filename_file(const char *filename, vector<string> &filenames) {
+void read_filename_file(const char *filename, vector<string> &filenames) {
 
   static const size_t INPUT_BUFFER_SIZE = 1000000;
 
@@ -499,15 +475,13 @@ read_filename_file(const char *filename, vector<string> &filenames) {
     in.getline(buffer, INPUT_BUFFER_SIZE);
     if (in.gcount() == static_cast<int>(INPUT_BUFFER_SIZE))
       throw runtime_error("Line in " + string(filename) +
-                          "\nexceeds max length: "
-                          + toa(INPUT_BUFFER_SIZE));
+                          "\nexceeds max length: " + toa(INPUT_BUFFER_SIZE));
     filenames.push_back(buffer);
     in.peek();
   }
 }
 
-size_t
-get_filesize(string filename) {
+size_t get_filesize(string filename) {
   std::ifstream f(filename.c_str());
   if (!f.good())
     return 0;
@@ -520,8 +494,7 @@ get_filesize(string filename) {
   return end_pos - begin_pos;
 }
 
-string
-basename(string filename) {
+string basename(string filename) {
   const string s(filename.substr(0, filename.find_last_of(".")));
   const size_t final_slash = s.find_last_of("/");
   if (final_slash != string::npos)
@@ -530,8 +503,7 @@ basename(string filename) {
     return s;
 }
 
-void
-read_dir(const string& dirname, vector<string> &filenames) {
+void read_dir(const string &dirname, vector<string> &filenames) {
   DIR *dir;
   if (!(dir = opendir(dirname.c_str())))
     throw "could not open directory: " + dirname;
@@ -550,8 +522,7 @@ read_dir(const string& dirname, vector<string> &filenames) {
   closedir(dir);
 }
 
-bool
-is_valid_output_file(const string &filename) {
+bool is_valid_output_file(const string &filename) {
   // ADS: seems like there is no way around "access" and apparently
   // access is not a great solution anyway.
   if (std::filesystem::exists(filename))
@@ -569,9 +540,8 @@ is_valid_output_file(const string &filename) {
   }
 }
 
-bool
-has_gz_ext(const string &filename) {
+bool has_gz_ext(const string &filename) {
   const string ext(".gz");
-  return filename.size() >= ext.size()
-    && filename.compare(filename.size() - ext.size(), ext.size(), ext) == 0;
+  return filename.size() >= ext.size() &&
+         filename.compare(filename.size() - ext.size(), ext.size(), ext) == 0;
 }

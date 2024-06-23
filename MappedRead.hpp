@@ -34,8 +34,7 @@ struct MappedRead {
   std::string tostring() const;
 };
 
-template <class T> T&
-operator>>(T &the_stream, MappedRead &mr) {
+template <class T> T &operator>>(T &the_stream, MappedRead &mr) {
   std::string buffer;
   if (getline(the_stream, buffer)) {
     mr = MappedRead(buffer);
@@ -43,8 +42,7 @@ operator>>(T &the_stream, MappedRead &mr) {
   return the_stream;
 }
 
-template <class T> T&
-operator<<(T &the_stream, const MappedRead &mr) {
+template <class T> T &operator<<(T &the_stream, const MappedRead &mr) {
   the_stream << mr.tostring();
   return the_stream;
 }

@@ -22,21 +22,19 @@
 
 #include "QualityScore.hpp"
 
-#include <fstream>
 #include "smithlab_utils.hpp"
+#include <fstream>
 
-using std::string;
 using std::runtime_error;
+using std::string;
 
-static bool
-check_formats(char c, bool &solexa, bool &phred) {
+static bool check_formats(char c, bool &solexa, bool &phred) {
   solexa = solexa && valid_solexa_score(c);
   phred = phred && valid_phred_score(c);
   return (solexa && phred);
 }
 
-FASTQScoreType
-fastq_score_type(const string filename) {
+FASTQScoreType fastq_score_type(const string filename) {
   static const size_t MAX_LINE_SIZE = 1000;
   std::ifstream f(filename.c_str());
   if (!f)
@@ -48,7 +46,8 @@ fastq_score_type(const string filename) {
   while (f.getline(line, MAX_LINE_SIZE)) {
     if (line_count % 4 == 3) {
       char *c = line;
-      while (*c != '\0' && check_formats(*c, solexa, phred)) ++c;
+      while (*c != '\0' && check_formats(*c, solexa, phred))
+        ++c;
       if (!check_formats(*c, solexa, phred))
         return ((phred) ? FASTQ_Phred : FASTQ_Solexa);
     }
@@ -57,8 +56,7 @@ fastq_score_type(const string filename) {
   return (phred) ? FASTQ_Phred : FASTQ_Solexa;
 }
 
-FASTQScoreType
-mapped_reads_score_type(const string filename) {
+FASTQScoreType mapped_reads_score_type(const string filename) {
   static const size_t MAX_LINE_SIZE = 10000;
   std::ifstream f(filename.c_str());
   if (!f)
@@ -84,7 +82,8 @@ mapped_reads_score_type(const string filename) {
     while (position < MAX_LINE_SIZE && isspace(line[position]))
       ++position;
     char *c = line + position;
-    while (!isspace(*c) && check_formats(*c, solexa, phred)) ++c;
+    while (!isspace(*c) && check_formats(*c, solexa, phred))
+      ++c;
     if (!check_formats(*c, solexa, phred))
       return ((phred) ? FASTQ_Phred : FASTQ_Solexa);
   }

@@ -32,10 +32,7 @@ using std::runtime_error;
 using std::string;
 using std::vector;
 
-char
-check_htslib_wrapper() {
-  return 1;
-}
+char check_htslib_wrapper() { return 1; }
 
 SAMReader::SAMReader(const string &fn)
     : filename(fn), good(true), hts(nullptr), hdr(nullptr), b(nullptr) {
@@ -68,8 +65,7 @@ SAMReader::~SAMReader() {
   good = false;
 }
 
-SAMReader &
-operator>>(SAMReader &reader, sam_rec &aln) {
+SAMReader &operator>>(SAMReader &reader, sam_rec &aln) {
   reader.get_sam_record(aln);
   return reader;
 }
@@ -78,8 +74,7 @@ operator>>(SAMReader &reader, sam_rec &aln) {
 //// general facility for SAM format
 /////////////////////////////////////////////
 
-bool
-SAMReader::get_sam_record(sam_rec &sr) {
+bool SAMReader::get_sam_record(sam_rec &sr) {
   int rd_ret = 0;
   if ((rd_ret = sam_read1(hts, hdr, b)) >= 0) {
     // ADS: the line below implicitly converts the 0-based leftmost
@@ -90,7 +85,7 @@ SAMReader::get_sam_record(sam_rec &sr) {
     if ((fmt_ret = sam_format1(hdr, b, &hts->line)) <= 0)
       throw runtime_error("failed reading record from: " + filename);
     sr = sam_rec(hts->line.s);
-    good = true;  // reader.get_sam_record(reader.hts->line.s, sr);
+    good = true; // reader.get_sam_record(reader.hts->line.s, sr);
     // ADS: line below seems to be needed when the file format is SAM
     // because the hts_getline for parsing SAM format files within
     // sam_read1 only get called when "(fp->line.l == 0)". For BAM
@@ -101,12 +96,11 @@ SAMReader::get_sam_record(sam_rec &sr) {
   }
   else if (rd_ret == -1)
     good = false;
-  else  // rd_ret < -1
+  else // rd_ret < -1
     throw runtime_error("failed to read record from file: " + filename);
   return good;
 }
 
-string
-SAMReader::get_header() const {
-  return hdr->text;  // includes newline
+string SAMReader::get_header() const {
+  return hdr->text; // includes newline
 }

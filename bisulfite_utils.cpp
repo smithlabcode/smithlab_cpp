@@ -28,11 +28,10 @@
 
 using std::string;
 
-void
-bisulfite_treatment(std::mt19937 &generator, string &seq,
-                    double bs_rate, double meth_rate) {
+void bisulfite_treatment(std::mt19937 &generator, string &seq, double bs_rate,
+                         double meth_rate) {
 
-  std::uniform_real_distribution<double> unif(0.0,1.0);
+  std::uniform_real_distribution<double> unif(0.0, 1.0);
 
   const size_t seq_len = seq.length() - 1;
   for (size_t i = 0; i < seq_len; ++i)
