@@ -1,0 +1,20 @@
+name: Source code format check
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  check-format:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Install dependencies
+      run: sudo apt-get install -y clang-format
+    - name: Run clang-format
+      run: |
+        git $(ls-files '*.*pp') | xargs clang-format -n -Werror
