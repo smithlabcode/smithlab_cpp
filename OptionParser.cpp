@@ -1,24 +1,24 @@
-/*
- *    Part of SMITHLAB software
+/* Part of SMITHLAB software
  *
- *    Copyright (C) 2008 Cold Spring Harbor Laboratory,
- *                       University of Southern California and
- *                       Andrew D. Smith
+ * Copyright (C) 2008-2024 Cold Spring Harbor Laboratory,
+ *                            University of Southern California and
+ *                            Andrew D. Smith
  *
- *    Authors: Andrew D. Smith
+ * Authors: Andrew D. Smith
  *
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
  *
- *    You should have received a copy of the GNU General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 
 #include "OptionParser.hpp"
@@ -32,6 +32,7 @@
 #include <functional>
 #include <iomanip>
 #include <iterator>
+#include <regex>
 #include <sstream>
 
 #include "smithlab_utils.hpp"
@@ -211,7 +212,7 @@ string Option::format_option_description(const size_t offset,
 
     size_t line_len = 0;
     for (size_t i = 0; i < parts.size(); ++i) {
-      if (offset + line_len + parts[i].size() >= MAX_LINE_LENGTH && i > 0) {
+      if (offset + line_len + parts[i].size() > MAX_LINE_LENGTH && i > 0) {
         line_len = 0;
         ss << endl;
       }
@@ -530,16 +531,24 @@ string OptionParser::help_message() const {
 
 string OptionParser::about_message() const {
   static const char *PROGRAM_NAME_TAG = "PROGRAM: ";
+  static const std::regex whitespace_re(R"([\s]+)");
+
+  // remove newlines
+  string tmp_descr{prog_descr};
+  regex_replace(begin(tmp_descr), cbegin(tmp_descr), cend(tmp_descr),
+                whitespace_re, " ");
+  tmp_descr.erase(tmp_descr.find_last_not_of(' ') + 1);
+  tmp_descr.erase(0, tmp_descr.find_first_not_of(' '));
 
   vector<string> parts;
-  smithlab::split_whitespace(prog_descr, parts);
+  smithlab::split_whitespace(tmp_descr, parts);
 
   std::ostringstream ss;
   ss << PROGRAM_NAME_TAG << prog_name << endl;
   ss << parts.front();
   size_t line_len = parts.front().length();
   for (size_t i = 1; i < parts.size(); ++i) {
-    if (line_len + parts[i].size() >= MAX_LINE_LENGTH) {
+    if (line_len + parts[i].size() > MAX_LINE_LENGTH) {
       line_len = 0;
       ss << endl;
     }
