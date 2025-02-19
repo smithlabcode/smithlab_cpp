@@ -52,7 +52,7 @@ Out copy_if(In first, In last, Out res, Pred p) {
   }
   return res;
 }
-}; // namespace smithlab
+} // namespace smithlab
 
 typedef size_t MASK_t;
 
