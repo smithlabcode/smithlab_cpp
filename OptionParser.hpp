@@ -105,13 +105,12 @@ public:
   void add_opt(const std::string l_name, const char s_name,
                const std::string descr, const bool reqd, char &val);
 
-  void parse(const int argc, const char **argv,
-             std::vector<std::string> &arguments);
+  void parse(const int argc, char *argv[], std::vector<std::string> &arguments);
 
-  std::vector<std::string> parse(const int argc, const char **argv);
+  std::vector<std::string> parse(const int argc, char *argv[]);
 
-  void parse(const int argc, const char **argv,
-             std::vector<std::string> &arguments, std::string config_filename);
+  void parse(const int argc, char *argv[], std::vector<std::string> &arguments,
+             std::string config_filename);
 
   bool help_requested() const { return help_request; }
   std::string help_message() const;

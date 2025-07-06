@@ -399,7 +399,7 @@ static void read_config_file(const string &config_filename,
   }
 }
 
-vector<string> OptionParser::parse(const int argc, const char **argv) {
+vector<string> OptionParser::parse(const int argc, char *argv[]) {
   // The "2" below corresponds to the "about" and "help" options
   assert(options.size() >= 2);
 
@@ -443,12 +443,12 @@ vector<string> OptionParser::parse(const int argc, const char **argv) {
   return arguments;
 }
 
-void OptionParser::parse(const int argc, const char **argv,
+void OptionParser::parse(const int argc, char *argv[],
                          vector<string> &arguments) {
   arguments = parse(argc, argv);
 }
 
-void OptionParser::parse(const int argc, const char **argv,
+void OptionParser::parse(const int argc, char *argv[],
                          vector<string> &arguments, string config_filename) {
   // The "2" below corresponds to the "about" and "help" options
   assert(options.size() >= 2);
