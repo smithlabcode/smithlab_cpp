@@ -533,15 +533,20 @@ string OptionParser::about_message() const {
   static const char *PROGRAM_NAME_TAG = "PROGRAM: ";
   static const std::regex whitespace_re(R"([\s]+)");
 
-  // remove newlines
-  string tmp_descr{prog_descr};
-  regex_replace(begin(tmp_descr), cbegin(tmp_descr), cend(tmp_descr),
-                whitespace_re, " ");
-  tmp_descr.erase(tmp_descr.find_last_not_of(' ') + 1);
-  tmp_descr.erase(0, tmp_descr.find_first_not_of(' '));
+  std::vector<std::string> parts = [&] {
+    if (prog_descr_is_raw)
+      return std::vector<std::string>(1, prog_descr);
+    // remove newlines
+    std::string tmp_descr{prog_descr};
+    std::regex_replace(std::begin(tmp_descr), std::cbegin(tmp_descr),
+                       std::cend(tmp_descr), whitespace_re, " ");
+    tmp_descr.erase(tmp_descr.find_last_not_of(' ') + 1);
+    tmp_descr.erase(0, tmp_descr.find_first_not_of(' '));
 
-  vector<string> parts;
-  smithlab::split_whitespace(tmp_descr, parts);
+    vector<string> parts;
+    smithlab::split_whitespace(tmp_descr, parts);
+    return parts;
+  }();
 
   std::ostringstream ss;
   ss << PROGRAM_NAME_TAG << prog_name << endl;
