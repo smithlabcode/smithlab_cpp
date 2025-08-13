@@ -128,6 +128,7 @@ public:
   }
 
   std::string option_missing_message() const;
+  void set_prog_descr_raw() { prog_descr_is_raw = true; }
 
   static const bool OPTIONAL = false;
   static const bool REQUIRED = true;
@@ -135,6 +136,7 @@ public:
 private:
   std::string prog_name;
   std::string prog_descr;
+  bool prog_descr_is_raw{};
   std::string noflag_message;
   std::vector<Option> options;
 
