@@ -42,5 +42,5 @@ foreach(cpp_file ${cpp_files})
 endforeach()
 
 add_library(smithlab_cpp)
-target_include_directories(smithlab_cpp PUBLIC)
+target_include_directories(smithlab_cpp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(smithlab_cpp PUBLIC ${LIBRARY_OBJECTS})
