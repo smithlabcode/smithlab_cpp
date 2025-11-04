@@ -1,6 +1,6 @@
 dnl This file is part of smithlab_cpp
 dnl
-dnl Copyright (C) 2010-2022: Andrew D. Smith and Meng Zhou
+dnl Copyright (C) 2010-2025: Andrew D. Smith and Meng Zhou
 dnl
 dnl Author: Andrew D. Smith and Meng Zhou
 dnl
@@ -14,7 +14,7 @@ dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
 dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 dnl General Public License for more details.
 
-AC_INIT([libsmithlab_cpp], [1.0.2], [andrewds@usc.edu],
+AC_INIT([libsmithlab_cpp], [1.2.0], [andrewds@usc.edu],
         [], [https://github.com/smithlabcode])
 dnl the config.h is not currently #included in the source, and only
 dnl used to keep command lines short.
