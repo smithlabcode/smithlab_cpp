@@ -32,6 +32,18 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
 include(GNUInstallDirs)
 
+if(STATIC_ANALYSIS)
+  include(cmake/static_analysis.cmake)
+endif()
+
+add_compile_options(
+  -Wall
+  -Wextra
+  -Wpedantic
+  -Werror
+  -Wfatal-errors
+)
+
 file(GLOB cpp_files "*.cpp")
 
 set(LIBRARY_OBJECTS "")
@@ -42,5 +54,9 @@ foreach(cpp_file ${cpp_files})
 endforeach()
 
 add_library(smithlab_cpp)
-target_include_directories(smithlab_cpp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(smithlab_cpp PUBLIC ${LIBRARY_OBJECTS})
+target_include_directories(smithlab_cpp PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+target_link_libraries(smithlab_cpp PUBLIC
+  ${LIBRARY_OBJECTS}
+)
