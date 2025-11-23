@@ -17,8 +17,10 @@
 #ifndef DNA_FOUR_BIT_HPP
 #define DNA_FOUR_BIT_HPP
 
+#include <cstddef>
 #include <cstdint>
-#include <iterator>
+#include <iterator> // IWYU pragma: keep
+#include <utility>
 #include <vector>
 
 enum base_in_byte { left, right };

@@ -21,11 +21,15 @@
  */
 
 #include "GenomicRegion.hpp"
-
-#include <exception>
+#include "smithlab_os.hpp"
 
 #include <cassert>
+#include <cctype>
+#include <cstdlib>
 #include <fstream>
+#include <limits>
+#include <sstream>
+#include <stdexcept>
 #include <unordered_map>
 
 using std::ostringstream;
@@ -135,8 +139,6 @@ bool SimpleGenomicRegion::operator==(const SimpleGenomicRegion &rhs) const {
 bool SimpleGenomicRegion::operator!=(const SimpleGenomicRegion &rhs) const {
   return (chrom != rhs.chrom || start != rhs.start || end != rhs.end);
 }
-
-#include <iostream>
 
 unordered_map<string, chrom_id_type> GenomicRegion::fw_table_in;
 unordered_map<chrom_id_type, string> GenomicRegion::fw_table_out;

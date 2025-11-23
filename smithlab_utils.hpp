@@ -25,15 +25,10 @@
 #define SMITHLAB_UTILS_HPP
 
 #include <algorithm>
-#include <cassert>
+#include <cctype>
 #include <cmath>
-#include <cstdint>
-#include <iomanip>
-#include <iostream>
+#include <cstddef>
 #include <iterator>
-#include <limits>
-#include <numeric>
-#include <ostream>
 #include <sstream>
 #include <string>
 #include <vector>

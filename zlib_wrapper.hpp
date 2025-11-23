@@ -16,11 +16,11 @@
 #ifndef ZLIB_WRAPPER_HPP
 #define ZLIB_WRAPPER_HPP
 
+#include <zlib.h>
+
+#include <cstddef>
 #include <string>
 #include <vector>
-
-// ADS: need some way to check if this is installed
-#include <zlib.h>
 
 struct igzfstream {
   igzfstream(const std::string filename)

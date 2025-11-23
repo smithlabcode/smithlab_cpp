@@ -24,18 +24,19 @@
 #ifndef GENOMIC_REGION_HPP
 #define GENOMIC_REGION_HPP
 
-#include "smithlab_os.hpp"
 #include "smithlab_utils.hpp"
 
+#include <algorithm>
 #include <fstream>
-#include <limits>
+#include <iterator>
+#include <stdio.h>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
+class GenomicRegion;
 
 typedef unsigned chrom_id_type;
-
-class GenomicRegion;
 
 class SimpleGenomicRegion {
 public:

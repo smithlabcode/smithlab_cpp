@@ -15,8 +15,8 @@
 
 #include "cigar_utils.hpp"
 
-#include <exception>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 using std::runtime_error;

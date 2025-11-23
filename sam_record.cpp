@@ -17,13 +17,12 @@
  */
 
 #include "sam_record.hpp"
+#include "cigar_utils.hpp"
 
 #include <cstdint>
 #include <regex>
 #include <sstream>
-
-#include "cigar_utils.hpp"
-#include "smithlab_utils.hpp"
+#include <stdexcept>
 
 using std::begin;
 using std::end;

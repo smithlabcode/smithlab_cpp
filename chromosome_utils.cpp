@@ -21,8 +21,16 @@
  */
 
 #include "chromosome_utils.hpp"
+#include "GenomicRegion.hpp"
+#include "smithlab_os.hpp"
 
+#include <algorithm>
+#include <cassert>
 #include <cctype>
+#include <cmath>
+#include <cstdlib>
+#include <fstream>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>

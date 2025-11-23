@@ -17,14 +17,13 @@
  */
 
 #include "htslib_wrapper.hpp"
+#include "sam_record.hpp"
 
-#include <fstream>
+#include <cassert>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-
-#include "MappedRead.hpp"
-#include "smithlab_utils.hpp"
 
 using std::cerr;
 using std::endl;

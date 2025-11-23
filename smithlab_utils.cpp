@@ -21,9 +21,14 @@
  */
 
 #include "smithlab_utils.hpp"
+
+#include <cassert>
 #include <cmath>
 #include <cstring>
+#include <iomanip>
+#include <limits>
 #include <string>
+#include <utility>
 
 using std::string;
 using std::vector;

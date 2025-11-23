@@ -16,8 +16,7 @@
 #include "zlib_wrapper.hpp"
 
 #include <algorithm>
-
-using std::string;
+#include <iterator>
 
 char igzfstream::peek() {
   const char c = gzgetc(fileobj);
@@ -26,7 +25,7 @@ char igzfstream::peek() {
   return c;
 }
 
-igzfstream &getline(igzfstream &in, string &line) {
+igzfstream &getline(igzfstream &in, std::string &line) {
   if (gzgets(in.fileobj, &in.buf[0], in.chunk_size)) {
     auto eol = std::find(begin(in.buf), end(in.buf), '\n');
     line.clear();
@@ -36,11 +35,11 @@ igzfstream &getline(igzfstream &in, string &line) {
   return in;
 }
 
-igzfstream &operator>>(igzfstream &in, string &line) {
+igzfstream &operator>>(igzfstream &in, std::string &line) {
   return getline(in, line);
 }
 
-ogzfstream &operator<<(ogzfstream &out, const string &line) {
+ogzfstream &operator<<(ogzfstream &out, const std::string &line) {
   gzputs(out.fileobj, line.c_str());
   return out;
 }
