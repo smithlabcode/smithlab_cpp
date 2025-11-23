@@ -18,17 +18,13 @@
 #ifndef HTSLIB_WRAPPER_HPP
 #define HTSLIB_WRAPPER_HPP
 
-#include <fstream>
-#include <string>
-#include <vector>
-
-#include "sam_record.hpp"
-#include "smithlab_utils.hpp"
-
-extern "C" {
 #include <htslib/hts.h>
 #include <htslib/sam.h>
-}
+
+#include <cstddef>
+#include <string>
+
+class sam_rec;
 
 extern "C" {
 char check_htslib_wrapper();

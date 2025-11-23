@@ -21,11 +21,11 @@
  */
 
 #include "MappedRead.hpp"
-#include "smithlab_utils.hpp"
 
 #include <algorithm>
-#include <fstream>
+#include <cctype>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 using std::runtime_error;

@@ -17,7 +17,10 @@
 #define CIGAR_UTILS_HPP
 
 #include <algorithm>
-#include <cctype> // isdigit
+#include <cctype>
+#include <cstdio>
+#include <initializer_list>
+#include <iterator>
 #include <string>
 
 inline bool consumes_query(const char op) {

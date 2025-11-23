@@ -22,8 +22,9 @@
 
 #include "QualityScore.hpp"
 
-#include "smithlab_utils.hpp"
+#include <cctype>
 #include <fstream>
+#include <stdexcept>
 
 using std::runtime_error;
 using std::string;

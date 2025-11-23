@@ -22,20 +22,18 @@
  */
 
 #include "OptionParser.hpp"
+#include "smithlab_utils.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cstdlib>
-#include <cstring>
-#include <exception>
 #include <fstream>
-#include <functional>
 #include <iomanip>
 #include <iterator>
 #include <regex>
 #include <sstream>
-
-#include "smithlab_utils.hpp"
+#include <stdexcept>
 
 using std::begin;
 using std::end;

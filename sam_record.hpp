@@ -19,8 +19,9 @@
 #ifndef SAM_RECORD_HPP
 #define SAM_RECORD_HPP
 
+#include <algorithm>
+#include <cstddef>
 #include <cstdint>
-#include <iostream>
 #include <iterator>
 #include <sstream>
 #include <string>

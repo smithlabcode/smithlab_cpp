@@ -16,22 +16,21 @@
  * General Public License for more details.
  */
 
-#include <algorithm>
-#include <cmath>
-#include <cstring>
-#include <exception>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <unordered_map>
-
-#include "QualityScore.hpp"
 #include "smithlab_os.hpp"
+#include "QualityScore.hpp"
 #include "smithlab_utils.hpp"
 
+#include <algorithm>
+#include <cassert>
+#include <cerrno>
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iterator>
+#include <stdexcept>
+#include <unordered_map>
+
 #include <dirent.h>
-#include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
 

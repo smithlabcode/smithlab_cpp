@@ -24,6 +24,8 @@
 #define MAPPED_READ_HPP
 
 #include "GenomicRegion.hpp"
+#include <cstdio>
+#include <string>
 
 struct MappedRead {
   MappedRead() {}

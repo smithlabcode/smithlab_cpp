@@ -23,18 +23,13 @@
 #ifndef CHROMOSOME_UTILS_HPP
 #define CHROMOSOME_UTILS_HPP
 
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <iostream>
-#include <iterator>
-#include <limits>
-#include <ostream>
-#include <sstream>
+#include <cstddef>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
-#include "GenomicRegion.hpp"
+class GenomicRegion;
+class SimpleGenomicRegion;
 
 void parse_region_name(std::string region_name, std::string &chrom,
                        size_t &start, size_t &end);

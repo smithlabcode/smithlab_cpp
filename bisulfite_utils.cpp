@@ -22,14 +22,12 @@
  */
 
 #include "bisulfite_utils.hpp"
+#include <cctype>
 #include <cstdlib>
-#include <iostream>
 #include <random>
 
-using std::string;
-
-void bisulfite_treatment(std::mt19937 &generator, string &seq, double bs_rate,
-                         double meth_rate) {
+void bisulfite_treatment(std::mt19937 &generator, std::string &seq,
+                         double bs_rate, double meth_rate) {
 
   std::uniform_real_distribution<double> unif(0.0, 1.0);
 

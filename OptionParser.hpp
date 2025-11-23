@@ -19,6 +19,7 @@
 #ifndef OPTION_PARSER_HPP
 #define OPTION_PARSER_HPP
 
+#include <cstddef>
 #include <limits>
 #include <string>
 #include <vector>

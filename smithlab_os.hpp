@@ -19,6 +19,7 @@
 #ifndef SMITHLAB_OS_HPP
 #define SMITHLAB_OS_HPP
 
+#include <cstddef>
 #include <string>
 #include <unordered_map>
 #include <vector>
