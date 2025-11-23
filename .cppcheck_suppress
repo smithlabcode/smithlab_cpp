@@ -1,0 +1,5 @@
+unmatchedSuppression
+checkersReport
+# Exclude all for now
+*:*.hpp
+*:*.cpp
