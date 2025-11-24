@@ -18,7 +18,6 @@
 #ifndef HTSLIB_WRAPPER_HPP
 #define HTSLIB_WRAPPER_HPP
 
-#include <htslib/hts.h>
 #include <htslib/sam.h>
 
 #include <cstddef>
