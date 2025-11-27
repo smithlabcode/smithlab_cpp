@@ -32,6 +32,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
 include(GNUInstallDirs)
 
+if (NOT PROJECT_IS_TOP_LEVEL)
+  set(STATIC_ANALYSIS OFF)
+endif()
+
 if(STATIC_ANALYSIS)
   include(cmake/static_analysis.cmake)
 endif()
