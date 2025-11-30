@@ -30,7 +30,6 @@ libsmithlab_cpp_a_SOURCES = \
 	GenomicRegion.cpp \
 	MappedRead.cpp \
 	OptionParser.cpp \
-	QualityScore.cpp \
 	chromosome_utils.cpp \
 	bisulfite_utils.cpp \
 	smithlab_os.cpp \
@@ -48,7 +47,6 @@ include_HEADERS = \
 	GenomicRegion.hpp \
 	MappedRead.hpp \
 	OptionParser.hpp \
-	QualityScore.hpp \
 	chromosome_utils.hpp \
 	bisulfite_utils.hpp \
 	smithlab_os.hpp \
