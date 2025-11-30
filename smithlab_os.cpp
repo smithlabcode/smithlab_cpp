@@ -17,22 +17,22 @@
  */
 
 #include "smithlab_os.hpp"
-#include "QualityScore.hpp"
 #include "smithlab_utils.hpp"
+
+#include <dirent.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <algorithm>
 #include <cassert>
 #include <cerrno>
+#include <cmath>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <stdexcept>
 #include <unordered_map>
-
-#include <dirent.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 using std::begin;
 using std::ios_base;
@@ -198,11 +198,41 @@ inline bool is_fastq_score_line(size_t line_count) {
   return ((line_count & 3ul) == 3ul);
 }
 
+static const double neg_ten_over_log_ten = -4.342944819032517501;
+
+//// CONVERT _TO_ ERROR PROBABILITIES
+inline double phred_to_error_probability(const double r) {
+  const double h = r / neg_ten_over_log_ten;
+  return std::exp(h);
+}
+inline double solexa_to_error_probability(const double r) {
+  const double s = r / neg_ten_over_log_ten;
+  return std::exp(s) / (1.0 + std::exp(s));
+}
+
+//// CONVERT _FROM_ QUALITY CHARACTERS (I.E. THE CHARACTERS IN FASTQ FILES)
+inline char quality_character_to_phred(const char c) { return char(c - 33); }
+inline char quality_character_to_solexa(const char c) { return char(c - 64); }
+
+//// CONVERT _TO_ QUALITY CHARACTERS (I.E. THE CHARACTERS IN FASTQ FILES)
+inline char phred_to_quality_character(const double h) {
+  return char(std::min(60.0, h) + 33);
+}
+inline char solexa_to_quality_character(const double s) {
+  return char(std::min(40.0, s) + 64);
+}
+
+//// CHECK FOR VALIDITY OF A FASTQ SCORE CHARACTER
+inline bool valid_phred_score(const char c) { return (c >= 33 && c <= 93); }
+inline bool valid_solexa_score(const char c) {
+  // return (c >= 64 && c <= 104);
+  return (c >= 59 && c <= 104); // to allow for old Solexa format
+}
+
 void read_fastq_file(const char *filename, vector<string> &names,
                      vector<string> &sequences,
                      vector<vector<double>> &scores) {
-
-  static const size_t INPUT_BUFFER_SIZE = 1000000;
+  static constexpr auto INPUT_BUFFER_SIZE = 1000000ul;
 
   std::ifstream in(filename);
   if (!in)
@@ -274,13 +304,15 @@ void read_fastq_file(const char *filename, vector<string> &names,
   bool phred_scores = true, solexa_scores = true;
   for (size_t i = 0; i < scrs.size() && phred_scores && solexa_scores; ++i) {
     phred_scores =
-        phred_scores && (find_if(begin(scrs[i]), end(scrs[i]), [](char c) {
-                           return !valid_phred_score(c);
-                         }) == end(scrs[i]));
+        phred_scores && (std::find_if(std::cbegin(scrs[i]), std::cend(scrs[i]),
+                                      [](const char c) {
+                                        return !valid_phred_score(c);
+                                      }) == std::cend(scrs[i]));
     solexa_scores =
-        solexa_scores && (find_if(begin(scrs[i]), end(scrs[i]), [](char c) {
-                            return !valid_solexa_score(c);
-                          }) == end(scrs[i]));
+        solexa_scores && (std::find_if(std::cbegin(scrs[i]), std::cend(scrs[i]),
+                                       [](const char c) {
+                                         return !valid_solexa_score(c);
+                                       }) == std::cend(scrs[i]));
   }
 
   if (!phred_scores && !solexa_scores)
