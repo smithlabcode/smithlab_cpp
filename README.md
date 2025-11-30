@@ -71,9 +71,6 @@ This code needs lots of changes. I'm listing them here for the present
 and hope to take care of each with separate issues on GitHub. The
 result should be less total code overall in smithlab_cpp.
 
-- `QualityScore.*pp` likely should be removed, as we only use
-  sequencing quality scores in specific places, and in those places
-  have chosen to re-implement anything that would be here.
 - `smithlab_os.*` Any use of character arrays should be replaced with
   strings for filenames. Implementation of many functions in the cpp
   file is sloppy.
