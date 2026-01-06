@@ -40,6 +40,8 @@ if(STATIC_ANALYSIS)
   include(cmake/static_analysis.cmake)
 endif()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
 add_compile_options(
   -Wall
   -Wextra
@@ -49,6 +51,8 @@ add_compile_options(
 )
 
 file(GLOB cpp_files "*.cpp")
+# exclude htslib_wrapper unless (below) USE_HTSLIB is set
+list(FILTER cpp_files EXCLUDE REGEX "htslib_wrapper.cpp")
 
 set(LIBRARY_OBJECTS "")
 foreach(cpp_file ${cpp_files})
@@ -56,6 +60,17 @@ foreach(cpp_file ${cpp_files})
   add_library(${BASE_NAME} OBJECT ${cpp_file})
   list(APPEND LIBRARY_OBJECTS ${BASE_NAME})
 endforeach()
+
+if(USE_HTSLIB)
+  find_package(HTSLIB REQUIRED)
+  find_package(Threads REQUIRED)
+  add_library(htslib_wrapper OBJECT htslib_wrapper.cpp)
+  list(APPEND LIBRARY_OBJECTS htslib_wrapper)
+  target_link_libraries(htslib_wrapper PUBLIC
+    HTSLIB::HTSLIB
+    Threads::Threads
+  )
+endif()
 
 add_library(smithlab_cpp)
 target_include_directories(smithlab_cpp PUBLIC
